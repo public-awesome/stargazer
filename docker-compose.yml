@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  db:
+    image: postgres:12.2
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: stakewatcher
+    volumes:
+      - ./db_data:/var/lib/postgresql/data
+  adminer:
+    image: adminer
+    ports:
+      - 9090:8080

@@ -1,0 +1,27 @@
+[psql]
+  dbname = "stakewatcher"
+  host   = "localhost"
+  port   = 5432
+  user   = "postgres"
+  pass   = "postgres"
+  schema = "public"
+  sslmode= "disable"
+  blacklist = ["migrations"]
+
+[[aliases.tables]]
+name = "pre_commits"
+  [[aliases.tables.relationships]]
+  name    = "pre_commits_validators_validator_address_fkey"
+  foreign = "Validator"
+
+[[aliases.tables]]
+name = "blocks"
+  [[aliases.tables.relationships]]
+  name    = "blocks_validators_proposer_address_fkey"
+  foreign = "Proposer"
+
+[[aliases.tables]]
+name = "transactions"
+  [[aliases.tables.relationships]]
+  name    = "transactions_blocks_height_fkey"
+  foreign = "Block"
