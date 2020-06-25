@@ -830,7 +830,7 @@ func testBlocksSelect(t *testing.T) {
 }
 
 var (
-	blockDBTypes = map[string]string{`Height`: `integer`, `Hash`: `text`, `NumTXS`: `integer`, `TotalGas`: `integer`, `ProposerAddress`: `text`, `PreCommits`: `integer`, `BlockTimestamp`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	blockDBTypes = map[string]string{`Height`: `integer`, `Hash`: `text`, `NumTXS`: `integer`, `TotalGas`: `integer`, `ProposerAddress`: `text`, `Signatures`: `integer`, `BlockTimestamp`: `timestamp without time zone`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
 	_            = bytes.MinRead
 )
 

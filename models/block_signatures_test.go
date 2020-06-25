@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testPreCommits(t *testing.T) {
+func testBlockSignatures(t *testing.T) {
 	t.Parallel()
 
-	query := PreCommits()
+	query := BlockSignatures()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testPreCommitsDelete(t *testing.T) {
+func testBlockSignaturesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testPreCommitsDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testPreCommitsDelete(t *testing.T) {
 	}
 }
 
-func testPreCommitsQueryDeleteAll(t *testing.T) {
+func testBlockSignaturesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testPreCommitsQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := PreCommits().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := BlockSignatures().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testPreCommitsQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testPreCommitsSliceDeleteAll(t *testing.T) {
+func testBlockSignaturesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testPreCommitsSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := PreCommitSlice{o}
+	slice := BlockSignatureSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testPreCommitsSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testPreCommitsSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testPreCommitsExists(t *testing.T) {
+func testBlockSignaturesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testPreCommitsExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := PreCommitExists(ctx, tx, o.ID)
+	e, err := BlockSignatureExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if PreCommit exists: %s", err)
+		t.Errorf("Unable to check if BlockSignature exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected PreCommitExists to return true, but got false.")
+		t.Errorf("Expected BlockSignatureExists to return true, but got false.")
 	}
 }
 
-func testPreCommitsFind(t *testing.T) {
+func testBlockSignaturesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testPreCommitsFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	preCommitFound, err := FindPreCommit(ctx, tx, o.ID)
+	blockSignatureFound, err := FindBlockSignature(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if preCommitFound == nil {
+	if blockSignatureFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testPreCommitsBind(t *testing.T) {
+func testBlockSignaturesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testPreCommitsBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = PreCommits().Bind(ctx, tx, o); err != nil {
+	if err = BlockSignatures().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testPreCommitsOne(t *testing.T) {
+func testBlockSignaturesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testPreCommitsOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := PreCommits().One(ctx, tx); err != nil {
+	if x, err := BlockSignatures().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testPreCommitsAll(t *testing.T) {
+func testBlockSignaturesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	preCommitOne := &PreCommit{}
-	preCommitTwo := &PreCommit{}
-	if err = randomize.Struct(seed, preCommitOne, preCommitDBTypes, false, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	blockSignatureOne := &BlockSignature{}
+	blockSignatureTwo := &BlockSignature{}
+	if err = randomize.Struct(seed, blockSignatureOne, blockSignatureDBTypes, false, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
-	if err = randomize.Struct(seed, preCommitTwo, preCommitDBTypes, false, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err = randomize.Struct(seed, blockSignatureTwo, blockSignatureDBTypes, false, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = preCommitOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = blockSignatureOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = preCommitTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = blockSignatureTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := PreCommits().All(ctx, tx)
+	slice, err := BlockSignatures().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testPreCommitsAll(t *testing.T) {
 	}
 }
 
-func testPreCommitsCount(t *testing.T) {
+func testBlockSignaturesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	preCommitOne := &PreCommit{}
-	preCommitTwo := &PreCommit{}
-	if err = randomize.Struct(seed, preCommitOne, preCommitDBTypes, false, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	blockSignatureOne := &BlockSignature{}
+	blockSignatureTwo := &BlockSignature{}
+	if err = randomize.Struct(seed, blockSignatureOne, blockSignatureDBTypes, false, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
-	if err = randomize.Struct(seed, preCommitTwo, preCommitDBTypes, false, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err = randomize.Struct(seed, blockSignatureTwo, blockSignatureDBTypes, false, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = preCommitOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = blockSignatureOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = preCommitTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = blockSignatureTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,155 +299,155 @@ func testPreCommitsCount(t *testing.T) {
 	}
 }
 
-func preCommitBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureBeforeInsertHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureAfterInsertHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureAfterSelectHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureBeforeUpdateHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureAfterUpdateHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureBeforeDeleteHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureAfterDeleteHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureBeforeUpsertHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func preCommitAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *PreCommit) error {
-	*o = PreCommit{}
+func blockSignatureAfterUpsertHook(ctx context.Context, e boil.ContextExecutor, o *BlockSignature) error {
+	*o = BlockSignature{}
 	return nil
 }
 
-func testPreCommitsHooks(t *testing.T) {
+func testBlockSignaturesHooks(t *testing.T) {
 	t.Parallel()
 
 	var err error
 
 	ctx := context.Background()
-	empty := &PreCommit{}
-	o := &PreCommit{}
+	empty := &BlockSignature{}
+	o := &BlockSignature{}
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, o, preCommitDBTypes, false); err != nil {
-		t.Errorf("Unable to randomize PreCommit object: %s", err)
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, false); err != nil {
+		t.Errorf("Unable to randomize BlockSignature object: %s", err)
 	}
 
-	AddPreCommitHook(boil.BeforeInsertHook, preCommitBeforeInsertHook)
+	AddBlockSignatureHook(boil.BeforeInsertHook, blockSignatureBeforeInsertHook)
 	if err = o.doBeforeInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeInsertHook function to empty object, but got: %#v", o)
 	}
-	preCommitBeforeInsertHooks = []PreCommitHook{}
+	blockSignatureBeforeInsertHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.AfterInsertHook, preCommitAfterInsertHook)
+	AddBlockSignatureHook(boil.AfterInsertHook, blockSignatureAfterInsertHook)
 	if err = o.doAfterInsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterInsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterInsertHook function to empty object, but got: %#v", o)
 	}
-	preCommitAfterInsertHooks = []PreCommitHook{}
+	blockSignatureAfterInsertHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.AfterSelectHook, preCommitAfterSelectHook)
+	AddBlockSignatureHook(boil.AfterSelectHook, blockSignatureAfterSelectHook)
 	if err = o.doAfterSelectHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterSelectHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterSelectHook function to empty object, but got: %#v", o)
 	}
-	preCommitAfterSelectHooks = []PreCommitHook{}
+	blockSignatureAfterSelectHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.BeforeUpdateHook, preCommitBeforeUpdateHook)
+	AddBlockSignatureHook(boil.BeforeUpdateHook, blockSignatureBeforeUpdateHook)
 	if err = o.doBeforeUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpdateHook function to empty object, but got: %#v", o)
 	}
-	preCommitBeforeUpdateHooks = []PreCommitHook{}
+	blockSignatureBeforeUpdateHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.AfterUpdateHook, preCommitAfterUpdateHook)
+	AddBlockSignatureHook(boil.AfterUpdateHook, blockSignatureAfterUpdateHook)
 	if err = o.doAfterUpdateHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpdateHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpdateHook function to empty object, but got: %#v", o)
 	}
-	preCommitAfterUpdateHooks = []PreCommitHook{}
+	blockSignatureAfterUpdateHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.BeforeDeleteHook, preCommitBeforeDeleteHook)
+	AddBlockSignatureHook(boil.BeforeDeleteHook, blockSignatureBeforeDeleteHook)
 	if err = o.doBeforeDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeDeleteHook function to empty object, but got: %#v", o)
 	}
-	preCommitBeforeDeleteHooks = []PreCommitHook{}
+	blockSignatureBeforeDeleteHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.AfterDeleteHook, preCommitAfterDeleteHook)
+	AddBlockSignatureHook(boil.AfterDeleteHook, blockSignatureAfterDeleteHook)
 	if err = o.doAfterDeleteHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterDeleteHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterDeleteHook function to empty object, but got: %#v", o)
 	}
-	preCommitAfterDeleteHooks = []PreCommitHook{}
+	blockSignatureAfterDeleteHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.BeforeUpsertHook, preCommitBeforeUpsertHook)
+	AddBlockSignatureHook(boil.BeforeUpsertHook, blockSignatureBeforeUpsertHook)
 	if err = o.doBeforeUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doBeforeUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected BeforeUpsertHook function to empty object, but got: %#v", o)
 	}
-	preCommitBeforeUpsertHooks = []PreCommitHook{}
+	blockSignatureBeforeUpsertHooks = []BlockSignatureHook{}
 
-	AddPreCommitHook(boil.AfterUpsertHook, preCommitAfterUpsertHook)
+	AddBlockSignatureHook(boil.AfterUpsertHook, blockSignatureAfterUpsertHook)
 	if err = o.doAfterUpsertHooks(ctx, nil); err != nil {
 		t.Errorf("Unable to execute doAfterUpsertHooks: %s", err)
 	}
 	if !reflect.DeepEqual(o, empty) {
 		t.Errorf("Expected AfterUpsertHook function to empty object, but got: %#v", o)
 	}
-	preCommitAfterUpsertHooks = []PreCommitHook{}
+	blockSignatureAfterUpsertHooks = []BlockSignatureHook{}
 }
 
-func testPreCommitsInsert(t *testing.T) {
+func testBlockSignaturesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -457,7 +457,7 @@ func testPreCommitsInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -467,24 +467,24 @@ func testPreCommitsInsert(t *testing.T) {
 	}
 }
 
-func testPreCommitsInsertWhitelist(t *testing.T) {
+func testBlockSignaturesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(preCommitColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(blockSignatureColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -494,17 +494,17 @@ func testPreCommitsInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testPreCommitToOneValidatorUsingValidator(t *testing.T) {
+func testBlockSignatureToOneValidatorUsingValidator(t *testing.T) {
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var local PreCommit
+	var local BlockSignature
 	var foreign Validator
 
 	seed := randomize.NewSeed()
-	if err := randomize.Struct(seed, &local, preCommitDBTypes, false, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err := randomize.Struct(seed, &local, blockSignatureDBTypes, false, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 	if err := randomize.Struct(seed, &foreign, validatorDBTypes, false, validatorColumnsWithDefault...); err != nil {
 		t.Errorf("Unable to randomize Validator struct: %s", err)
@@ -528,8 +528,8 @@ func testPreCommitToOneValidatorUsingValidator(t *testing.T) {
 		t.Errorf("want: %v, got %v", foreign.Address, check.Address)
 	}
 
-	slice := PreCommitSlice{&local}
-	if err = local.L.LoadValidator(ctx, tx, false, (*[]*PreCommit)(&slice), nil); err != nil {
+	slice := BlockSignatureSlice{&local}
+	if err = local.L.LoadValidator(ctx, tx, false, (*[]*BlockSignature)(&slice), nil); err != nil {
 		t.Fatal(err)
 	}
 	if local.R.Validator == nil {
@@ -545,18 +545,18 @@ func testPreCommitToOneValidatorUsingValidator(t *testing.T) {
 	}
 }
 
-func testPreCommitToOneSetOpValidatorUsingValidator(t *testing.T) {
+func testBlockSignatureToOneSetOpValidatorUsingValidator(t *testing.T) {
 	var err error
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 
-	var a PreCommit
+	var a BlockSignature
 	var b, c Validator
 
 	seed := randomize.NewSeed()
-	if err = randomize.Struct(seed, &a, preCommitDBTypes, false, strmangle.SetComplement(preCommitPrimaryKeyColumns, preCommitColumnsWithoutDefault)...); err != nil {
+	if err = randomize.Struct(seed, &a, blockSignatureDBTypes, false, strmangle.SetComplement(blockSignaturePrimaryKeyColumns, blockSignatureColumnsWithoutDefault)...); err != nil {
 		t.Fatal(err)
 	}
 	if err = randomize.Struct(seed, &b, validatorDBTypes, false, strmangle.SetComplement(validatorPrimaryKeyColumns, validatorColumnsWithoutDefault)...); err != nil {
@@ -583,7 +583,7 @@ func testPreCommitToOneSetOpValidatorUsingValidator(t *testing.T) {
 			t.Error("relationship struct not set to correct value")
 		}
 
-		if x.R.ValidatorAddressPreCommits[0] != &a {
+		if x.R.ValidatorAddressBlockSignatures[0] != &a {
 			t.Error("failed to append to foreign relationship struct")
 		}
 		if a.ValidatorAddress != x.Address {
@@ -603,14 +603,14 @@ func testPreCommitToOneSetOpValidatorUsingValidator(t *testing.T) {
 	}
 }
 
-func testPreCommitsReload(t *testing.T) {
+func testBlockSignaturesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -625,14 +625,14 @@ func testPreCommitsReload(t *testing.T) {
 	}
 }
 
-func testPreCommitsReloadAll(t *testing.T) {
+func testBlockSignaturesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -642,21 +642,21 @@ func testPreCommitsReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := PreCommitSlice{o}
+	slice := BlockSignatureSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testPreCommitsSelect(t *testing.T) {
+func testBlockSignaturesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -666,7 +666,7 @@ func testPreCommitsSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := PreCommits().All(ctx, tx)
+	slice, err := BlockSignatures().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -677,25 +677,25 @@ func testPreCommitsSelect(t *testing.T) {
 }
 
 var (
-	preCommitDBTypes = map[string]string{`ID`: `integer`, `Height`: `integer`, `Round`: `integer`, `ValidatorAddress`: `text`, `PreCommitTimestamp`: `timestamp without time zone`, `VotingPower`: `integer`, `ProposerPriority`: `integer`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
-	_                = bytes.MinRead
+	blockSignatureDBTypes = map[string]string{`ID`: `integer`, `Height`: `integer`, `Round`: `integer`, `ValidatorAddress`: `text`, `Flag`: `integer`, `Timestamp`: `timestamp without time zone`, `Hash`: `text`, `VotingPower`: `integer`, `ProposerPriority`: `integer`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	_                     = bytes.MinRead
 )
 
-func testPreCommitsUpdate(t *testing.T) {
+func testBlockSignaturesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(preCommitPrimaryKeyColumns) {
+	if 0 == len(blockSignaturePrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(preCommitAllColumns) == len(preCommitPrimaryKeyColumns) {
+	if len(blockSignatureAllColumns) == len(blockSignaturePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -705,7 +705,7 @@ func testPreCommitsUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -714,8 +714,8 @@ func testPreCommitsUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignaturePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -725,18 +725,18 @@ func testPreCommitsUpdate(t *testing.T) {
 	}
 }
 
-func testPreCommitsSliceUpdateAll(t *testing.T) {
+func testBlockSignaturesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(preCommitAllColumns) == len(preCommitPrimaryKeyColumns) {
+	if len(blockSignatureAllColumns) == len(blockSignaturePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &PreCommit{}
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := &BlockSignature{}
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignatureColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -746,7 +746,7 @@ func testPreCommitsSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -755,18 +755,18 @@ func testPreCommitsSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, preCommitDBTypes, true, preCommitPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err = randomize.Struct(seed, o, blockSignatureDBTypes, true, blockSignaturePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(preCommitAllColumns, preCommitPrimaryKeyColumns) {
-		fields = preCommitAllColumns
+	if strmangle.StringSliceMatch(blockSignatureAllColumns, blockSignaturePrimaryKeyColumns) {
+		fields = blockSignatureAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			preCommitAllColumns,
-			preCommitPrimaryKeyColumns,
+			blockSignatureAllColumns,
+			blockSignaturePrimaryKeyColumns,
 		)
 	}
 
@@ -784,7 +784,7 @@ func testPreCommitsSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := PreCommitSlice{o}
+	slice := BlockSignatureSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -792,29 +792,29 @@ func testPreCommitsSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testPreCommitsUpsert(t *testing.T) {
+func testBlockSignaturesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(preCommitAllColumns) == len(preCommitPrimaryKeyColumns) {
+	if len(blockSignatureAllColumns) == len(blockSignaturePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := PreCommit{}
-	if err = randomize.Struct(seed, &o, preCommitDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	o := BlockSignature{}
+	if err = randomize.Struct(seed, &o, blockSignatureDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert PreCommit: %s", err)
+		t.Errorf("Unable to upsert BlockSignature: %s", err)
 	}
 
-	count, err := PreCommits().Count(ctx, tx)
+	count, err := BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -823,15 +823,15 @@ func testPreCommitsUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, preCommitDBTypes, false, preCommitPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize PreCommit struct: %s", err)
+	if err = randomize.Struct(seed, &o, blockSignatureDBTypes, false, blockSignaturePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize BlockSignature struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert PreCommit: %s", err)
+		t.Errorf("Unable to upsert BlockSignature: %s", err)
 	}
 
-	count, err = PreCommits().Count(ctx, tx)
+	count, err = BlockSignatures().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

@@ -9,9 +9,9 @@
   blacklist = ["migrations"]
 
 [[aliases.tables]]
-name = "pre_commits"
+name = "block_signatures"
   [[aliases.tables.relationships]]
-  name    = "pre_commits_validators_validator_address_fkey"
+  name    = "block_signatures_validators_validator_address_fkey"
   foreign = "Validator"
 
 [[aliases.tables]]

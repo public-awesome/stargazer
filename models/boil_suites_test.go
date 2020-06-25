@@ -12,113 +12,113 @@ import "testing"
 // It does NOT run each operation group in parallel.
 // Separating the tests thusly grants avoidance of Postgres deadlocks.
 func TestParent(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignatures)
 	t.Run("Blocks", testBlocks)
 	t.Run("Delegations", testDelegations)
 	t.Run("Posts", testPosts)
-	t.Run("PreCommits", testPreCommits)
 	t.Run("Transactions", testTransactions)
 	t.Run("Validators", testValidators)
 }
 
 func TestDelete(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesDelete)
 	t.Run("Blocks", testBlocksDelete)
 	t.Run("Delegations", testDelegationsDelete)
 	t.Run("Posts", testPostsDelete)
-	t.Run("PreCommits", testPreCommitsDelete)
 	t.Run("Transactions", testTransactionsDelete)
 	t.Run("Validators", testValidatorsDelete)
 }
 
 func TestQueryDeleteAll(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesQueryDeleteAll)
 	t.Run("Blocks", testBlocksQueryDeleteAll)
 	t.Run("Delegations", testDelegationsQueryDeleteAll)
 	t.Run("Posts", testPostsQueryDeleteAll)
-	t.Run("PreCommits", testPreCommitsQueryDeleteAll)
 	t.Run("Transactions", testTransactionsQueryDeleteAll)
 	t.Run("Validators", testValidatorsQueryDeleteAll)
 }
 
 func TestSliceDeleteAll(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesSliceDeleteAll)
 	t.Run("Blocks", testBlocksSliceDeleteAll)
 	t.Run("Delegations", testDelegationsSliceDeleteAll)
 	t.Run("Posts", testPostsSliceDeleteAll)
-	t.Run("PreCommits", testPreCommitsSliceDeleteAll)
 	t.Run("Transactions", testTransactionsSliceDeleteAll)
 	t.Run("Validators", testValidatorsSliceDeleteAll)
 }
 
 func TestExists(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesExists)
 	t.Run("Blocks", testBlocksExists)
 	t.Run("Delegations", testDelegationsExists)
 	t.Run("Posts", testPostsExists)
-	t.Run("PreCommits", testPreCommitsExists)
 	t.Run("Transactions", testTransactionsExists)
 	t.Run("Validators", testValidatorsExists)
 }
 
 func TestFind(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesFind)
 	t.Run("Blocks", testBlocksFind)
 	t.Run("Delegations", testDelegationsFind)
 	t.Run("Posts", testPostsFind)
-	t.Run("PreCommits", testPreCommitsFind)
 	t.Run("Transactions", testTransactionsFind)
 	t.Run("Validators", testValidatorsFind)
 }
 
 func TestBind(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesBind)
 	t.Run("Blocks", testBlocksBind)
 	t.Run("Delegations", testDelegationsBind)
 	t.Run("Posts", testPostsBind)
-	t.Run("PreCommits", testPreCommitsBind)
 	t.Run("Transactions", testTransactionsBind)
 	t.Run("Validators", testValidatorsBind)
 }
 
 func TestOne(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesOne)
 	t.Run("Blocks", testBlocksOne)
 	t.Run("Delegations", testDelegationsOne)
 	t.Run("Posts", testPostsOne)
-	t.Run("PreCommits", testPreCommitsOne)
 	t.Run("Transactions", testTransactionsOne)
 	t.Run("Validators", testValidatorsOne)
 }
 
 func TestAll(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesAll)
 	t.Run("Blocks", testBlocksAll)
 	t.Run("Delegations", testDelegationsAll)
 	t.Run("Posts", testPostsAll)
-	t.Run("PreCommits", testPreCommitsAll)
 	t.Run("Transactions", testTransactionsAll)
 	t.Run("Validators", testValidatorsAll)
 }
 
 func TestCount(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesCount)
 	t.Run("Blocks", testBlocksCount)
 	t.Run("Delegations", testDelegationsCount)
 	t.Run("Posts", testPostsCount)
-	t.Run("PreCommits", testPreCommitsCount)
 	t.Run("Transactions", testTransactionsCount)
 	t.Run("Validators", testValidatorsCount)
 }
 
 func TestHooks(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesHooks)
 	t.Run("Blocks", testBlocksHooks)
 	t.Run("Delegations", testDelegationsHooks)
 	t.Run("Posts", testPostsHooks)
-	t.Run("PreCommits", testPreCommitsHooks)
 	t.Run("Transactions", testTransactionsHooks)
 	t.Run("Validators", testValidatorsHooks)
 }
 
 func TestInsert(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesInsert)
+	t.Run("BlockSignatures", testBlockSignaturesInsertWhitelist)
 	t.Run("Blocks", testBlocksInsert)
 	t.Run("Blocks", testBlocksInsertWhitelist)
 	t.Run("Delegations", testDelegationsInsert)
 	t.Run("Delegations", testDelegationsInsertWhitelist)
 	t.Run("Posts", testPostsInsert)
 	t.Run("Posts", testPostsInsertWhitelist)
-	t.Run("PreCommits", testPreCommitsInsert)
-	t.Run("PreCommits", testPreCommitsInsertWhitelist)
 	t.Run("Transactions", testTransactionsInsert)
 	t.Run("Transactions", testTransactionsInsertWhitelist)
 	t.Run("Validators", testValidatorsInsert)
@@ -128,8 +128,8 @@ func TestInsert(t *testing.T) {
 // TestToOne tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOne(t *testing.T) {
+	t.Run("BlockSignatureToValidatorUsingValidator", testBlockSignatureToOneValidatorUsingValidator)
 	t.Run("BlockToValidatorUsingProposer", testBlockToOneValidatorUsingProposer)
-	t.Run("PreCommitToValidatorUsingValidator", testPreCommitToOneValidatorUsingValidator)
 	t.Run("TransactionToBlockUsingBlock", testTransactionToOneBlockUsingBlock)
 }
 
@@ -141,15 +141,15 @@ func TestOneToOne(t *testing.T) {}
 // or deadlocks can occur.
 func TestToMany(t *testing.T) {
 	t.Run("BlockToHeightTransactions", testBlockToManyHeightTransactions)
+	t.Run("ValidatorToValidatorAddressBlockSignatures", testValidatorToManyValidatorAddressBlockSignatures)
 	t.Run("ValidatorToProposerAddressBlocks", testValidatorToManyProposerAddressBlocks)
-	t.Run("ValidatorToValidatorAddressPreCommits", testValidatorToManyValidatorAddressPreCommits)
 }
 
 // TestToOneSet tests cannot be run in parallel
 // or deadlocks can occur.
 func TestToOneSet(t *testing.T) {
+	t.Run("BlockSignatureToValidatorUsingValidatorAddressBlockSignatures", testBlockSignatureToOneSetOpValidatorUsingValidator)
 	t.Run("BlockToValidatorUsingProposerAddressBlocks", testBlockToOneSetOpValidatorUsingProposer)
-	t.Run("PreCommitToValidatorUsingValidatorAddressPreCommits", testPreCommitToOneSetOpValidatorUsingValidator)
 	t.Run("TransactionToBlockUsingHeightTransactions", testTransactionToOneSetOpBlockUsingBlock)
 }
 
@@ -169,8 +169,8 @@ func TestOneToOneRemove(t *testing.T) {}
 // or deadlocks can occur.
 func TestToManyAdd(t *testing.T) {
 	t.Run("BlockToHeightTransactions", testBlockToManyAddOpHeightTransactions)
+	t.Run("ValidatorToValidatorAddressBlockSignatures", testValidatorToManyAddOpValidatorAddressBlockSignatures)
 	t.Run("ValidatorToProposerAddressBlocks", testValidatorToManyAddOpProposerAddressBlocks)
-	t.Run("ValidatorToValidatorAddressPreCommits", testValidatorToManyAddOpValidatorAddressPreCommits)
 }
 
 // TestToManySet tests cannot be run in parallel
@@ -182,46 +182,46 @@ func TestToManySet(t *testing.T) {}
 func TestToManyRemove(t *testing.T) {}
 
 func TestReload(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesReload)
 	t.Run("Blocks", testBlocksReload)
 	t.Run("Delegations", testDelegationsReload)
 	t.Run("Posts", testPostsReload)
-	t.Run("PreCommits", testPreCommitsReload)
 	t.Run("Transactions", testTransactionsReload)
 	t.Run("Validators", testValidatorsReload)
 }
 
 func TestReloadAll(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesReloadAll)
 	t.Run("Blocks", testBlocksReloadAll)
 	t.Run("Delegations", testDelegationsReloadAll)
 	t.Run("Posts", testPostsReloadAll)
-	t.Run("PreCommits", testPreCommitsReloadAll)
 	t.Run("Transactions", testTransactionsReloadAll)
 	t.Run("Validators", testValidatorsReloadAll)
 }
 
 func TestSelect(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesSelect)
 	t.Run("Blocks", testBlocksSelect)
 	t.Run("Delegations", testDelegationsSelect)
 	t.Run("Posts", testPostsSelect)
-	t.Run("PreCommits", testPreCommitsSelect)
 	t.Run("Transactions", testTransactionsSelect)
 	t.Run("Validators", testValidatorsSelect)
 }
 
 func TestUpdate(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesUpdate)
 	t.Run("Blocks", testBlocksUpdate)
 	t.Run("Delegations", testDelegationsUpdate)
 	t.Run("Posts", testPostsUpdate)
-	t.Run("PreCommits", testPreCommitsUpdate)
 	t.Run("Transactions", testTransactionsUpdate)
 	t.Run("Validators", testValidatorsUpdate)
 }
 
 func TestSliceUpdateAll(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesSliceUpdateAll)
 	t.Run("Blocks", testBlocksSliceUpdateAll)
 	t.Run("Delegations", testDelegationsSliceUpdateAll)
 	t.Run("Posts", testPostsSliceUpdateAll)
-	t.Run("PreCommits", testPreCommitsSliceUpdateAll)
 	t.Run("Transactions", testTransactionsSliceUpdateAll)
 	t.Run("Validators", testValidatorsSliceUpdateAll)
 }

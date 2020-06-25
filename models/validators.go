@@ -66,17 +66,17 @@ var ValidatorWhere = struct {
 
 // ValidatorRels is where relationship names are stored.
 var ValidatorRels = struct {
-	ProposerAddressBlocks      string
-	ValidatorAddressPreCommits string
+	ValidatorAddressBlockSignatures string
+	ProposerAddressBlocks           string
 }{
-	ProposerAddressBlocks:      "ProposerAddressBlocks",
-	ValidatorAddressPreCommits: "ValidatorAddressPreCommits",
+	ValidatorAddressBlockSignatures: "ValidatorAddressBlockSignatures",
+	ProposerAddressBlocks:           "ProposerAddressBlocks",
 }
 
 // validatorR is where relationships are stored.
 type validatorR struct {
-	ProposerAddressBlocks      BlockSlice     `boil:"ProposerAddressBlocks" json:"ProposerAddressBlocks" toml:"ProposerAddressBlocks" yaml:"ProposerAddressBlocks"`
-	ValidatorAddressPreCommits PreCommitSlice `boil:"ValidatorAddressPreCommits" json:"ValidatorAddressPreCommits" toml:"ValidatorAddressPreCommits" yaml:"ValidatorAddressPreCommits"`
+	ValidatorAddressBlockSignatures BlockSignatureSlice `boil:"ValidatorAddressBlockSignatures" json:"ValidatorAddressBlockSignatures" toml:"ValidatorAddressBlockSignatures" yaml:"ValidatorAddressBlockSignatures"`
+	ProposerAddressBlocks           BlockSlice          `boil:"ProposerAddressBlocks" json:"ProposerAddressBlocks" toml:"ProposerAddressBlocks" yaml:"ProposerAddressBlocks"`
 }
 
 // NewStruct creates a new relationship struct
@@ -369,6 +369,27 @@ func (q validatorQuery) Exists(ctx context.Context, exec boil.ContextExecutor) (
 	return count > 0, nil
 }
 
+// ValidatorAddressBlockSignatures retrieves all the block_signature's BlockSignatures with an executor via validator_address column.
+func (o *Validator) ValidatorAddressBlockSignatures(mods ...qm.QueryMod) blockSignatureQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"block_signatures\".\"validator_address\"=?", o.Address),
+	)
+
+	query := BlockSignatures(queryMods...)
+	queries.SetFrom(query.Query, "\"block_signatures\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"block_signatures\".*"})
+	}
+
+	return query
+}
+
 // ProposerAddressBlocks retrieves all the block's Blocks with an executor via proposer_address column.
 func (o *Validator) ProposerAddressBlocks(mods ...qm.QueryMod) blockQuery {
 	var queryMods []qm.QueryMod
@@ -390,25 +411,102 @@ func (o *Validator) ProposerAddressBlocks(mods ...qm.QueryMod) blockQuery {
 	return query
 }
 
-// ValidatorAddressPreCommits retrieves all the pre_commit's PreCommits with an executor via validator_address column.
-func (o *Validator) ValidatorAddressPreCommits(mods ...qm.QueryMod) preCommitQuery {
-	var queryMods []qm.QueryMod
-	if len(mods) != 0 {
-		queryMods = append(queryMods, mods...)
+// LoadValidatorAddressBlockSignatures allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (validatorL) LoadValidatorAddressBlockSignatures(ctx context.Context, e boil.ContextExecutor, singular bool, maybeValidator interface{}, mods queries.Applicator) error {
+	var slice []*Validator
+	var object *Validator
+
+	if singular {
+		object = maybeValidator.(*Validator)
+	} else {
+		slice = *maybeValidator.(*[]*Validator)
 	}
 
-	queryMods = append(queryMods,
-		qm.Where("\"pre_commits\".\"validator_address\"=?", o.Address),
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &validatorR{}
+		}
+		args = append(args, object.Address)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &validatorR{}
+			}
+
+			for _, a := range args {
+				if a == obj.Address {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.Address)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`block_signatures`),
+		qm.WhereIn(`block_signatures.validator_address in ?`, args...),
 	)
-
-	query := PreCommits(queryMods...)
-	queries.SetFrom(query.Query, "\"pre_commits\"")
-
-	if len(queries.GetSelect(query.Query)) == 0 {
-		queries.SetSelect(query.Query, []string{"\"pre_commits\".*"})
+	if mods != nil {
+		mods.Apply(query)
 	}
 
-	return query
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load block_signatures")
+	}
+
+	var resultSlice []*BlockSignature
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice block_signatures")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on block_signatures")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for block_signatures")
+	}
+
+	if len(blockSignatureAfterSelectHooks) != 0 {
+		for _, obj := range resultSlice {
+			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
+				return err
+			}
+		}
+	}
+	if singular {
+		object.R.ValidatorAddressBlockSignatures = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &blockSignatureR{}
+			}
+			foreign.R.Validator = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.Address == foreign.ValidatorAddress {
+				local.R.ValidatorAddressBlockSignatures = append(local.R.ValidatorAddressBlockSignatures, foreign)
+				if foreign.R == nil {
+					foreign.R = &blockSignatureR{}
+				}
+				foreign.R.Validator = local
+				break
+			}
+		}
+	}
+
+	return nil
 }
 
 // LoadProposerAddressBlocks allows an eager lookup of values, cached into the
@@ -509,101 +607,56 @@ func (validatorL) LoadProposerAddressBlocks(ctx context.Context, e boil.ContextE
 	return nil
 }
 
-// LoadValidatorAddressPreCommits allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for a 1-M or N-M relationship.
-func (validatorL) LoadValidatorAddressPreCommits(ctx context.Context, e boil.ContextExecutor, singular bool, maybeValidator interface{}, mods queries.Applicator) error {
-	var slice []*Validator
-	var object *Validator
+// AddValidatorAddressBlockSignatures adds the given related objects to the existing relationships
+// of the validator, optionally inserting them as new records.
+// Appends related to o.R.ValidatorAddressBlockSignatures.
+// Sets related.R.Validator appropriately.
+func (o *Validator) AddValidatorAddressBlockSignatures(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*BlockSignature) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.ValidatorAddress = o.Address
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"block_signatures\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"validator_address"}),
+				strmangle.WhereClause("\"", "\"", 2, blockSignaturePrimaryKeyColumns),
+			)
+			values := []interface{}{o.Address, rel.ID}
 
-	if singular {
-		object = maybeValidator.(*Validator)
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.ValidatorAddress = o.Address
+		}
+	}
+
+	if o.R == nil {
+		o.R = &validatorR{
+			ValidatorAddressBlockSignatures: related,
+		}
 	} else {
-		slice = *maybeValidator.(*[]*Validator)
+		o.R.ValidatorAddressBlockSignatures = append(o.R.ValidatorAddressBlockSignatures, related...)
 	}
 
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &validatorR{}
-		}
-		args = append(args, object.Address)
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &validatorR{}
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &blockSignatureR{
+				Validator: o,
 			}
-
-			for _, a := range args {
-				if a == obj.Address {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.Address)
+		} else {
+			rel.R.Validator = o
 		}
 	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.From(`pre_commits`),
-		qm.WhereIn(`pre_commits.validator_address in ?`, args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load pre_commits")
-	}
-
-	var resultSlice []*PreCommit
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice pre_commits")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results in eager load on pre_commits")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for pre_commits")
-	}
-
-	if len(preCommitAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-	if singular {
-		object.R.ValidatorAddressPreCommits = resultSlice
-		for _, foreign := range resultSlice {
-			if foreign.R == nil {
-				foreign.R = &preCommitR{}
-			}
-			foreign.R.Validator = object
-		}
-		return nil
-	}
-
-	for _, foreign := range resultSlice {
-		for _, local := range slice {
-			if local.Address == foreign.ValidatorAddress {
-				local.R.ValidatorAddressPreCommits = append(local.R.ValidatorAddressPreCommits, foreign)
-				if foreign.R == nil {
-					foreign.R = &preCommitR{}
-				}
-				foreign.R.Validator = local
-				break
-			}
-		}
-	}
-
 	return nil
 }
 
@@ -655,59 +708,6 @@ func (o *Validator) AddProposerAddressBlocks(ctx context.Context, exec boil.Cont
 			}
 		} else {
 			rel.R.Proposer = o
-		}
-	}
-	return nil
-}
-
-// AddValidatorAddressPreCommits adds the given related objects to the existing relationships
-// of the validator, optionally inserting them as new records.
-// Appends related to o.R.ValidatorAddressPreCommits.
-// Sets related.R.Validator appropriately.
-func (o *Validator) AddValidatorAddressPreCommits(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*PreCommit) error {
-	var err error
-	for _, rel := range related {
-		if insert {
-			rel.ValidatorAddress = o.Address
-			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
-				return errors.Wrap(err, "failed to insert into foreign table")
-			}
-		} else {
-			updateQuery := fmt.Sprintf(
-				"UPDATE \"pre_commits\" SET %s WHERE %s",
-				strmangle.SetParamNames("\"", "\"", 1, []string{"validator_address"}),
-				strmangle.WhereClause("\"", "\"", 2, preCommitPrimaryKeyColumns),
-			)
-			values := []interface{}{o.Address, rel.ID}
-
-			if boil.IsDebug(ctx) {
-				writer := boil.DebugWriterFrom(ctx)
-				fmt.Fprintln(writer, updateQuery)
-				fmt.Fprintln(writer, values)
-			}
-			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-				return errors.Wrap(err, "failed to update foreign table")
-			}
-
-			rel.ValidatorAddress = o.Address
-		}
-	}
-
-	if o.R == nil {
-		o.R = &validatorR{
-			ValidatorAddressPreCommits: related,
-		}
-	} else {
-		o.R.ValidatorAddressPreCommits = append(o.R.ValidatorAddressPreCommits, related...)
-	}
-
-	for _, rel := range related {
-		if rel.R == nil {
-			rel.R = &preCommitR{
-				Validator: o,
-			}
-		} else {
-			rel.R.Validator = o
 		}
 	}
 	return nil

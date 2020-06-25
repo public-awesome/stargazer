@@ -6,13 +6,13 @@ package models
 import "testing"
 
 func TestUpsert(t *testing.T) {
+	t.Run("BlockSignatures", testBlockSignaturesUpsert)
+
 	t.Run("Blocks", testBlocksUpsert)
 
 	t.Run("Delegations", testDelegationsUpsert)
 
 	t.Run("Posts", testPostsUpsert)
-
-	t.Run("PreCommits", testPreCommitsUpsert)
 
 	t.Run("Transactions", testTransactionsUpsert)
 

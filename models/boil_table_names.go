@@ -4,17 +4,17 @@
 package models
 
 var TableNames = struct {
-	Blocks       string
-	Delegations  string
-	Posts        string
-	PreCommits   string
-	Transactions string
-	Validators   string
+	BlockSignatures string
+	Blocks          string
+	Delegations     string
+	Posts           string
+	Transactions    string
+	Validators      string
 }{
-	Blocks:       "blocks",
-	Delegations:  "delegations",
-	Posts:        "posts",
-	PreCommits:   "pre_commits",
-	Transactions: "transactions",
-	Validators:   "validators",
+	BlockSignatures: "block_signatures",
+	Blocks:          "blocks",
+	Delegations:     "delegations",
+	Posts:           "posts",
+	Transactions:    "transactions",
+	Validators:      "validators",
 }

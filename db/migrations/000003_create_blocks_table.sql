@@ -7,7 +7,7 @@ CREATE TABLE blocks
   num_txs INTEGER NOT NULL DEFAULT 0,
   total_gas INTEGER  NOT NULL DEFAULT 0,
   proposer_address TEXT NOT NULL,
-  pre_commits INTEGER NOT NULL,
+  signatures INTEGER NOT NULL,
   block_timestamp TIMESTAMP NOT NULL,
   created_at TIMESTAMP NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
