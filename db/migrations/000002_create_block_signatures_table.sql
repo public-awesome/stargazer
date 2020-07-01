@@ -3,7 +3,7 @@
 CREATE TABLE block_signatures
 (
   id SERIAL PRIMARY KEY,
-  height INTEGER NOT NULL,
+  height BIGINT NOT NULL,
   round INTEGER NOT NULL,
   validator_address TEXT NOT NULL,
   flag INT NOT NULL DEFAULT 0,

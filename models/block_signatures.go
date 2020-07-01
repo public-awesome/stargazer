@@ -25,7 +25,7 @@ import (
 // BlockSignature is an object representing the database table.
 type BlockSignature struct {
 	ID               int       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Height           int       `boil:"height" json:"height" toml:"height" yaml:"height"`
+	Height           int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
 	Round            int       `boil:"round" json:"round" toml:"round" yaml:"round"`
 	ValidatorAddress string    `boil:"validator_address" json:"validatorAddress" toml:"validatorAddress" yaml:"validatorAddress"`
 	Flag             int       `boil:"flag" json:"flag" toml:"flag" yaml:"flag"`
@@ -87,6 +87,29 @@ func (w whereHelperint) IN(slice []int) qm.QueryMod {
 	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
 }
 func (w whereHelperint) NIN(slice []int) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s NOT IN ?", w.field), values...)
+}
+
+type whereHelperint64 struct{ field string }
+
+func (w whereHelperint64) EQ(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperint64) NEQ(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperint64) LT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperint64) LTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperint64) GT(x int64) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperint64) GTE(x int64) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
+func (w whereHelperint64) IN(slice []int64) qm.QueryMod {
+	values := make([]interface{}, 0, len(slice))
+	for _, value := range slice {
+		values = append(values, value)
+	}
+	return qm.WhereIn(fmt.Sprintf("%s IN ?", w.field), values...)
+}
+func (w whereHelperint64) NIN(slice []int64) qm.QueryMod {
 	values := make([]interface{}, 0, len(slice))
 	for _, value := range slice {
 		values = append(values, value)
@@ -163,7 +186,7 @@ func (w whereHelpernull_Time) GTE(x null.Time) qm.QueryMod {
 
 var BlockSignatureWhere = struct {
 	ID               whereHelperint
-	Height           whereHelperint
+	Height           whereHelperint64
 	Round            whereHelperint
 	ValidatorAddress whereHelperstring
 	Flag             whereHelperint
@@ -176,7 +199,7 @@ var BlockSignatureWhere = struct {
 	DeletedAt        whereHelpernull_Time
 }{
 	ID:               whereHelperint{field: "\"block_signatures\".\"id\""},
-	Height:           whereHelperint{field: "\"block_signatures\".\"height\""},
+	Height:           whereHelperint64{field: "\"block_signatures\".\"height\""},
 	Round:            whereHelperint{field: "\"block_signatures\".\"round\""},
 	ValidatorAddress: whereHelperstring{field: "\"block_signatures\".\"validator_address\""},
 	Flag:             whereHelperint{field: "\"block_signatures\".\"flag\""},

@@ -3,10 +3,9 @@
 CREATE TABLE transactions
 (
   hash TEXT NOT NULL PRIMARY KEY,
-  timestamp TIMESTAMP NOT NULL,
   gas_wanted INTEGER NOT NULL DEFAULT 0,
   gas_used INTEGER NOT NULL DEFAULT 0,
-  height INTEGER NOT NULL,
+  height BIGINT NOT NULL,
   events jsonb NOT NULL DEFAULT '[]'::jsonb,
   messages jsonb NOT NULL DEFAULT '[]'::jsonb,
   fee jsonb NOT NULL DEFAULT '{}'::jsonb,

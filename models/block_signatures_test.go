@@ -677,7 +677,7 @@ func testBlockSignaturesSelect(t *testing.T) {
 }
 
 var (
-	blockSignatureDBTypes = map[string]string{`ID`: `integer`, `Height`: `integer`, `Round`: `integer`, `ValidatorAddress`: `text`, `Flag`: `integer`, `Timestamp`: `timestamp without time zone`, `Hash`: `text`, `VotingPower`: `integer`, `ProposerPriority`: `integer`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	blockSignatureDBTypes = map[string]string{`ID`: `integer`, `Height`: `bigint`, `Round`: `integer`, `ValidatorAddress`: `text`, `Flag`: `integer`, `Timestamp`: `timestamp without time zone`, `Hash`: `text`, `VotingPower`: `integer`, `ProposerPriority`: `integer`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
 	_                     = bytes.MinRead
 )
 

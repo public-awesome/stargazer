@@ -458,6 +458,8 @@ github.com/prometheus/procfs v0.0.3/go.mod h1:4A/X28fw3Fc593LaREMrKMqOKvUAntwMDa
 github.com/prometheus/procfs v0.0.8 h1:+fpWZdT24pJBiqJdAwYBjPSk+5YmQzYNPYzQsdzLkt8=
 github.com/prometheus/procfs v0.0.8/go.mod h1:7Qr8sr6344vo1JqZ6HhLceV9o3AJ1Ff+GxbHq6oeK9A=
 github.com/prometheus/tsdb v0.7.1/go.mod h1:qhTCs0VvXwvX/y3TZrWD7rabWM+ijKTux40TwIPHuXU=
+github.com/public-awesome/stakebird v0.0.0-20200622161232-9b1e2ba24beb h1:Bf7nWOVYmK6SD7DHuEJ0E734m1y9U2UtiI4Bc+wt6MY=
+github.com/public-awesome/stakebird v0.0.0-20200622161232-9b1e2ba24beb/go.mod h1:yoRTKKzCLPAnSLH1jhzmjRY3QDsiFDYab+igBHcQnIk=
 github.com/rakyll/statik v0.1.5/go.mod h1:OEi9wJV/fMUAGx1eNjq75DKDsJVuEv1U0oYdX6GX8Zs=
 github.com/rakyll/statik v0.1.6/go.mod h1:OEi9wJV/fMUAGx1eNjq75DKDsJVuEv1U0oYdX6GX8Zs=
 github.com/rakyll/statik v0.1.7 h1:OF3QCZUuyPxuGEP7B4ypUa7sB/iHtqOTDYZXGM8KOdQ=

@@ -10,11 +10,11 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("Blocks", testBlocksUpsert)
 
-	t.Run("Delegations", testDelegationsUpsert)
-
 	t.Run("Posts", testPostsUpsert)
 
 	t.Run("Transactions", testTransactionsUpsert)
+
+	t.Run("Upvotes", testUpvotesUpsert)
 
 	t.Run("Validators", testValidatorsUpsert)
 }

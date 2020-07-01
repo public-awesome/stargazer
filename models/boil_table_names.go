@@ -6,15 +6,15 @@ package models
 var TableNames = struct {
 	BlockSignatures string
 	Blocks          string
-	Delegations     string
 	Posts           string
 	Transactions    string
+	Upvotes         string
 	Validators      string
 }{
 	BlockSignatures: "block_signatures",
 	Blocks:          "blocks",
-	Delegations:     "delegations",
 	Posts:           "posts",
 	Transactions:    "transactions",
+	Upvotes:         "upvotes",
 	Validators:      "validators",
 }

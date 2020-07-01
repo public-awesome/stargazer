@@ -24,10 +24,10 @@ import (
 
 // Block is an object representing the database table.
 type Block struct {
-	Height          int       `boil:"height" json:"height" toml:"height" yaml:"height"`
+	Height          int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
 	Hash            string    `boil:"hash" json:"hash" toml:"hash" yaml:"hash"`
 	NumTXS          int       `boil:"num_txs" json:"numTXS" toml:"numTXS" yaml:"numTXS"`
-	TotalGas        int       `boil:"total_gas" json:"totalGas" toml:"totalGas" yaml:"totalGas"`
+	TotalGas        int64     `boil:"total_gas" json:"totalGas" toml:"totalGas" yaml:"totalGas"`
 	ProposerAddress string    `boil:"proposer_address" json:"proposerAddress" toml:"proposerAddress" yaml:"proposerAddress"`
 	Signatures      int       `boil:"signatures" json:"signatures" toml:"signatures" yaml:"signatures"`
 	BlockTimestamp  time.Time `boil:"block_timestamp" json:"blockTimestamp" toml:"blockTimestamp" yaml:"blockTimestamp"`
@@ -66,10 +66,10 @@ var BlockColumns = struct {
 // Generated where
 
 var BlockWhere = struct {
-	Height          whereHelperint
+	Height          whereHelperint64
 	Hash            whereHelperstring
 	NumTXS          whereHelperint
-	TotalGas        whereHelperint
+	TotalGas        whereHelperint64
 	ProposerAddress whereHelperstring
 	Signatures      whereHelperint
 	BlockTimestamp  whereHelpertime_Time
@@ -77,10 +77,10 @@ var BlockWhere = struct {
 	UpdatedAt       whereHelpertime_Time
 	DeletedAt       whereHelpernull_Time
 }{
-	Height:          whereHelperint{field: "\"blocks\".\"height\""},
+	Height:          whereHelperint64{field: "\"blocks\".\"height\""},
 	Hash:            whereHelperstring{field: "\"blocks\".\"hash\""},
 	NumTXS:          whereHelperint{field: "\"blocks\".\"num_txs\""},
-	TotalGas:        whereHelperint{field: "\"blocks\".\"total_gas\""},
+	TotalGas:        whereHelperint64{field: "\"blocks\".\"total_gas\""},
 	ProposerAddress: whereHelperstring{field: "\"blocks\".\"proposer_address\""},
 	Signatures:      whereHelperint{field: "\"blocks\".\"signatures\""},
 	BlockTimestamp:  whereHelpertime_Time{field: "\"blocks\".\"block_timestamp\""},
@@ -739,7 +739,7 @@ func Blocks(mods ...qm.QueryMod) blockQuery {
 
 // FindBlock retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindBlock(ctx context.Context, exec boil.ContextExecutor, height int, selectCols ...string) (*Block, error) {
+func FindBlock(ctx context.Context, exec boil.ContextExecutor, height int64, selectCols ...string) (*Block, error) {
 	blockObj := &Block{}
 
 	sel := "*"
@@ -1257,7 +1257,7 @@ func (o *BlockSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) e
 }
 
 // BlockExists checks if the Block row exists.
-func BlockExists(ctx context.Context, exec boil.ContextExecutor, height int) (bool, error) {
+func BlockExists(ctx context.Context, exec boil.ContextExecutor, height int64) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"blocks\" where \"height\"=$1 limit 1)"
 

@@ -2,10 +2,10 @@
 -- +migrate Up
 CREATE TABLE blocks
 (
-  height INTEGER PRIMARY KEY,
+  height BIGINT PRIMARY KEY,
   hash TEXT NOT NULL UNIQUE,
   num_txs INTEGER NOT NULL DEFAULT 0,
-  total_gas INTEGER  NOT NULL DEFAULT 0,
+  total_gas BIGINT  NOT NULL DEFAULT 0,
   proposer_address TEXT NOT NULL,
   signatures INTEGER NOT NULL,
   block_timestamp TIMESTAMP NOT NULL,

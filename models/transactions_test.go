@@ -677,7 +677,7 @@ func testTransactionsSelect(t *testing.T) {
 }
 
 var (
-	transactionDBTypes = map[string]string{`Hash`: `text`, `Timestamp`: `timestamp without time zone`, `GasWanted`: `integer`, `GasUsed`: `integer`, `Height`: `integer`, `Events`: `jsonb`, `Messages`: `jsonb`, `Fee`: `jsonb`, `Signatures`: `jsonb`, `Memo`: `character varying`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	transactionDBTypes = map[string]string{`Hash`: `text`, `GasWanted`: `integer`, `GasUsed`: `integer`, `Height`: `bigint`, `Events`: `jsonb`, `Messages`: `jsonb`, `Fee`: `jsonb`, `Signatures`: `jsonb`, `Memo`: `character varying`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
 	_                  = bytes.MinRead
 )
 

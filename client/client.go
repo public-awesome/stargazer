@@ -119,6 +119,7 @@ func (p *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 // if the transaction exists. An error is returned if the tx doesn't exist or
 // decoding fails.
 func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
+
 	resp, err := p.httpClient.Get(fmt.Sprintf("%s/txs/%s", p.restNode, hash))
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -130,13 +131,13 @@ func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
-
+	if resp.StatusCode != http.StatusOK {
+		return sdk.TxResponse{}, fmt.Errorf("response error fetching transaction with status [%d] -  %s ", resp.StatusCode, resp.Status)
+	}
 	var tx sdk.TxResponse
-
 	if err := p.cdc.UnmarshalJSON(bz, &tx); err != nil {
 		return sdk.TxResponse{}, err
 	}
-
 	return tx, nil
 }
 

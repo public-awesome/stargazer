@@ -1,9 +1,9 @@
 
 -- +migrate Up
-CREATE TABLE posts (
+CREATE TABLE upvotes (
   id BIGSERIAL PRIMARY KEY,
   vendor_id INTEGER NOT NULL,
-  post_id BIGINT NOT NULL,
+  post_id VARCHAR(65) NOT NULL,
   creator VARCHAR(65),
   deposit TEXT NOT NULL,
   timestamp TIMESTAMP NOT NULL,
@@ -14,4 +14,4 @@ CREATE TABLE posts (
   deleted_at TIMESTAMP
 );
 -- +migrate Down
-DROP TABLE posts;
+DROP TABLE upvotes;

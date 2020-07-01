@@ -10,7 +10,7 @@ require (
 	github.com/lib/pq v1.2.1-0.20191011153232-f91d3411e481
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/pelletier/go-toml v1.8.0 // indirect
-	github.com/rocket-protocol/stakebird v0.0.0-20200525230544-1ee24f95a1f3
+	github.com/public-awesome/stakebird v0.0.0-20200622161232-9b1e2ba24beb
 	github.com/rs/zerolog v1.19.0
 	github.com/spf13/viper v1.7.0
 	github.com/tendermint/tendermint v0.33.4

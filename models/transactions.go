@@ -26,10 +26,9 @@ import (
 // Transaction is an object representing the database table.
 type Transaction struct {
 	Hash       string     `boil:"hash" json:"hash" toml:"hash" yaml:"hash"`
-	Timestamp  time.Time  `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
 	GasWanted  int        `boil:"gas_wanted" json:"gasWanted" toml:"gasWanted" yaml:"gasWanted"`
 	GasUsed    int        `boil:"gas_used" json:"gasUsed" toml:"gasUsed" yaml:"gasUsed"`
-	Height     int        `boil:"height" json:"height" toml:"height" yaml:"height"`
+	Height     int64      `boil:"height" json:"height" toml:"height" yaml:"height"`
 	Events     types.JSON `boil:"events" json:"events" toml:"events" yaml:"events"`
 	Messages   types.JSON `boil:"messages" json:"messages" toml:"messages" yaml:"messages"`
 	Fee        types.JSON `boil:"fee" json:"fee" toml:"fee" yaml:"fee"`
@@ -45,7 +44,6 @@ type Transaction struct {
 
 var TransactionColumns = struct {
 	Hash       string
-	Timestamp  string
 	GasWanted  string
 	GasUsed    string
 	Height     string
@@ -59,7 +57,6 @@ var TransactionColumns = struct {
 	DeletedAt  string
 }{
 	Hash:       "hash",
-	Timestamp:  "timestamp",
 	GasWanted:  "gas_wanted",
 	GasUsed:    "gas_used",
 	Height:     "height",
@@ -98,10 +95,9 @@ func (w whereHelpertypes_JSON) GTE(x types.JSON) qm.QueryMod {
 
 var TransactionWhere = struct {
 	Hash       whereHelperstring
-	Timestamp  whereHelpertime_Time
 	GasWanted  whereHelperint
 	GasUsed    whereHelperint
-	Height     whereHelperint
+	Height     whereHelperint64
 	Events     whereHelpertypes_JSON
 	Messages   whereHelpertypes_JSON
 	Fee        whereHelpertypes_JSON
@@ -112,10 +108,9 @@ var TransactionWhere = struct {
 	DeletedAt  whereHelpernull_Time
 }{
 	Hash:       whereHelperstring{field: "\"transactions\".\"hash\""},
-	Timestamp:  whereHelpertime_Time{field: "\"transactions\".\"timestamp\""},
 	GasWanted:  whereHelperint{field: "\"transactions\".\"gas_wanted\""},
 	GasUsed:    whereHelperint{field: "\"transactions\".\"gas_used\""},
-	Height:     whereHelperint{field: "\"transactions\".\"height\""},
+	Height:     whereHelperint64{field: "\"transactions\".\"height\""},
 	Events:     whereHelpertypes_JSON{field: "\"transactions\".\"events\""},
 	Messages:   whereHelpertypes_JSON{field: "\"transactions\".\"messages\""},
 	Fee:        whereHelpertypes_JSON{field: "\"transactions\".\"fee\""},
@@ -147,8 +142,8 @@ func (*transactionR) NewStruct() *transactionR {
 type transactionL struct{}
 
 var (
-	transactionAllColumns            = []string{"hash", "timestamp", "gas_wanted", "gas_used", "height", "events", "messages", "fee", "signatures", "memo", "created_at", "updated_at", "deleted_at"}
-	transactionColumnsWithoutDefault = []string{"hash", "timestamp", "height", "deleted_at"}
+	transactionAllColumns            = []string{"hash", "gas_wanted", "gas_used", "height", "events", "messages", "fee", "signatures", "memo", "created_at", "updated_at", "deleted_at"}
+	transactionColumnsWithoutDefault = []string{"hash", "height", "deleted_at"}
 	transactionColumnsWithDefault    = []string{"gas_wanted", "gas_used", "events", "messages", "fee", "signatures", "memo", "created_at", "updated_at"}
 	transactionPrimaryKeyColumns     = []string{"hash"}
 )
