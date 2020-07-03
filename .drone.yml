@@ -1,0 +1,21 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: build
+    image: golang:1.14.3
+    commands:
+      - apt-get update && apt-get install cmake -y
+      - make build
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+    when:
+      status: [success, failure]
+---
+kind: signature
+hmac: aecb0e9a4dd41d27319b3d48b73b260d83d893300a042d86b6e3974d59bfe314
