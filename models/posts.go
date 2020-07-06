@@ -26,10 +26,11 @@ import (
 type Post struct {
 	ID              int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
 	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
-	PostID          int64     `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
+	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
 	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
 	RewardAddress   string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
-	Deposit         string    `boil:"deposit" json:"deposit" toml:"deposit" yaml:"deposit"`
+	DepositAmount   int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
+	DepositDenom    string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
 	Timestamp       time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
 	CurationEndTime time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
 	Body            string    `boil:"body" json:"body" toml:"body" yaml:"body"`
@@ -47,7 +48,8 @@ var PostColumns = struct {
 	PostID          string
 	Creator         string
 	RewardAddress   string
-	Deposit         string
+	DepositAmount   string
+	DepositDenom    string
 	Timestamp       string
 	CurationEndTime string
 	Body            string
@@ -60,7 +62,8 @@ var PostColumns = struct {
 	PostID:          "post_id",
 	Creator:         "creator",
 	RewardAddress:   "reward_address",
-	Deposit:         "deposit",
+	DepositAmount:   "deposit_amount",
+	DepositDenom:    "deposit_denom",
 	Timestamp:       "timestamp",
 	CurationEndTime: "curation_end_time",
 	Body:            "body",
@@ -74,10 +77,11 @@ var PostColumns = struct {
 var PostWhere = struct {
 	ID              whereHelperint64
 	VendorID        whereHelperint
-	PostID          whereHelperint64
+	PostID          whereHelperstring
 	Creator         whereHelperstring
 	RewardAddress   whereHelperstring
-	Deposit         whereHelperstring
+	DepositAmount   whereHelperint64
+	DepositDenom    whereHelperstring
 	Timestamp       whereHelpertime_Time
 	CurationEndTime whereHelpertime_Time
 	Body            whereHelperstring
@@ -87,10 +91,11 @@ var PostWhere = struct {
 }{
 	ID:              whereHelperint64{field: "\"posts\".\"id\""},
 	VendorID:        whereHelperint{field: "\"posts\".\"vendor_id\""},
-	PostID:          whereHelperint64{field: "\"posts\".\"post_id\""},
+	PostID:          whereHelperstring{field: "\"posts\".\"post_id\""},
 	Creator:         whereHelperstring{field: "\"posts\".\"creator\""},
 	RewardAddress:   whereHelperstring{field: "\"posts\".\"reward_address\""},
-	Deposit:         whereHelperstring{field: "\"posts\".\"deposit\""},
+	DepositAmount:   whereHelperint64{field: "\"posts\".\"deposit_amount\""},
+	DepositDenom:    whereHelperstring{field: "\"posts\".\"deposit_denom\""},
 	Timestamp:       whereHelpertime_Time{field: "\"posts\".\"timestamp\""},
 	CurationEndTime: whereHelpertime_Time{field: "\"posts\".\"curation_end_time\""},
 	Body:            whereHelperstring{field: "\"posts\".\"body\""},
@@ -116,8 +121,8 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "reward_address", "deposit", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	postColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "reward_address", "deposit", "timestamp", "curation_end_time", "body", "deleted_at"}
+	postAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
+	postColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
 	postColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	postPrimaryKeyColumns     = []string{"id"}
 )

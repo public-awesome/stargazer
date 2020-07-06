@@ -1,18 +1,21 @@
-
 -- +migrate Up
 CREATE TABLE posts (
-  id BIGSERIAL PRIMARY KEY,
-  vendor_id INTEGER NOT NULL,
-  post_id BIGINT NOT NULL,
-  creator VARCHAR(65) NOT NULL,
-  reward_address VARCHAR(65) NOT NULL,
-  deposit TEXT NOT NULL,
-  timestamp TIMESTAMP NOT NULL,
-  curation_end_time TIMESTAMP NOT NULL,
-  body TEXT NOT NULL,
-  created_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  updated_at TIMESTAMP NOT NULL DEFAULT NOW(),
-  deleted_at TIMESTAMP
+  id bigserial PRIMARY KEY,
+  vendor_id integer NOT NULL,
+  post_id text NOT NULL,
+  creator text NOT NULL,
+  reward_address text NOT NULL,
+  deposit_amount bigint NOT NULL,
+  deposit_denom varchar(10) NOT NULL,
+  timestamp timestamp NOT NULL,
+  curation_end_time timestamp NOT NULL,
+  body text NOT NULL,
+  created_at timestamp NOT NULL DEFAULT NOW(),
+  updated_at timestamp NOT NULL DEFAULT NOW(),
+  deleted_at timestamp,
+  UNIQUE (vendor_id, post_id)
 );
+
 -- +migrate Down
 DROP TABLE posts;
+

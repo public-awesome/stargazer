@@ -24,17 +24,18 @@ import (
 
 // Upvote is an object representing the database table.
 type Upvote struct {
-	ID              int64       `boil:"id" json:"id" toml:"id" yaml:"id"`
-	VendorID        int         `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
-	PostID          string      `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
-	Creator         null.String `boil:"creator" json:"creator,omitempty" toml:"creator" yaml:"creator,omitempty"`
-	Deposit         string      `boil:"deposit" json:"deposit" toml:"deposit" yaml:"deposit"`
-	Timestamp       time.Time   `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
-	CurationEndTime time.Time   `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
-	Body            string      `boil:"body" json:"body" toml:"body" yaml:"body"`
-	CreatedAt       time.Time   `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time   `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	DeletedAt       null.Time   `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	ID              int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
+	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
+	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
+	RewardAddress   string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
+	Deposit         string    `boil:"deposit" json:"deposit" toml:"deposit" yaml:"deposit"`
+	Timestamp       time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
+	CurationEndTime time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
+	Body            string    `boil:"body" json:"body" toml:"body" yaml:"body"`
+	CreatedAt       time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt       time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	DeletedAt       null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 
 	R *upvoteR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L upvoteL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -45,6 +46,7 @@ var UpvoteColumns = struct {
 	VendorID        string
 	PostID          string
 	Creator         string
+	RewardAddress   string
 	Deposit         string
 	Timestamp       string
 	CurationEndTime string
@@ -57,6 +59,7 @@ var UpvoteColumns = struct {
 	VendorID:        "vendor_id",
 	PostID:          "post_id",
 	Creator:         "creator",
+	RewardAddress:   "reward_address",
 	Deposit:         "deposit",
 	Timestamp:       "timestamp",
 	CurationEndTime: "curation_end_time",
@@ -68,34 +71,12 @@ var UpvoteColumns = struct {
 
 // Generated where
 
-type whereHelpernull_String struct{ field string }
-
-func (w whereHelpernull_String) EQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, false, x)
-}
-func (w whereHelpernull_String) NEQ(x null.String) qm.QueryMod {
-	return qmhelper.WhereNullEQ(w.field, true, x)
-}
-func (w whereHelpernull_String) IsNull() qm.QueryMod    { return qmhelper.WhereIsNull(w.field) }
-func (w whereHelpernull_String) IsNotNull() qm.QueryMod { return qmhelper.WhereIsNotNull(w.field) }
-func (w whereHelpernull_String) LT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LT, x)
-}
-func (w whereHelpernull_String) LTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.LTE, x)
-}
-func (w whereHelpernull_String) GT(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GT, x)
-}
-func (w whereHelpernull_String) GTE(x null.String) qm.QueryMod {
-	return qmhelper.Where(w.field, qmhelper.GTE, x)
-}
-
 var UpvoteWhere = struct {
 	ID              whereHelperint64
 	VendorID        whereHelperint
 	PostID          whereHelperstring
-	Creator         whereHelpernull_String
+	Creator         whereHelperstring
+	RewardAddress   whereHelperstring
 	Deposit         whereHelperstring
 	Timestamp       whereHelpertime_Time
 	CurationEndTime whereHelpertime_Time
@@ -107,7 +88,8 @@ var UpvoteWhere = struct {
 	ID:              whereHelperint64{field: "\"upvotes\".\"id\""},
 	VendorID:        whereHelperint{field: "\"upvotes\".\"vendor_id\""},
 	PostID:          whereHelperstring{field: "\"upvotes\".\"post_id\""},
-	Creator:         whereHelpernull_String{field: "\"upvotes\".\"creator\""},
+	Creator:         whereHelperstring{field: "\"upvotes\".\"creator\""},
+	RewardAddress:   whereHelperstring{field: "\"upvotes\".\"reward_address\""},
 	Deposit:         whereHelperstring{field: "\"upvotes\".\"deposit\""},
 	Timestamp:       whereHelpertime_Time{field: "\"upvotes\".\"timestamp\""},
 	CurationEndTime: whereHelpertime_Time{field: "\"upvotes\".\"curation_end_time\""},
@@ -134,8 +116,8 @@ func (*upvoteR) NewStruct() *upvoteR {
 type upvoteL struct{}
 
 var (
-	upvoteAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "deposit", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	upvoteColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "deposit", "timestamp", "curation_end_time", "body", "deleted_at"}
+	upvoteAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "reward_address", "deposit", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
+	upvoteColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "reward_address", "deposit", "timestamp", "curation_end_time", "body", "deleted_at"}
 	upvoteColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	upvotePrimaryKeyColumns     = []string{"id"}
 )
