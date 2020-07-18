@@ -1,12 +1,20 @@
-.PHONY: build test run
+.PHONY: build test run pkger
 
 
 generate-models:
 	sqlboiler psql  --struct-tag-casing camel  --wipe
+
+install-pkger:
+	go install github.com/markbates/pkger/cmd/pkger
+
+pkger:
+	pkger -o cmd/stakewatcher
 	
-build:
+build: pkger
 	go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
+migrate: pkger
+	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher migrate
 run:
 	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher
 

@@ -12,13 +12,27 @@ import (
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/lib/pq"
+	"github.com/markbates/pkger"
 	"github.com/public-awesome/stakebird/app"
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/workqueue"
 	"github.com/rs/zerolog/log"
+	migrate "github.com/rubenv/sql-migrate"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
+func runMigrations(db *sql.DB) {
+	migrationSource := &migrate.HttpFileSystemMigrationSource{
+		FileSystem: pkger.Dir("/db/migrations/"),
+	}
+
+	n, err := migrate.Exec(db, "postgres", migrationSource, migrate.Up)
+	if err != nil {
+		panic(err)
+	}
+	log.Info().Msgf("Migrations run %d", n)
+
+}
 func main() {
 	flag.NewFlagSet("stakewatcher", flag.ExitOnError)
 	flag.Parse()
@@ -51,6 +65,7 @@ func main() {
 	if err != nil {
 		panic(err)
 	}
+	runMigrations(db)
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	var wg sync.WaitGroup
