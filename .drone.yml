@@ -8,6 +8,7 @@ steps:
     image: golang:1.14.3
     commands:
       - apt-get update && apt-get install cmake -y
+      - make install-pkger
       - make build
   - name: slack
     image: plugins/slack
