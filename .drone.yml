@@ -20,7 +20,7 @@ steps:
   - name: publish-docker
     image: plugins/docker:18
     settings:
-      dockerfile: docker/Dockerfile
+      dockerfile: Dockerfile
       repo: publicawesome/stakewatcher
       username:
         from_secret: docker_username
@@ -31,6 +31,6 @@ steps:
         - push
 ---
 kind: signature
-hmac: 1259a3e03b4788d0053c9b96dbaa2aad561890f1c178e401d340b3573f5f7c85
+hmac: c9d3c05556970091086c2378e493b72ccca2d60238cf8859afc982f720f98368
 
 ...
