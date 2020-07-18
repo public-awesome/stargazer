@@ -17,8 +17,20 @@ steps:
         from_secret: slack_webhook
     when:
       status: [success, failure]
+  - name: publish-docker
+    image: plugins/docker:18
+    settings:
+      dockerfile: docker/Dockerfile
+      repo: publicawesome/stakewatcher
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      event:
+        - push
 ---
 kind: signature
-hmac: 7fda4a977972103d2aac1ac85f0118ad46ce405835f90aa5c0f862f8a1a02c43
+hmac: 1259a3e03b4788d0053c9b96dbaa2aad561890f1c178e401d340b3573f5f7c85
 
 ...
