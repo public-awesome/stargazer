@@ -10,13 +10,6 @@ steps:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
       - make build
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-    when:
-      status: [success, failure]
   - name: publish-docker
     image: plugins/docker:18
     settings:
@@ -29,6 +22,14 @@ steps:
     when:
       event:
         - push
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+    when:
+      status: [success, failure]
+
 ---
 kind: signature
 hmac: c9d3c05556970091086c2378e493b72ccca2d60238cf8859afc982f720f98368
