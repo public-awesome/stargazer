@@ -4,7 +4,6 @@ import (
 	"context"
 	"database/sql"
 	"flag"
-	"fmt"
 	"os"
 	"os/signal"
 	"sync"
@@ -36,7 +35,15 @@ func runMigrations(db *sql.DB) {
 
 }
 func main() {
+
+	var (
+		rpcEndpoint        string
+		restServerEndpoint string
+	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
+	fs.StringVar(&rpcEndpoint, "rpc-endpoint", "http://localhost:26657", "--rpc-endpoint specify the rpc endpoint")
+	fs.StringVar(&restServerEndpoint, "rest-server", "http://localhost:1317", "--rest-server specify the rest-server endpoint")
+
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
 		log.Fatal().Err(err).Msg("error parsing arguments")
@@ -49,11 +56,11 @@ func main() {
 	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
 	config.Seal()
 
-	cp, err := client.NewProxy("http://localhost:26657", "http://localhost:1317", cdc, appCodec)
-
+	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, cdc, appCodec)
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("error init client %w", err))
+		log.Fatal().Err(err).Msg("error initializing client")
 	}
+	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", restServerEndpoint).Msg("client settings")
 
 	dbSourceName := os.Getenv("DB_SOURCE")
 	if dbSourceName == "" {
@@ -63,7 +70,7 @@ func main() {
 	// Open handle to database like normal
 	db, err := sql.Open("postgres", dbSourceName)
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("unable to conect to db")
 	}
 	err = db.Ping()
 	if err != nil {
