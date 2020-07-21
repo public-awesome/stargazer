@@ -32,12 +32,15 @@ func runMigrations(db *sql.DB) {
 		panic(err)
 	}
 
-	log.Info().Msgf("Migrations run %d", n)
+	log.Info().Msgf("migrations run %d", n)
 
 }
 func main() {
-	flag.NewFlagSet("stakewatcher", flag.ExitOnError)
-	flag.Parse()
+	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
+	err := fs.Parse(os.Args[1:])
+	if err != nil {
+		log.Fatal().Err(err).Msg("error parsing arguments")
+	}
 	appCodec, cdc := app.MakeCodecs()
 
 	config := sdk.GetConfig()
@@ -54,7 +57,7 @@ func main() {
 
 	dbSourceName := os.Getenv("DB_SOURCE")
 	if dbSourceName == "" {
-		fmt.Println("using default db")
+		log.Info().Msg("using default db settings")
 		dbSourceName = "dbname=stakewatcher user=postgres password=postgres sslmode=disable"
 	}
 	// Open handle to database like normal
@@ -82,7 +85,7 @@ func main() {
 		signal.Notify(sigC, syscall.SIGINT, syscall.SIGTERM)
 
 		s := <-sigC
-		log.Printf("received %s, shutting down", s)
+		log.Info().Msgf("received %s, shutting down", s)
 		cancel()
 
 		// Stop handling signals at this point to allow the user to forcefully
@@ -103,13 +106,12 @@ func main() {
 func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, startHeight int64, exportQueue chan<- int64) {
 	latestBlockHeight, err := cp.LatestHeight()
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to get lastest block from RPC client %w", err))
+		log.Fatal().Err(err).Msg("failed to fetch latest block from RPC endpoint")
 	}
 
 	log.Info().Msg("syncing missing blocks")
-
 	for i := startHeight; i <= latestBlockHeight; i++ {
-		ctx.Err()
+		// TODO : check context cancelation status
 		log.Info().Int64("height", i).Msg("enqueueing missing block")
 		exportQueue <- i
 	}
@@ -119,14 +121,12 @@ func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, startHeight int
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.
 func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64) {
-	eventCh, cancel, err := cp.SubscribeNewBlocks("juno-client")
+	eventCh, cancel, err := cp.SubscribeNewBlocks("stakewatcher-client")
 	defer cancel()
-
 	if err != nil {
-		log.Fatal().Err(fmt.Errorf("failed to subscribe to new blocks %w", err))
+		log.Fatal().Err(err).Msg("failed to subscribe to new blocks")
 	}
-
-	log.Printf("listening for new block events...")
+	log.Info().Msg("listening for new block events")
 
 	for {
 		select {
