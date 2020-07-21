@@ -49,19 +49,6 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("error parsing arguments")
 	}
-	appCodec, cdc := app.MakeCodecs()
-
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
-	config.Seal()
-
-	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, cdc, appCodec)
-	if err != nil {
-		log.Fatal().Err(err).Msg("error initializing client")
-	}
-	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", restServerEndpoint).Msg("client settings")
 
 	dbSourceName := os.Getenv("DB_SOURCE")
 	if dbSourceName == "" {
@@ -81,6 +68,20 @@ func main() {
 	if autoMigrate {
 		runMigrations(db)
 	}
+
+	appCodec, cdc := app.MakeCodecs()
+
+	config := sdk.GetConfig()
+	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
+	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
+	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
+	config.Seal()
+
+	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, cdc, appCodec)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error initializing client")
+	}
+	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", restServerEndpoint).Msg("client settings")
 
 	// context cancelation setup
 	ctx, cancel := context.WithCancel(context.Background())
