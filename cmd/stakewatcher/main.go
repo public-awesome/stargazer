@@ -22,14 +22,16 @@ import (
 )
 
 func runMigrations(db *sql.DB) {
+	migrate.SetTable("migrations")
 	migrationSource := &migrate.HttpFileSystemMigrationSource{
 		FileSystem: pkger.Dir("/db/migrations/"),
 	}
+	n, err := migrate.ExecMax(db, "postgres", migrationSource, migrate.Up, 0)
 
-	n, err := migrate.Exec(db, "postgres", migrationSource, migrate.Up)
 	if err != nil {
 		panic(err)
 	}
+
 	log.Info().Msgf("Migrations run %d", n)
 
 }
@@ -55,7 +57,6 @@ func main() {
 		fmt.Println("using default db")
 		dbSourceName = "dbname=stakewatcher user=postgres password=postgres sslmode=disable"
 	}
-
 	// Open handle to database like normal
 	db, err := sql.Open("postgres", dbSourceName)
 	if err != nil {
@@ -63,7 +64,7 @@ func main() {
 	}
 	err = db.Ping()
 	if err != nil {
-		panic(err)
+		log.Fatal().Err(err).Msg("unable to conect to db")
 	}
 	runMigrations(db)
 	ctx, cancel := context.WithCancel(context.Background())
@@ -90,7 +91,7 @@ func main() {
 	}()
 
 	exportQueue := make(chan int64, 100)
-	go enqueueMissingBlocks(ctx, cp, 1, exportQueue)
+	go enqueueMissingBlocks(ctx, cp, 520, exportQueue)
 	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue)

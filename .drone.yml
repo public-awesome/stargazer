@@ -9,7 +9,7 @@ steps:
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
-      - make build
+      - make build-linux
   - name: publish-docker
     image: plugins/docker:18
     settings:
@@ -32,6 +32,6 @@ steps:
 
 ---
 kind: signature
-hmac: c5acb4aeb48db2e1babf5235ef6970bc9b4c12a53d01e02a6203e5df39f63d53
+hmac: 8827416b5430f5f44e317656a675c6d0551b6d7052b5afe5dc8c71936adc6af5
 
 ...

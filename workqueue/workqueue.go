@@ -8,6 +8,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/std"
+	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/models"
 	"github.com/rs/zerolog/log"
@@ -88,7 +89,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	// if err := w.db.ExportBlockSignatures(block.Block.LastCommit, vals); err != nil {
 	// 	return err
 	// }
-	err = ExportBlock(ctx, block, txs, vals, w.db)
+	err = w.ExportBlock(ctx, block, txs, vals, w.db)
 	if err != nil {
 		return err
 	}
@@ -96,7 +97,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	return nil
 }
 
-func ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
+func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
 	totalGas := sumGasTxs(txs)
 	signatures := len(b.Block.LastCommit.Signatures)
 
@@ -106,7 +107,7 @@ func ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxRespo
 		err := fmt.Errorf("failed to find validator by address %s for block %d", proposerAddress, b.Block.Height)
 		return err
 	}
-
+	fmt.Println("inserting block", b.Block.Height)
 	block := &models.Block{
 		Height:          b.Block.Height,
 		NumTXS:          len(txs),
@@ -116,6 +117,7 @@ func ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxRespo
 		Hash:            b.BlockID.Hash.String(),
 		BlockTimestamp:  b.Block.Time,
 	}
+
 	err := block.Insert(ctx, db, boil.Infer())
 	if err != nil {
 		return err
@@ -126,10 +128,27 @@ func ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxRespo
 			fmt.Println("error parsing time", err)
 			continue
 		}
+
+		stdTx, ok := t.Tx.(auth.StdTx)
+		if !ok {
+			fmt.Printf("unsupported tx type: %T", t.Tx)
+			continue
+		}
+		msgsBz, err := w.cdc.MarshalJSON(stdTx.GetMsgs())
+		if err != nil {
+			return fmt.Errorf("failed to JSON encode tx messages: %s", err)
+		}
+		evtsBz, err := w.cdc.MarshalJSON(t.Logs)
+		if err != nil {
+			return fmt.Errorf("failed to JSON encode tx messages: %s", err)
+		}
 		tx := &models.Transaction{
+			Height:    b.Block.Height,
 			Hash:      t.TxHash,
 			GasWanted: int(t.GasWanted),
 			GasUsed:   int(t.GasUsed),
+			Messages:  msgsBz,
+			Events:    evtsBz,
 		}
 		err = tx.Insert(ctx, db, boil.Infer())
 		if err != nil {
