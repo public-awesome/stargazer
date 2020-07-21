@@ -1,6 +1,7 @@
 -- +migrate Up
 CREATE TABLE upvotes (
-  id bigserial PRIMARY KEY,
+  id uuid PRIMARY KEY,
+  height bigint NOT NULL,
   vendor_id integer NOT NULL,
   post_id text NOT NULL,
   creator text NOT NULL,

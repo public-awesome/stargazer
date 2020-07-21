@@ -6,7 +6,7 @@ CREATE TABLE block_signatures (
   validator_address text NOT NULL,
   flag int NOT NULL DEFAULT 0,
   timestamp timestamp NOT NULL,
-  hash TEXT NOT NULL UNIQUE,
+  hash TEXT NOT NULL,
   voting_power integer NOT NULL,
   proposer_priority integer NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),

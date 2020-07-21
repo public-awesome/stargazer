@@ -55,7 +55,6 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	if height == 1 {
 		return nil
 	}
-
 	exists, err := models.BlockExists(ctx, w.db, height)
 	if err != nil {
 		return err
@@ -86,14 +85,10 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 		log.Info().Err(err).Int64("height", height).Msg("failed to export precommits")
 		return err
 	}
-	// if err := w.db.ExportBlockSignatures(block.Block.LastCommit, vals); err != nil {
-	// 	return err
-	// }
 	err = w.ExportBlock(ctx, block, txs, vals, w.db)
 	if err != nil {
 		return err
 	}
-	// return w.db.ExportBlock(block, txs, vals)
 	return nil
 }
 
@@ -107,7 +102,6 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		err := fmt.Errorf("failed to find validator by address %s for block %d", proposerAddress, b.Block.Height)
 		return err
 	}
-	fmt.Println("inserting block", b.Block.Height)
 	block := &models.Block{
 		Height:          b.Block.Height,
 		NumTXS:          len(txs),
@@ -124,23 +118,18 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 	}
 
 	for _, t := range txs {
-		if err != nil {
-			fmt.Println("error parsing time", err)
-			continue
-		}
-
 		stdTx, ok := t.Tx.(auth.StdTx)
 		if !ok {
-			fmt.Printf("unsupported tx type: %T", t.Tx)
+			log.Warn().Msgf("unsupported tx type: %T", t.Tx)
 			continue
 		}
 		msgsBz, err := w.cdc.MarshalJSON(stdTx.GetMsgs())
 		if err != nil {
-			return fmt.Errorf("failed to JSON encode tx messages: %s", err)
+			return fmt.Errorf("failed to JSON encode tx messages: %w", err)
 		}
 		evtsBz, err := w.cdc.MarshalJSON(t.Logs)
 		if err != nil {
-			return fmt.Errorf("failed to JSON encode tx messages: %s", err)
+			return fmt.Errorf("failed to JSON encode tx logs: %w", err)
 		}
 		tx := &models.Transaction{
 			Height:    b.Block.Height,
@@ -152,9 +141,17 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		}
 		err = tx.Insert(ctx, db, boil.Infer())
 		if err != nil {
-			fmt.Println("error inserting tx", err)
-			continue
+			return fmt.Errorf("error inserting tx %w", err)
 		}
+		fmt.Println("timeline", t.Timestamp)
+		parseLogs(ctx, db, t.Logs)
+	}
+	return nil
+}
+
+func parseLogs(ctx context.Context, db *sql.DB, logs sdk.ABCIMessageLogs) error {
+	for _, l := range logs {
+		fmt.Println(l.Events)
 	}
 	return nil
 }
@@ -162,11 +159,9 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 // sumGasTxs returns the total gas consumed by a set of transactions.
 func sumGasTxs(txs []sdk.TxResponse) uint64 {
 	var totalGas uint64
-
 	for _, tx := range txs {
 		totalGas += uint64(tx.GasUsed)
 	}
-
 	return totalGas
 }
 
@@ -191,8 +186,6 @@ func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validato
 		if err != nil {
 			return err
 		}
-
-		log.Info().Int64("voting-power", val.VotingPower).Msg("found validator")
 	}
 	return nil
 }

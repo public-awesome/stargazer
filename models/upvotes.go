@@ -24,7 +24,8 @@ import (
 
 // Upvote is an object representing the database table.
 type Upvote struct {
-	ID              int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID              string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Height          int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
 	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
 	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
 	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
@@ -47,6 +48,7 @@ type Upvote struct {
 
 var UpvoteColumns = struct {
 	ID              string
+	Height          string
 	VendorID        string
 	PostID          string
 	Creator         string
@@ -64,6 +66,7 @@ var UpvoteColumns = struct {
 	DeletedAt       string
 }{
 	ID:              "id",
+	Height:          "height",
 	VendorID:        "vendor_id",
 	PostID:          "post_id",
 	Creator:         "creator",
@@ -84,7 +87,8 @@ var UpvoteColumns = struct {
 // Generated where
 
 var UpvoteWhere = struct {
-	ID              whereHelperint64
+	ID              whereHelperstring
+	Height          whereHelperint64
 	VendorID        whereHelperint
 	PostID          whereHelperstring
 	Creator         whereHelperstring
@@ -101,7 +105,8 @@ var UpvoteWhere = struct {
 	UpdatedAt       whereHelpertime_Time
 	DeletedAt       whereHelpernull_Time
 }{
-	ID:              whereHelperint64{field: "\"upvotes\".\"id\""},
+	ID:              whereHelperstring{field: "\"upvotes\".\"id\""},
+	Height:          whereHelperint64{field: "\"upvotes\".\"height\""},
 	VendorID:        whereHelperint{field: "\"upvotes\".\"vendor_id\""},
 	PostID:          whereHelperstring{field: "\"upvotes\".\"post_id\""},
 	Creator:         whereHelperstring{field: "\"upvotes\".\"creator\""},
@@ -136,9 +141,9 @@ func (*upvoteR) NewStruct() *upvoteR {
 type upvoteL struct{}
 
 var (
-	upvoteAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	upvoteColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
-	upvoteColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	upvoteAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
+	upvoteColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
+	upvoteColumnsWithDefault    = []string{"created_at", "updated_at"}
 	upvotePrimaryKeyColumns     = []string{"id"}
 )
 
@@ -425,7 +430,7 @@ func Upvotes(mods ...qm.QueryMod) upvoteQuery {
 
 // FindUpvote retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindUpvote(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Upvote, error) {
+func FindUpvote(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*Upvote, error) {
 	upvoteObj := &Upvote{}
 
 	sel := "*"
@@ -943,7 +948,7 @@ func (o *UpvoteSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) 
 }
 
 // UpvoteExists checks if the Upvote row exists.
-func UpvoteExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
+func UpvoteExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"upvotes\" where \"id\"=$1 limit 1)"
 

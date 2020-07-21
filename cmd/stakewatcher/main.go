@@ -39,11 +39,12 @@ func main() {
 	var (
 		rpcEndpoint        string
 		restServerEndpoint string
+		autoMigrate        bool
 	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
 	fs.StringVar(&rpcEndpoint, "rpc-endpoint", "http://localhost:26657", "--rpc-endpoint specify the rpc endpoint")
 	fs.StringVar(&restServerEndpoint, "rest-server", "http://localhost:1317", "--rest-server specify the rest-server endpoint")
-
+	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
 		log.Fatal().Err(err).Msg("error parsing arguments")
@@ -76,7 +77,12 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("unable to conect to db")
 	}
-	runMigrations(db)
+
+	if autoMigrate {
+		runMigrations(db)
+	}
+
+	// context cancelation setup
 	ctx, cancel := context.WithCancel(context.Background())
 	defer cancel()
 	var wg sync.WaitGroup

@@ -24,7 +24,8 @@ import (
 
 // Post is an object representing the database table.
 type Post struct {
-	ID              int64     `boil:"id" json:"id" toml:"id" yaml:"id"`
+	ID              string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Height          int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
 	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
 	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
 	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
@@ -44,6 +45,7 @@ type Post struct {
 
 var PostColumns = struct {
 	ID              string
+	Height          string
 	VendorID        string
 	PostID          string
 	Creator         string
@@ -58,6 +60,7 @@ var PostColumns = struct {
 	DeletedAt       string
 }{
 	ID:              "id",
+	Height:          "height",
 	VendorID:        "vendor_id",
 	PostID:          "post_id",
 	Creator:         "creator",
@@ -75,7 +78,8 @@ var PostColumns = struct {
 // Generated where
 
 var PostWhere = struct {
-	ID              whereHelperint64
+	ID              whereHelperstring
+	Height          whereHelperint64
 	VendorID        whereHelperint
 	PostID          whereHelperstring
 	Creator         whereHelperstring
@@ -89,7 +93,8 @@ var PostWhere = struct {
 	UpdatedAt       whereHelpertime_Time
 	DeletedAt       whereHelpernull_Time
 }{
-	ID:              whereHelperint64{field: "\"posts\".\"id\""},
+	ID:              whereHelperstring{field: "\"posts\".\"id\""},
+	Height:          whereHelperint64{field: "\"posts\".\"height\""},
 	VendorID:        whereHelperint{field: "\"posts\".\"vendor_id\""},
 	PostID:          whereHelperstring{field: "\"posts\".\"post_id\""},
 	Creator:         whereHelperstring{field: "\"posts\".\"creator\""},
@@ -121,9 +126,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	postColumnsWithoutDefault = []string{"vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
-	postColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
+	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
+	postColumnsWithDefault    = []string{"created_at", "updated_at"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 
@@ -410,7 +415,7 @@ func Posts(mods ...qm.QueryMod) postQuery {
 
 // FindPost retrieves a single record by ID with an executor.
 // If selectCols is empty Find will return all columns.
-func FindPost(ctx context.Context, exec boil.ContextExecutor, iD int64, selectCols ...string) (*Post, error) {
+func FindPost(ctx context.Context, exec boil.ContextExecutor, iD string, selectCols ...string) (*Post, error) {
 	postObj := &Post{}
 
 	sel := "*"
@@ -928,7 +933,7 @@ func (o *PostSlice) ReloadAll(ctx context.Context, exec boil.ContextExecutor) er
 }
 
 // PostExists checks if the Post row exists.
-func PostExists(ctx context.Context, exec boil.ContextExecutor, iD int64) (bool, error) {
+func PostExists(ctx context.Context, exec boil.ContextExecutor, iD string) (bool, error) {
 	var exists bool
 	sql := "select exists(select 1 from \"posts\" where \"id\"=$1 limit 1)"
 
