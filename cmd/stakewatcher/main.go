@@ -109,7 +109,7 @@ func main() {
 	}()
 
 	exportQueue := make(chan int64, 100)
-	go enqueueMissingBlocks(ctx, cp, 1700, exportQueue)
+	go enqueueMissingBlocks(ctx, cp, 1, exportQueue)
 	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue)
