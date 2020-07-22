@@ -60,6 +60,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("unable to conect to db")
 	}
+	defer db.Close()
 	err = db.Ping()
 	if err != nil {
 		log.Fatal().Err(err).Msg("unable to conect to db")
@@ -108,7 +109,7 @@ func main() {
 	}()
 
 	exportQueue := make(chan int64, 100)
-	go enqueueMissingBlocks(ctx, cp, 520, exportQueue)
+	go enqueueMissingBlocks(ctx, cp, 1700, exportQueue)
 	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue)

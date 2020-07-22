@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"strconv"
 	"strings"
+	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/std"
@@ -15,6 +17,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gofrs/uuid"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -45,7 +48,10 @@ func (w *Worker) Start(ctx context.Context) {
 			log.Info().Msg("closing worker listener")
 			return
 		case blockHeight := <-w.q:
-			w.process(ctx, blockHeight)
+			err := w.process(ctx, blockHeight)
+			if err != nil {
+				log.Err(err).Msg("error processing block")
+			}
 		}
 	}
 }
@@ -143,15 +149,109 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		if err != nil {
 			return fmt.Errorf("error inserting tx %w", err)
 		}
-		fmt.Println("timeline", t.Timestamp)
-		parseLogs(ctx, db, t.Logs)
+		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, t.Logs)
+		if err != nil {
+			return fmt.Errorf("error parsing logs %w", err)
+		}
 	}
 	return nil
 }
 
-func parseLogs(ctx context.Context, db *sql.DB, logs sdk.ABCIMessageLogs) error {
+func parseAttributes(attributes []sdk.Attribute) map[string]string {
+	attrs := make(map[string]string)
+	for _, a := range attributes {
+		attrs[a.Key] = a.Value
+	}
+	return attrs
+}
+func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	deposit, err := sdk.ParseCoin(attrs["deposit"])
+	if err != nil {
+		return err
+	}
+	endTime, err := time.Parse(time.RFC3339, attrs["curation_end_time"])
+	if err != nil {
+		return err
+	}
+	id, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+	p := &models.Post{
+		ID:              id.String(),
+		VendorID:        vendorID,
+		Height:          height,
+		PostID:          attrs["post_id"],
+		Body:            attrs["body"],
+		Creator:         attrs["creator"],
+		RewardAddress:   attrs["reward_account"],
+		DepositAmount:   deposit.Amount.Int64(),
+		DepositDenom:    deposit.Denom,
+		CurationEndTime: endTime,
+		Timestamp:       ts,
+	}
+	return p.Insert(ctx, db, boil.Infer())
+}
+
+func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	voteNum, err := strconv.Atoi(attrs["vote_number"])
+	if err != nil {
+		return err
+	}
+	deposit, err := sdk.ParseCoin(attrs["deposit"])
+	if err != nil {
+		return err
+	}
+	voteAmount, err := sdk.ParseCoin(attrs["vote_amount"])
+	if err != nil {
+		return err
+	}
+	id, err := uuid.NewV4()
+	if err != nil {
+		return err
+	}
+	p := &models.Upvote{
+		ID:            id.String(),
+		VendorID:      vendorID,
+		Height:        height,
+		PostID:        attrs["post_id"],
+		Creator:       attrs["curator"],
+		RewardAddress: attrs["reward_account"],
+		DepositAmount: deposit.Amount.Int64(),
+		DepositDenom:  deposit.Denom,
+		VoteAmount:    voteAmount.Amount.Int64(),
+		VoteDenom:     voteAmount.Denom,
+		VoteNumber:    voteNum,
+		Timestamp:     ts,
+	}
+	return p.Insert(ctx, db, boil.Infer())
+}
+func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
-		fmt.Println(l.Events)
+		for _, evt := range l.Events {
+			switch evt.Type {
+			case "post":
+				err := handlePost(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			case "upvote":
+				err := handleUpvote(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			}
+		}
 	}
 	return nil
 }
