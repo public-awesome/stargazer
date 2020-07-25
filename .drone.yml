@@ -4,8 +4,13 @@ type: docker
 name: default
 
 steps:
+  - name: lint
+    image: golangci/golangci-lint:v1.29
+    commands:
+      - go mod download
+      - golangci-lint run -v --timeout 3m
   - name: build
-    image: golang:1.14.3
+    image: golang:1.14.6
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
@@ -33,5 +38,3 @@ steps:
 ---
 kind: signature
 hmac: 8827416b5430f5f44e317656a675c6d0551b6d7052b5afe5dc8c71936adc6af5
-
-...
