@@ -145,7 +145,7 @@ func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
 // in the sdk.TxResponse format which internally contains an sdk.Tx. An error is
 // returned if any query fails.
 func (p *Proxy) Txs(block *tmctypes.ResultBlock) ([]sdk.TxResponse, error) {
-	txResponses := make([]sdk.TxResponse, len(block.Block.Txs), len(block.Block.Txs))
+	txResponses := make([]sdk.TxResponse, len(block.Block.Txs))
 
 	for i, tmTx := range block.Block.Txs {
 		txResponse, err := p.Tx(fmt.Sprintf("%X", tmTx.Hash()))
