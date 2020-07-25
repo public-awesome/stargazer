@@ -12,7 +12,6 @@ CREATE TABLE upvotes (
   deposit_amount bigint NOT NULL,
   deposit_denom text NOT NULL,
   timestamp timestamp NOT NULL,
-  curation_end_time timestamp NOT NULL,
   body text NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),
   updated_at timestamp NOT NULL DEFAULT NOW(),

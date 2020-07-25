@@ -24,104 +24,99 @@ import (
 
 // Upvote is an object representing the database table.
 type Upvote struct {
-	ID              string    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Height          int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
-	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
-	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
-	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
-	RewardAddress   string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
-	VoteNumber      int       `boil:"vote_number" json:"voteNumber" toml:"voteNumber" yaml:"voteNumber"`
-	VoteAmount      int64     `boil:"vote_amount" json:"voteAmount" toml:"voteAmount" yaml:"voteAmount"`
-	VoteDenom       string    `boil:"vote_denom" json:"voteDenom" toml:"voteDenom" yaml:"voteDenom"`
-	DepositAmount   int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
-	DepositDenom    string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
-	Timestamp       time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
-	CurationEndTime time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
-	Body            string    `boil:"body" json:"body" toml:"body" yaml:"body"`
-	CreatedAt       time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	DeletedAt       null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	ID            string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Height        int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
+	VendorID      int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
+	PostID        string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
+	Creator       string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
+	RewardAddress string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
+	VoteNumber    int       `boil:"vote_number" json:"voteNumber" toml:"voteNumber" yaml:"voteNumber"`
+	VoteAmount    int64     `boil:"vote_amount" json:"voteAmount" toml:"voteAmount" yaml:"voteAmount"`
+	VoteDenom     string    `boil:"vote_denom" json:"voteDenom" toml:"voteDenom" yaml:"voteDenom"`
+	DepositAmount int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
+	DepositDenom  string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
+	Timestamp     time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
+	Body          string    `boil:"body" json:"body" toml:"body" yaml:"body"`
+	CreatedAt     time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt     time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	DeletedAt     null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 
 	R *upvoteR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L upvoteL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var UpvoteColumns = struct {
-	ID              string
-	Height          string
-	VendorID        string
-	PostID          string
-	Creator         string
-	RewardAddress   string
-	VoteNumber      string
-	VoteAmount      string
-	VoteDenom       string
-	DepositAmount   string
-	DepositDenom    string
-	Timestamp       string
-	CurationEndTime string
-	Body            string
-	CreatedAt       string
-	UpdatedAt       string
-	DeletedAt       string
+	ID            string
+	Height        string
+	VendorID      string
+	PostID        string
+	Creator       string
+	RewardAddress string
+	VoteNumber    string
+	VoteAmount    string
+	VoteDenom     string
+	DepositAmount string
+	DepositDenom  string
+	Timestamp     string
+	Body          string
+	CreatedAt     string
+	UpdatedAt     string
+	DeletedAt     string
 }{
-	ID:              "id",
-	Height:          "height",
-	VendorID:        "vendor_id",
-	PostID:          "post_id",
-	Creator:         "creator",
-	RewardAddress:   "reward_address",
-	VoteNumber:      "vote_number",
-	VoteAmount:      "vote_amount",
-	VoteDenom:       "vote_denom",
-	DepositAmount:   "deposit_amount",
-	DepositDenom:    "deposit_denom",
-	Timestamp:       "timestamp",
-	CurationEndTime: "curation_end_time",
-	Body:            "body",
-	CreatedAt:       "created_at",
-	UpdatedAt:       "updated_at",
-	DeletedAt:       "deleted_at",
+	ID:            "id",
+	Height:        "height",
+	VendorID:      "vendor_id",
+	PostID:        "post_id",
+	Creator:       "creator",
+	RewardAddress: "reward_address",
+	VoteNumber:    "vote_number",
+	VoteAmount:    "vote_amount",
+	VoteDenom:     "vote_denom",
+	DepositAmount: "deposit_amount",
+	DepositDenom:  "deposit_denom",
+	Timestamp:     "timestamp",
+	Body:          "body",
+	CreatedAt:     "created_at",
+	UpdatedAt:     "updated_at",
+	DeletedAt:     "deleted_at",
 }
 
 // Generated where
 
 var UpvoteWhere = struct {
-	ID              whereHelperstring
-	Height          whereHelperint64
-	VendorID        whereHelperint
-	PostID          whereHelperstring
-	Creator         whereHelperstring
-	RewardAddress   whereHelperstring
-	VoteNumber      whereHelperint
-	VoteAmount      whereHelperint64
-	VoteDenom       whereHelperstring
-	DepositAmount   whereHelperint64
-	DepositDenom    whereHelperstring
-	Timestamp       whereHelpertime_Time
-	CurationEndTime whereHelpertime_Time
-	Body            whereHelperstring
-	CreatedAt       whereHelpertime_Time
-	UpdatedAt       whereHelpertime_Time
-	DeletedAt       whereHelpernull_Time
+	ID            whereHelperstring
+	Height        whereHelperint64
+	VendorID      whereHelperint
+	PostID        whereHelperstring
+	Creator       whereHelperstring
+	RewardAddress whereHelperstring
+	VoteNumber    whereHelperint
+	VoteAmount    whereHelperint64
+	VoteDenom     whereHelperstring
+	DepositAmount whereHelperint64
+	DepositDenom  whereHelperstring
+	Timestamp     whereHelpertime_Time
+	Body          whereHelperstring
+	CreatedAt     whereHelpertime_Time
+	UpdatedAt     whereHelpertime_Time
+	DeletedAt     whereHelpernull_Time
 }{
-	ID:              whereHelperstring{field: "\"upvotes\".\"id\""},
-	Height:          whereHelperint64{field: "\"upvotes\".\"height\""},
-	VendorID:        whereHelperint{field: "\"upvotes\".\"vendor_id\""},
-	PostID:          whereHelperstring{field: "\"upvotes\".\"post_id\""},
-	Creator:         whereHelperstring{field: "\"upvotes\".\"creator\""},
-	RewardAddress:   whereHelperstring{field: "\"upvotes\".\"reward_address\""},
-	VoteNumber:      whereHelperint{field: "\"upvotes\".\"vote_number\""},
-	VoteAmount:      whereHelperint64{field: "\"upvotes\".\"vote_amount\""},
-	VoteDenom:       whereHelperstring{field: "\"upvotes\".\"vote_denom\""},
-	DepositAmount:   whereHelperint64{field: "\"upvotes\".\"deposit_amount\""},
-	DepositDenom:    whereHelperstring{field: "\"upvotes\".\"deposit_denom\""},
-	Timestamp:       whereHelpertime_Time{field: "\"upvotes\".\"timestamp\""},
-	CurationEndTime: whereHelpertime_Time{field: "\"upvotes\".\"curation_end_time\""},
-	Body:            whereHelperstring{field: "\"upvotes\".\"body\""},
-	CreatedAt:       whereHelpertime_Time{field: "\"upvotes\".\"created_at\""},
-	UpdatedAt:       whereHelpertime_Time{field: "\"upvotes\".\"updated_at\""},
-	DeletedAt:       whereHelpernull_Time{field: "\"upvotes\".\"deleted_at\""},
+	ID:            whereHelperstring{field: "\"upvotes\".\"id\""},
+	Height:        whereHelperint64{field: "\"upvotes\".\"height\""},
+	VendorID:      whereHelperint{field: "\"upvotes\".\"vendor_id\""},
+	PostID:        whereHelperstring{field: "\"upvotes\".\"post_id\""},
+	Creator:       whereHelperstring{field: "\"upvotes\".\"creator\""},
+	RewardAddress: whereHelperstring{field: "\"upvotes\".\"reward_address\""},
+	VoteNumber:    whereHelperint{field: "\"upvotes\".\"vote_number\""},
+	VoteAmount:    whereHelperint64{field: "\"upvotes\".\"vote_amount\""},
+	VoteDenom:     whereHelperstring{field: "\"upvotes\".\"vote_denom\""},
+	DepositAmount: whereHelperint64{field: "\"upvotes\".\"deposit_amount\""},
+	DepositDenom:  whereHelperstring{field: "\"upvotes\".\"deposit_denom\""},
+	Timestamp:     whereHelpertime_Time{field: "\"upvotes\".\"timestamp\""},
+	Body:          whereHelperstring{field: "\"upvotes\".\"body\""},
+	CreatedAt:     whereHelpertime_Time{field: "\"upvotes\".\"created_at\""},
+	UpdatedAt:     whereHelpertime_Time{field: "\"upvotes\".\"updated_at\""},
+	DeletedAt:     whereHelpernull_Time{field: "\"upvotes\".\"deleted_at\""},
 }
 
 // UpvoteRels is where relationship names are stored.
@@ -141,8 +136,8 @@ func (*upvoteR) NewStruct() *upvoteR {
 type upvoteL struct{}
 
 var (
-	upvoteAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	upvoteColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
+	upvoteAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "body", "created_at", "updated_at", "deleted_at"}
+	upvoteColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "body", "deleted_at"}
 	upvoteColumnsWithDefault    = []string{"created_at", "updated_at"}
 	upvotePrimaryKeyColumns     = []string{"id"}
 )
