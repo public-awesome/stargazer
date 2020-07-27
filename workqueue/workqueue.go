@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"fmt"
+	"net/rpc"
 	"strconv"
 	"strings"
 	"time"
@@ -23,21 +24,23 @@ import (
 )
 
 type Worker struct {
-	q        <-chan int64
-	cdc      *codec.Codec
-	appCodec *std.Codec
-	db       *sql.DB
-	cp       *client.Proxy
+	q           <-chan int64
+	cdc         *codec.Codec
+	appCodec    *std.Codec
+	db          *sql.DB
+	cp          *client.Proxy
+	eventClient *rpc.Client
 }
 
 // NewWorker returns an intialized worker
-func NewWorker(cdc *codec.Codec, appCodec *std.Codec, queue <-chan int64, db *sql.DB, cp *client.Proxy) *Worker {
+func NewWorker(cdc *codec.Codec, appCodec *std.Codec, queue <-chan int64, db *sql.DB, cp *client.Proxy, eventClient *rpc.Client) *Worker {
 	return &Worker{
-		q:        queue,
-		cdc:      cdc,
-		appCodec: appCodec,
-		db:       db,
-		cp:       cp,
+		q:           queue,
+		cdc:         cdc,
+		appCodec:    appCodec,
+		db:          db,
+		cp:          cp,
+		eventClient: eventClient,
 	}
 }
 
@@ -149,7 +152,7 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		if err != nil {
 			return fmt.Errorf("error inserting tx %w", err)
 		}
-		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, t.Logs)
+		err = parseLogs(ctx, db, w.eventClient, b.Block.Height, b.Block.Time, t.Logs)
 		if err != nil {
 			return fmt.Errorf("error parsing logs %w", err)
 		}
@@ -164,7 +167,7 @@ func parseAttributes(attributes []sdk.Attribute) map[string]string {
 	}
 	return attrs
 }
-func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+func handlePost(ctx context.Context, db *sql.DB, eventClient *rpc.Client, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -195,10 +198,17 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		CurationEndTime: endTime,
 		Timestamp:       ts,
 	}
+
+	var res bool
+	err = eventClient.Call("StakeWatcher.Posted", p, &res)
+	if err != nil {
+		return err
+	}
+
 	return p.Insert(ctx, db, boil.Infer())
 }
 
-func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+func handleUpvote(ctx context.Context, db *sql.DB, eventClient *rpc.Client, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -234,19 +244,26 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 		VoteNumber:    voteNum,
 		Timestamp:     ts,
 	}
+
+	var res bool
+	err = eventClient.Call("StakeWatcher.Upvoted", p, &res)
+	if err != nil {
+		return err
+	}
+
 	return p.Insert(ctx, db, boil.Infer())
 }
-func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
+func parseLogs(ctx context.Context, db *sql.DB, eventClient *rpc.Client, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
 		for _, evt := range l.Events {
 			switch evt.Type {
 			case "post":
-				err := handlePost(ctx, db, evt.Attributes, height, ts)
+				err := handlePost(ctx, db, eventClient, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
 			case "upvote":
-				err := handleUpvote(ctx, db, evt.Attributes, height, ts)
+				err := handleUpvote(ctx, db, eventClient, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}

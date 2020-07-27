@@ -4,6 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
+	"net/rpc"
 	"os"
 	"os/signal"
 	"sync"
@@ -37,11 +39,13 @@ func runMigrations(db *sql.DB) {
 func main() {
 
 	var (
+		sbEventListener    string
 		rpcEndpoint        string
 		restServerEndpoint string
 		autoMigrate        bool
 	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
+	fs.StringVar(&sbEventListener, "event-listener", "http://localhost:1666", "--event-listener specify the stakebird listener endpoint")
 	fs.StringVar(&rpcEndpoint, "rpc-endpoint", "http://localhost:26657", "--rpc-endpoint specify the rpc endpoint")
 	fs.StringVar(&restServerEndpoint, "rest-server", "http://localhost:1317", "--rest-server specify the rest-server endpoint")
 	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
@@ -108,9 +112,15 @@ func main() {
 		signal.Stop(sigC)
 	}()
 
+	fmt.Println(sbEventListener)
+	eventClient, err := rpc.DialHTTP("tcp", sbEventListener)
+	if err != nil {
+		log.Fatal().Err(err).Msg("error connecting to stakebird event listener server")
+	}
+
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, 1, exportQueue)
-	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
+	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp, eventClient)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue)
 

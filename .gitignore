@@ -1,3 +1,4 @@
 build/
 db_data/
 *.swp
+cmd/stakewatcher/pkged.go
