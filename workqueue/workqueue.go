@@ -23,6 +23,7 @@ import (
 	tmtypes "github.com/tendermint/tendermint/types"
 )
 
+// Worker is the queue processor.
 type Worker struct {
 	q        <-chan int64
 	cdc      *codec.Codec
@@ -42,6 +43,7 @@ func NewWorker(cdc *codec.Codec, appCodec *std.Codec, queue <-chan int64, db *sq
 	}
 }
 
+// Start runs the listener that process blocks.
 func (w *Worker) Start(ctx context.Context) {
 	for {
 		select {
@@ -51,8 +53,11 @@ func (w *Worker) Start(ctx context.Context) {
 		case blockHeight := <-w.q:
 			err := w.process(ctx, blockHeight)
 			if err != nil {
-				log.Err(err).Msg("error processing block")
+				log.Error().Err(err).Int64("height", blockHeight).Msg("error processing block")
+				// TODO: add retry
+				continue
 			}
+			log.Info().Int64("height", blockHeight).Msg("block synced")
 		}
 	}
 }
@@ -71,30 +76,26 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	}
 	block, err := w.cp.Block(height)
 	if err != nil {
-		log.Info().Err(err).Int64("height", height).Msg("failed to get block")
-		return err
+		return fmt.Errorf("failed to fetch block: %w", err)
 	}
 
 	txs, err := w.cp.Txs(block)
 	if err != nil {
-		log.Info().Err(err).Int64("height", height).Msg("failed to get transactions for block")
-		return err
+		return fmt.Errorf("failed to fetch transactions for block: %w", err)
 	}
 
 	vals, err := w.cp.Validators(block.Block.LastCommit.GetHeight())
 	if err != nil {
-		log.Info().Err(err).Int64("height", height).Msg("failed to get validators for block")
-		return err
+		return fmt.Errorf("failed to fetch validators for block: %w", err)
 	}
 
 	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, w.db)
 	if err != nil {
-		log.Info().Err(err).Int64("height", height).Msg("failed to export precommits")
-		return err
+		return fmt.Errorf("failed to export block signatures %w", err)
 	}
 	err = w.ExportBlock(ctx, block, txs, vals, w.db)
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to export block: %w", err)
 	}
 
 	sl, err := models.FindSyncLog(ctx, w.db, height)
@@ -105,10 +106,10 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	sl.SyncedAt = null.NewTime(time.Now(), true)
 
 	_, err = sl.Update(ctx, w.db, boil.Infer())
-	log.Info().Int64("height", height).Msg("block sync complete")
 	return err
 }
 
+// ExportBlock exports a block by processing it.
 func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
 	totalGas := sumGasTxs(txs)
 	signatures := len(b.Block.LastCommit.Signatures)
@@ -116,8 +117,7 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 	proposerAddress := sdk.ConsAddress(b.Block.ProposerAddress).String()
 	val := findValidatorByAddr(proposerAddress, validators)
 	if val == nil {
-		err := fmt.Errorf("failed to find validator by address %s for block %d", proposerAddress, b.Block.Height)
-		return err
+		return fmt.Errorf("failed to find validator by address %s for block %d", proposerAddress, b.Block.Height)
 	}
 	block := &models.Block{
 		Height:          b.Block.Height,
@@ -131,7 +131,7 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 
 	err := block.Insert(ctx, db, boil.Infer())
 	if err != nil {
-		return err
+		return fmt.Errorf("failed to insert block %w", err)
 	}
 
 	for _, t := range txs {
@@ -285,12 +285,11 @@ func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validato
 		addr := sdk.ConsAddress(sig.ValidatorAddress).String()
 		val := findValidatorByAddr(addr, validators)
 		if val == nil {
-			err := fmt.Errorf("failed to find validator by address %s for block %d", addr, commit.GetHeight())
-			return err
+			return fmt.Errorf("failed to find validator by address %s for block %d", addr, commit.GetHeight())
 		}
 		err := ExportValidator(ctx, val, db)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to export validator %w", err)
 		}
 
 		err = SetBlockSignature(ctx, commit, sig, val.VotingPower, val.ProposerPriority, db)
@@ -322,8 +321,7 @@ func ExportValidator(ctx context.Context, val *tmtypes.Validator, db *sql.DB) er
 	consPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, val.PubKey)
 
 	if err != nil {
-		log.Error().Err(err).Str("validator", address).Msg("failed to convert validator public key")
-		return err
+		return fmt.Errorf("failed to convert validator public key %w", err)
 	}
 	validator := &models.Validator{
 		Address: address,

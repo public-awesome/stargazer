@@ -142,6 +142,9 @@ func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, db *sql.DB, exp
 	}
 	var startHeight int64
 	sl, err := models.SyncLogs(qm.OrderBy(fmt.Sprintf("%s DESC", models.SyncLogColumns.BlockHeight))).One(ctx, db)
+	if err != nil && err != sql.ErrNoRows {
+		panic(err)
+	}
 	if err == sql.ErrNoRows {
 		startHeight = 1
 	}
