@@ -146,8 +146,6 @@ type (
 	// UpvoteSlice is an alias for a slice of pointers to Upvote.
 	// This should generally be used opposed to []Upvote.
 	UpvoteSlice []*Upvote
-	// UpvoteHook is the signature for custom Upvote hook methods
-	UpvoteHook func(context.Context, boil.ContextExecutor, *Upvote) error
 
 	upvoteQuery struct {
 		*queries.Query
@@ -175,176 +173,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var upvoteBeforeInsertHooks []UpvoteHook
-var upvoteBeforeUpdateHooks []UpvoteHook
-var upvoteBeforeDeleteHooks []UpvoteHook
-var upvoteBeforeUpsertHooks []UpvoteHook
-
-var upvoteAfterInsertHooks []UpvoteHook
-var upvoteAfterSelectHooks []UpvoteHook
-var upvoteAfterUpdateHooks []UpvoteHook
-var upvoteAfterDeleteHooks []UpvoteHook
-var upvoteAfterUpsertHooks []UpvoteHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Upvote) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Upvote) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Upvote) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Upvote) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Upvote) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Upvote) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Upvote) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Upvote) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Upvote) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range upvoteAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddUpvoteHook registers your hook function for all future operations.
-func AddUpvoteHook(hookPoint boil.HookPoint, upvoteHook UpvoteHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		upvoteBeforeInsertHooks = append(upvoteBeforeInsertHooks, upvoteHook)
-	case boil.BeforeUpdateHook:
-		upvoteBeforeUpdateHooks = append(upvoteBeforeUpdateHooks, upvoteHook)
-	case boil.BeforeDeleteHook:
-		upvoteBeforeDeleteHooks = append(upvoteBeforeDeleteHooks, upvoteHook)
-	case boil.BeforeUpsertHook:
-		upvoteBeforeUpsertHooks = append(upvoteBeforeUpsertHooks, upvoteHook)
-	case boil.AfterInsertHook:
-		upvoteAfterInsertHooks = append(upvoteAfterInsertHooks, upvoteHook)
-	case boil.AfterSelectHook:
-		upvoteAfterSelectHooks = append(upvoteAfterSelectHooks, upvoteHook)
-	case boil.AfterUpdateHook:
-		upvoteAfterUpdateHooks = append(upvoteAfterUpdateHooks, upvoteHook)
-	case boil.AfterDeleteHook:
-		upvoteAfterDeleteHooks = append(upvoteAfterDeleteHooks, upvoteHook)
-	case boil.AfterUpsertHook:
-		upvoteAfterUpsertHooks = append(upvoteAfterUpsertHooks, upvoteHook)
-	}
-}
-
 // One returns a single upvote record from the query.
 func (q upvoteQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Upvote, error) {
 	o := &Upvote{}
@@ -359,10 +187,6 @@ func (q upvoteQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Upvot
 		return nil, errors.Wrap(err, "models: failed to execute a one query for upvotes")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -373,14 +197,6 @@ func (q upvoteQuery) All(ctx context.Context, exec boil.ContextExecutor) (Upvote
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Upvote slice")
-	}
-
-	if len(upvoteAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -468,10 +284,6 @@ func (o *Upvote) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(upvoteColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -535,7 +347,7 @@ func (o *Upvote) Insert(ctx context.Context, exec boil.ContextExecutor, columns 
 		upvoteInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Upvote.
@@ -549,9 +361,6 @@ func (o *Upvote) Update(ctx context.Context, exec boil.ContextExecutor, columns 
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	upvoteUpdateCacheMut.RLock()
 	cache, cached := upvoteUpdateCache[key]
@@ -604,7 +413,7 @@ func (o *Upvote) Update(ctx context.Context, exec boil.ContextExecutor, columns 
 		upvoteUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -685,10 +494,6 @@ func (o *Upvote) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 			o.CreatedAt = currTime
 		}
 		o.UpdatedAt = currTime
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(upvoteColumnsWithDefault, o)
@@ -792,7 +597,7 @@ func (o *Upvote) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 		upvoteUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Upvote record with an executor.
@@ -800,10 +605,6 @@ func (o *Upvote) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOn
 func (o *Upvote) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Upvote provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), upvotePrimaryKeyMapping)
@@ -822,10 +623,6 @@ func (o *Upvote) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for upvotes")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -858,14 +655,6 @@ func (o UpvoteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 		return 0, nil
 	}
 
-	if len(upvoteBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), upvotePrimaryKeyMapping)
@@ -888,14 +677,6 @@ func (o UpvoteSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for upvotes")
-	}
-
-	if len(upvoteAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

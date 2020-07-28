@@ -12,6 +12,8 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("Posts", testPostsUpsert)
 
+	t.Run("SyncLogs", testSyncLogsUpsert)
+
 	t.Run("Transactions", testTransactionsUpsert)
 
 	t.Run("Upvotes", testUpvotesUpsert)

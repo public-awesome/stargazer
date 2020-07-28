@@ -2,7 +2,7 @@
 
 
 generate-models:
-	sqlboiler psql  --struct-tag-casing camel  --wipe
+	sqlboiler psql  --struct-tag-casing camel  --wipe --no-hooks
 
 install-pkger:
 	go install github.com/markbates/pkger/cmd/pkger

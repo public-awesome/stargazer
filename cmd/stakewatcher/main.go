@@ -16,10 +16,13 @@ import (
 	"github.com/markbates/pkger"
 	"github.com/public-awesome/stakebird/app"
 	"github.com/public-awesome/stakewatcher/client"
+	"github.com/public-awesome/stakewatcher/models"
 	"github.com/public-awesome/stakewatcher/workqueue"
 	"github.com/rs/zerolog/log"
 	migrate "github.com/rubenv/sql-migrate"
 	tmtypes "github.com/tendermint/tendermint/types"
+	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries/qm"
 )
 
 const (
@@ -123,25 +126,41 @@ func main() {
 	}()
 
 	exportQueue := make(chan int64, 100)
-	go enqueueMissingBlocks(ctx, cp, 1, exportQueue)
+	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
 	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
 	go wk.Start(ctx)
-	startNewBlockListener(ctx, cp, exportQueue)
+	startNewBlockListener(ctx, cp, exportQueue, db)
 
 }
 
 // enqueueMissingBlocks enqueues jobs (block heights) for missed blocks starting
 // at the startHeight up until the latest known height.
-func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, startHeight int64, exportQueue chan<- int64) {
+func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, db *sql.DB, exportQueue chan<- int64) {
 	latestBlockHeight, err := cp.LatestHeight()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to fetch latest block from RPC endpoint")
+	}
+	var startHeight int64
+	sl, err := models.SyncLogs(qm.OrderBy(fmt.Sprintf("%s DESC", models.SyncLogColumns.BlockHeight))).One(ctx, db)
+	if err == sql.ErrNoRows {
+		startHeight = 1
+	}
+
+	if err == nil {
+		startHeight = sl.BlockHeight + 1
 	}
 
 	log.Info().Msg("syncing missing blocks")
 	for i := startHeight; i <= latestBlockHeight; i++ {
 		// TODO : check context cancelation status
 		log.Info().Int64("height", i).Msg("enqueueing missing block")
+		l := &models.SyncLog{
+			BlockHeight: i,
+		}
+		err := l.Insert(ctx, db, boil.Infer())
+		if err != nil {
+			panic(err)
+		}
 		exportQueue <- i
 	}
 }
@@ -149,7 +168,7 @@ func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, startHeight int
 // startNewBlockListener subscribes to new block events via the Tendermint RPC
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.
-func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64) {
+func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64, db *sql.DB) {
 	eventCh, cancel, err := cp.SubscribeNewBlocks("stakewatcher-client")
 	defer cancel()
 	if err != nil {
@@ -165,7 +184,14 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 		case e := <-eventCh:
 			newBlock := e.Data.(tmtypes.EventDataNewBlock).Block
 			height := newBlock.Header.Height
-			log.Info().Int64("height", height).Msg("enqueueing new block")
+			log.Info().Int64("height", height).Msg("enqueueing missing block")
+			l := &models.SyncLog{
+				BlockHeight: height,
+			}
+			err := l.Insert(ctx, db, boil.Infer())
+			if err != nil {
+				panic(err)
+			}
 			exportQueue <- height
 		}
 	}

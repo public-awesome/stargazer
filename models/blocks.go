@@ -123,8 +123,6 @@ type (
 	// BlockSlice is an alias for a slice of pointers to Block.
 	// This should generally be used opposed to []Block.
 	BlockSlice []*Block
-	// BlockHook is the signature for custom Block hook methods
-	BlockHook func(context.Context, boil.ContextExecutor, *Block) error
 
 	blockQuery struct {
 		*queries.Query
@@ -152,176 +150,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var blockBeforeInsertHooks []BlockHook
-var blockBeforeUpdateHooks []BlockHook
-var blockBeforeDeleteHooks []BlockHook
-var blockBeforeUpsertHooks []BlockHook
-
-var blockAfterInsertHooks []BlockHook
-var blockAfterSelectHooks []BlockHook
-var blockAfterUpdateHooks []BlockHook
-var blockAfterDeleteHooks []BlockHook
-var blockAfterUpsertHooks []BlockHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Block) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Block) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Block) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Block) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Block) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Block) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Block) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Block) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Block) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddBlockHook registers your hook function for all future operations.
-func AddBlockHook(hookPoint boil.HookPoint, blockHook BlockHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		blockBeforeInsertHooks = append(blockBeforeInsertHooks, blockHook)
-	case boil.BeforeUpdateHook:
-		blockBeforeUpdateHooks = append(blockBeforeUpdateHooks, blockHook)
-	case boil.BeforeDeleteHook:
-		blockBeforeDeleteHooks = append(blockBeforeDeleteHooks, blockHook)
-	case boil.BeforeUpsertHook:
-		blockBeforeUpsertHooks = append(blockBeforeUpsertHooks, blockHook)
-	case boil.AfterInsertHook:
-		blockAfterInsertHooks = append(blockAfterInsertHooks, blockHook)
-	case boil.AfterSelectHook:
-		blockAfterSelectHooks = append(blockAfterSelectHooks, blockHook)
-	case boil.AfterUpdateHook:
-		blockAfterUpdateHooks = append(blockAfterUpdateHooks, blockHook)
-	case boil.AfterDeleteHook:
-		blockAfterDeleteHooks = append(blockAfterDeleteHooks, blockHook)
-	case boil.AfterUpsertHook:
-		blockAfterUpsertHooks = append(blockAfterUpsertHooks, blockHook)
-	}
-}
-
 // One returns a single block record from the query.
 func (q blockQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Block, error) {
 	o := &Block{}
@@ -336,10 +164,6 @@ func (q blockQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Block,
 		return nil, errors.Wrap(err, "models: failed to execute a one query for blocks")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -350,14 +174,6 @@ func (q blockQuery) All(ctx context.Context, exec boil.ContextExecutor) (BlockSl
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Block slice")
-	}
-
-	if len(blockAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -495,14 +311,6 @@ func (blockL) LoadProposer(ctx context.Context, e boil.ContextExecutor, singular
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for validators")
 	}
 
-	if len(blockAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
-
 	if len(resultSlice) == 0 {
 		return nil
 	}
@@ -597,13 +405,6 @@ func (blockL) LoadHeightTransactions(ctx context.Context, e boil.ContextExecutor
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for transactions")
 	}
 
-	if len(transactionAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.HeightTransactions = resultSlice
 		for _, foreign := range resultSlice {
@@ -782,10 +583,6 @@ func (o *Block) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(blockColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -849,7 +646,7 @@ func (o *Block) Insert(ctx context.Context, exec boil.ContextExecutor, columns b
 		blockInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Block.
@@ -863,9 +660,6 @@ func (o *Block) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	blockUpdateCacheMut.RLock()
 	cache, cached := blockUpdateCache[key]
@@ -918,7 +712,7 @@ func (o *Block) Update(ctx context.Context, exec boil.ContextExecutor, columns b
 		blockUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -999,10 +793,6 @@ func (o *Block) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 			o.CreatedAt = currTime
 		}
 		o.UpdatedAt = currTime
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(blockColumnsWithDefault, o)
@@ -1106,7 +896,7 @@ func (o *Block) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 		blockUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Block record with an executor.
@@ -1114,10 +904,6 @@ func (o *Block) Upsert(ctx context.Context, exec boil.ContextExecutor, updateOnC
 func (o *Block) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Block provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), blockPrimaryKeyMapping)
@@ -1136,10 +922,6 @@ func (o *Block) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, e
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for blocks")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1172,14 +954,6 @@ func (o BlockSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 		return 0, nil
 	}
 
-	if len(blockBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), blockPrimaryKeyMapping)
@@ -1202,14 +976,6 @@ func (o BlockSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor) (i
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for blocks")
-	}
-
-	if len(blockAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

@@ -98,8 +98,6 @@ type (
 	// ValidatorSlice is an alias for a slice of pointers to Validator.
 	// This should generally be used opposed to []Validator.
 	ValidatorSlice []*Validator
-	// ValidatorHook is the signature for custom Validator hook methods
-	ValidatorHook func(context.Context, boil.ContextExecutor, *Validator) error
 
 	validatorQuery struct {
 		*queries.Query
@@ -127,176 +125,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var validatorBeforeInsertHooks []ValidatorHook
-var validatorBeforeUpdateHooks []ValidatorHook
-var validatorBeforeDeleteHooks []ValidatorHook
-var validatorBeforeUpsertHooks []ValidatorHook
-
-var validatorAfterInsertHooks []ValidatorHook
-var validatorAfterSelectHooks []ValidatorHook
-var validatorAfterUpdateHooks []ValidatorHook
-var validatorAfterDeleteHooks []ValidatorHook
-var validatorAfterUpsertHooks []ValidatorHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *Validator) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *Validator) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *Validator) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *Validator) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *Validator) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *Validator) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *Validator) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *Validator) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *Validator) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range validatorAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddValidatorHook registers your hook function for all future operations.
-func AddValidatorHook(hookPoint boil.HookPoint, validatorHook ValidatorHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		validatorBeforeInsertHooks = append(validatorBeforeInsertHooks, validatorHook)
-	case boil.BeforeUpdateHook:
-		validatorBeforeUpdateHooks = append(validatorBeforeUpdateHooks, validatorHook)
-	case boil.BeforeDeleteHook:
-		validatorBeforeDeleteHooks = append(validatorBeforeDeleteHooks, validatorHook)
-	case boil.BeforeUpsertHook:
-		validatorBeforeUpsertHooks = append(validatorBeforeUpsertHooks, validatorHook)
-	case boil.AfterInsertHook:
-		validatorAfterInsertHooks = append(validatorAfterInsertHooks, validatorHook)
-	case boil.AfterSelectHook:
-		validatorAfterSelectHooks = append(validatorAfterSelectHooks, validatorHook)
-	case boil.AfterUpdateHook:
-		validatorAfterUpdateHooks = append(validatorAfterUpdateHooks, validatorHook)
-	case boil.AfterDeleteHook:
-		validatorAfterDeleteHooks = append(validatorAfterDeleteHooks, validatorHook)
-	case boil.AfterUpsertHook:
-		validatorAfterUpsertHooks = append(validatorAfterUpsertHooks, validatorHook)
-	}
-}
-
 // One returns a single validator record from the query.
 func (q validatorQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Validator, error) {
 	o := &Validator{}
@@ -311,10 +139,6 @@ func (q validatorQuery) One(ctx context.Context, exec boil.ContextExecutor) (*Va
 		return nil, errors.Wrap(err, "models: failed to execute a one query for validators")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -325,14 +149,6 @@ func (q validatorQuery) All(ctx context.Context, exec boil.ContextExecutor) (Val
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to Validator slice")
-	}
-
-	if len(validatorAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -475,13 +291,6 @@ func (validatorL) LoadValidatorAddressBlockSignatures(ctx context.Context, e boi
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for block_signatures")
 	}
 
-	if len(blockSignatureAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.ValidatorAddressBlockSignatures = resultSlice
 		for _, foreign := range resultSlice {
@@ -573,13 +382,6 @@ func (validatorL) LoadProposerAddressBlocks(ctx context.Context, e boil.ContextE
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for blocks")
 	}
 
-	if len(blockAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
-	}
 	if singular {
 		object.R.ProposerAddressBlocks = resultSlice
 		for _, foreign := range resultSlice {
@@ -764,10 +566,6 @@ func (o *Validator) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(validatorColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -831,7 +629,7 @@ func (o *Validator) Insert(ctx context.Context, exec boil.ContextExecutor, colum
 		validatorInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the Validator.
@@ -845,9 +643,6 @@ func (o *Validator) Update(ctx context.Context, exec boil.ContextExecutor, colum
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	validatorUpdateCacheMut.RLock()
 	cache, cached := validatorUpdateCache[key]
@@ -900,7 +695,7 @@ func (o *Validator) Update(ctx context.Context, exec boil.ContextExecutor, colum
 		validatorUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -981,10 +776,6 @@ func (o *Validator) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 			o.CreatedAt = currTime
 		}
 		o.UpdatedAt = currTime
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(validatorColumnsWithDefault, o)
@@ -1088,7 +879,7 @@ func (o *Validator) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 		validatorUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single Validator record with an executor.
@@ -1096,10 +887,6 @@ func (o *Validator) Upsert(ctx context.Context, exec boil.ContextExecutor, updat
 func (o *Validator) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no Validator provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), validatorPrimaryKeyMapping)
@@ -1118,10 +905,6 @@ func (o *Validator) Delete(ctx context.Context, exec boil.ContextExecutor) (int6
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for validators")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1154,14 +937,6 @@ func (o ValidatorSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 		return 0, nil
 	}
 
-	if len(validatorBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), validatorPrimaryKeyMapping)
@@ -1184,14 +959,6 @@ func (o ValidatorSlice) DeleteAll(ctx context.Context, exec boil.ContextExecutor
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for validators")
-	}
-
-	if len(validatorAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

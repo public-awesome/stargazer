@@ -243,8 +243,6 @@ type (
 	// BlockSignatureSlice is an alias for a slice of pointers to BlockSignature.
 	// This should generally be used opposed to []BlockSignature.
 	BlockSignatureSlice []*BlockSignature
-	// BlockSignatureHook is the signature for custom BlockSignature hook methods
-	BlockSignatureHook func(context.Context, boil.ContextExecutor, *BlockSignature) error
 
 	blockSignatureQuery struct {
 		*queries.Query
@@ -272,176 +270,6 @@ var (
 	_ = qmhelper.Where
 )
 
-var blockSignatureBeforeInsertHooks []BlockSignatureHook
-var blockSignatureBeforeUpdateHooks []BlockSignatureHook
-var blockSignatureBeforeDeleteHooks []BlockSignatureHook
-var blockSignatureBeforeUpsertHooks []BlockSignatureHook
-
-var blockSignatureAfterInsertHooks []BlockSignatureHook
-var blockSignatureAfterSelectHooks []BlockSignatureHook
-var blockSignatureAfterUpdateHooks []BlockSignatureHook
-var blockSignatureAfterDeleteHooks []BlockSignatureHook
-var blockSignatureAfterUpsertHooks []BlockSignatureHook
-
-// doBeforeInsertHooks executes all "before insert" hooks.
-func (o *BlockSignature) doBeforeInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureBeforeInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpdateHooks executes all "before Update" hooks.
-func (o *BlockSignature) doBeforeUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureBeforeUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeDeleteHooks executes all "before Delete" hooks.
-func (o *BlockSignature) doBeforeDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureBeforeDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doBeforeUpsertHooks executes all "before Upsert" hooks.
-func (o *BlockSignature) doBeforeUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureBeforeUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterInsertHooks executes all "after Insert" hooks.
-func (o *BlockSignature) doAfterInsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureAfterInsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterSelectHooks executes all "after Select" hooks.
-func (o *BlockSignature) doAfterSelectHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureAfterSelectHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpdateHooks executes all "after Update" hooks.
-func (o *BlockSignature) doAfterUpdateHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureAfterUpdateHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterDeleteHooks executes all "after Delete" hooks.
-func (o *BlockSignature) doAfterDeleteHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureAfterDeleteHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// doAfterUpsertHooks executes all "after Upsert" hooks.
-func (o *BlockSignature) doAfterUpsertHooks(ctx context.Context, exec boil.ContextExecutor) (err error) {
-	if boil.HooksAreSkipped(ctx) {
-		return nil
-	}
-
-	for _, hook := range blockSignatureAfterUpsertHooks {
-		if err := hook(ctx, exec, o); err != nil {
-			return err
-		}
-	}
-
-	return nil
-}
-
-// AddBlockSignatureHook registers your hook function for all future operations.
-func AddBlockSignatureHook(hookPoint boil.HookPoint, blockSignatureHook BlockSignatureHook) {
-	switch hookPoint {
-	case boil.BeforeInsertHook:
-		blockSignatureBeforeInsertHooks = append(blockSignatureBeforeInsertHooks, blockSignatureHook)
-	case boil.BeforeUpdateHook:
-		blockSignatureBeforeUpdateHooks = append(blockSignatureBeforeUpdateHooks, blockSignatureHook)
-	case boil.BeforeDeleteHook:
-		blockSignatureBeforeDeleteHooks = append(blockSignatureBeforeDeleteHooks, blockSignatureHook)
-	case boil.BeforeUpsertHook:
-		blockSignatureBeforeUpsertHooks = append(blockSignatureBeforeUpsertHooks, blockSignatureHook)
-	case boil.AfterInsertHook:
-		blockSignatureAfterInsertHooks = append(blockSignatureAfterInsertHooks, blockSignatureHook)
-	case boil.AfterSelectHook:
-		blockSignatureAfterSelectHooks = append(blockSignatureAfterSelectHooks, blockSignatureHook)
-	case boil.AfterUpdateHook:
-		blockSignatureAfterUpdateHooks = append(blockSignatureAfterUpdateHooks, blockSignatureHook)
-	case boil.AfterDeleteHook:
-		blockSignatureAfterDeleteHooks = append(blockSignatureAfterDeleteHooks, blockSignatureHook)
-	case boil.AfterUpsertHook:
-		blockSignatureAfterUpsertHooks = append(blockSignatureAfterUpsertHooks, blockSignatureHook)
-	}
-}
-
 // One returns a single blockSignature record from the query.
 func (q blockSignatureQuery) One(ctx context.Context, exec boil.ContextExecutor) (*BlockSignature, error) {
 	o := &BlockSignature{}
@@ -456,10 +284,6 @@ func (q blockSignatureQuery) One(ctx context.Context, exec boil.ContextExecutor)
 		return nil, errors.Wrap(err, "models: failed to execute a one query for block_signatures")
 	}
 
-	if err := o.doAfterSelectHooks(ctx, exec); err != nil {
-		return o, err
-	}
-
 	return o, nil
 }
 
@@ -470,14 +294,6 @@ func (q blockSignatureQuery) All(ctx context.Context, exec boil.ContextExecutor)
 	err := q.Bind(ctx, exec, &o)
 	if err != nil {
 		return nil, errors.Wrap(err, "models: failed to assign all query results to BlockSignature slice")
-	}
-
-	if len(blockSignatureAfterSelectHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterSelectHooks(ctx, exec); err != nil {
-				return o, err
-			}
-		}
 	}
 
 	return o, nil
@@ -592,14 +408,6 @@ func (blockSignatureL) LoadValidator(ctx context.Context, e boil.ContextExecutor
 	}
 	if err = results.Err(); err != nil {
 		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for validators")
-	}
-
-	if len(blockSignatureAfterSelectHooks) != 0 {
-		for _, obj := range resultSlice {
-			if err := obj.doAfterSelectHooks(ctx, e); err != nil {
-				return err
-			}
-		}
 	}
 
 	if len(resultSlice) == 0 {
@@ -730,10 +538,6 @@ func (o *BlockSignature) Insert(ctx context.Context, exec boil.ContextExecutor, 
 		}
 	}
 
-	if err := o.doBeforeInsertHooks(ctx, exec); err != nil {
-		return err
-	}
-
 	nzDefaults := queries.NonZeroDefaultSet(blockSignatureColumnsWithDefault, o)
 
 	key := makeCacheKey(columns, nzDefaults)
@@ -797,7 +601,7 @@ func (o *BlockSignature) Insert(ctx context.Context, exec boil.ContextExecutor, 
 		blockSignatureInsertCacheMut.Unlock()
 	}
 
-	return o.doAfterInsertHooks(ctx, exec)
+	return nil
 }
 
 // Update uses an executor to update the BlockSignature.
@@ -811,9 +615,6 @@ func (o *BlockSignature) Update(ctx context.Context, exec boil.ContextExecutor, 
 	}
 
 	var err error
-	if err = o.doBeforeUpdateHooks(ctx, exec); err != nil {
-		return 0, err
-	}
 	key := makeCacheKey(columns, nil)
 	blockSignatureUpdateCacheMut.RLock()
 	cache, cached := blockSignatureUpdateCache[key]
@@ -866,7 +667,7 @@ func (o *BlockSignature) Update(ctx context.Context, exec boil.ContextExecutor, 
 		blockSignatureUpdateCacheMut.Unlock()
 	}
 
-	return rowsAff, o.doAfterUpdateHooks(ctx, exec)
+	return rowsAff, nil
 }
 
 // UpdateAll updates all rows with the specified column values.
@@ -947,10 +748,6 @@ func (o *BlockSignature) Upsert(ctx context.Context, exec boil.ContextExecutor, 
 			o.CreatedAt = currTime
 		}
 		o.UpdatedAt = currTime
-	}
-
-	if err := o.doBeforeUpsertHooks(ctx, exec); err != nil {
-		return err
 	}
 
 	nzDefaults := queries.NonZeroDefaultSet(blockSignatureColumnsWithDefault, o)
@@ -1054,7 +851,7 @@ func (o *BlockSignature) Upsert(ctx context.Context, exec boil.ContextExecutor, 
 		blockSignatureUpsertCacheMut.Unlock()
 	}
 
-	return o.doAfterUpsertHooks(ctx, exec)
+	return nil
 }
 
 // Delete deletes a single BlockSignature record with an executor.
@@ -1062,10 +859,6 @@ func (o *BlockSignature) Upsert(ctx context.Context, exec boil.ContextExecutor, 
 func (o *BlockSignature) Delete(ctx context.Context, exec boil.ContextExecutor) (int64, error) {
 	if o == nil {
 		return 0, errors.New("models: no BlockSignature provided for delete")
-	}
-
-	if err := o.doBeforeDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	args := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(o)), blockSignaturePrimaryKeyMapping)
@@ -1084,10 +877,6 @@ func (o *BlockSignature) Delete(ctx context.Context, exec boil.ContextExecutor) 
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by delete for block_signatures")
-	}
-
-	if err := o.doAfterDeleteHooks(ctx, exec); err != nil {
-		return 0, err
 	}
 
 	return rowsAff, nil
@@ -1120,14 +909,6 @@ func (o BlockSignatureSlice) DeleteAll(ctx context.Context, exec boil.ContextExe
 		return 0, nil
 	}
 
-	if len(blockSignatureBeforeDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doBeforeDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
-	}
-
 	var args []interface{}
 	for _, obj := range o {
 		pkeyArgs := queries.ValuesFromMapping(reflect.Indirect(reflect.ValueOf(obj)), blockSignaturePrimaryKeyMapping)
@@ -1150,14 +931,6 @@ func (o BlockSignatureSlice) DeleteAll(ctx context.Context, exec boil.ContextExe
 	rowsAff, err := result.RowsAffected()
 	if err != nil {
 		return 0, errors.Wrap(err, "models: failed to get rows affected by deleteall for block_signatures")
-	}
-
-	if len(blockSignatureAfterDeleteHooks) != 0 {
-		for _, obj := range o {
-			if err := obj.doAfterDeleteHooks(ctx, exec); err != nil {
-				return 0, err
-			}
-		}
 	}
 
 	return rowsAff, nil

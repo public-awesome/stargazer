@@ -14,6 +14,7 @@ import (
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/models"
 	"github.com/rs/zerolog/log"
+	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -95,7 +96,17 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	if err != nil {
 		return err
 	}
-	return nil
+
+	sl, err := models.FindSyncLog(ctx, w.db, height)
+	if err != nil {
+		return fmt.Errorf("error finding sync log: %w", err)
+	}
+	sl.Processed = true
+	sl.SyncedAt = null.NewTime(time.Now(), true)
+
+	_, err = sl.Update(ctx, w.db, boil.Infer())
+	log.Info().Int64("height", height).Msg("block sync complete")
+	return err
 }
 
 func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
@@ -302,7 +313,7 @@ func SetBlockSignature(ctx context.Context, commit *tmtypes.Commit, sig tmtypes.
 		Timestamp:        sig.Timestamp,
 		Hash:             sig.BlockID(commit.BlockID).Hash.String(),
 	}
-	return s.Insert(ctx, db, boil.Infer())
+	return s.Upsert(ctx, db, false, nil, boil.Columns{}, boil.Infer())
 }
 
 // ExportValidator exports validator
@@ -318,7 +329,7 @@ func ExportValidator(ctx context.Context, val *tmtypes.Validator, db *sql.DB) er
 		Address: address,
 		PubKey:  consPubKey,
 	}
-	return validator.Upsert(ctx, db, false, []string{}, boil.Whitelist(), boil.Infer())
+	return validator.Upsert(ctx, db, false, []string{}, boil.Columns{}, boil.Infer())
 }
 
 // findValidatorByAddr finds a validator by address given a set of
