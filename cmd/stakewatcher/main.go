@@ -4,8 +4,10 @@ import (
 	"context"
 	"database/sql"
 	"flag"
+	"fmt"
 	"os"
 	"os/signal"
+	"strings"
 	"sync"
 	"syscall"
 
@@ -18,6 +20,10 @@ import (
 	"github.com/rs/zerolog/log"
 	migrate "github.com/rubenv/sql-migrate"
 	tmtypes "github.com/tendermint/tendermint/types"
+)
+
+const (
+	envPrefix = "STAKEWATCHER"
 )
 
 func runMigrations(db *sql.DB) {
@@ -34,16 +40,24 @@ func runMigrations(db *sql.DB) {
 	log.Info().Msgf("migrations run %d", n)
 
 }
-func main() {
 
+func getEnv(key, defaultValue string) string {
+	v := os.Getenv(fmt.Sprintf("%s_%s", envPrefix, key))
+	if v == strings.TrimSpace("") {
+		return defaultValue
+	}
+	return v
+}
+
+func main() {
 	var (
 		rpcEndpoint        string
 		restServerEndpoint string
 		autoMigrate        bool
 	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
-	fs.StringVar(&rpcEndpoint, "rpc-endpoint", "http://localhost:26657", "--rpc-endpoint specify the rpc endpoint")
-	fs.StringVar(&restServerEndpoint, "rest-server", "http://localhost:1317", "--rest-server specify the rest-server endpoint")
+	fs.StringVar(&rpcEndpoint, "rpc-endpoint", getEnv("RPC_ENDPOINT", "http://localhost:26657"), "--rpc-endpoint specify the rpc endpoint")
+	fs.StringVar(&restServerEndpoint, "rest-server", getEnv("REST_SERVER", "http://localhost:1317"), "--rest-server specify the rest-server endpoint")
 	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
