@@ -28,8 +28,8 @@ start:
 	./build/stakewatcher
 	
 fake-post:
-	stakecli tx curating post 1000000ufuel 1 $POST_ID "body" ""  --from validator --keyring-backend test --trust-node --chain-id $(shell stakecli status | jq '.node_info.network') -b block -y
+	stakecli tx curating post  1 $(POST_ID) "post body"  --from validator --keyring-backend test --trust-node --chain-id $(shell stakecli status | jq '.node_info.network') -b block -y
 
 	
 fake-upvote:
-	stakecli tx curating upvote 1000000ufuel 1 $(POST_ID) 1 "" --from validator --keyring-backend test --trust-node --chain-id $(shell stakecli status | jq '.node_info.network') -b block -y
+	stakecli tx curating upvote 1 $(POST_ID) 1  --from validator --keyring-backend test --trust-node --chain-id $(shell stakecli status | jq '.node_info.network') -b block -y

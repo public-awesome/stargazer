@@ -24,89 +24,104 @@ import (
 
 // Post is an object representing the database table.
 type Post struct {
-	ID              string    `boil:"id" json:"id" toml:"id" yaml:"id"`
-	Height          int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
-	VendorID        int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
-	PostID          string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
-	Creator         string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
-	RewardAddress   string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
-	DepositAmount   int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
-	DepositDenom    string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
-	Timestamp       time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
-	CurationEndTime time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
-	Body            string    `boil:"body" json:"body" toml:"body" yaml:"body"`
-	CreatedAt       time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt       time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	DeletedAt       null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	ID               string    `boil:"id" json:"id" toml:"id" yaml:"id"`
+	Height           int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
+	VendorID         int       `boil:"vendor_id" json:"vendorID" toml:"vendorID" yaml:"vendorID"`
+	PostID           string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
+	Creator          string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
+	RewardAddress    string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
+	DepositAmount    int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
+	DepositDenom     string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
+	Timestamp        time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
+	CurationEndTime  time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
+	Body             string    `boil:"body" json:"body" toml:"body" yaml:"body"`
+	TotalVotes       int       `boil:"total_votes" json:"totalVotes" toml:"totalVotes" yaml:"totalVotes"`
+	TotalVotesAmount int64     `boil:"total_votes_amount" json:"totalVotesAmount" toml:"totalVotesAmount" yaml:"totalVotesAmount"`
+	TotalVotesDenom  string    `boil:"total_votes_denom" json:"totalVotesDenom" toml:"totalVotesDenom" yaml:"totalVotesDenom"`
+	CreatedAt        time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt        time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	DeletedAt        null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var PostColumns = struct {
-	ID              string
-	Height          string
-	VendorID        string
-	PostID          string
-	Creator         string
-	RewardAddress   string
-	DepositAmount   string
-	DepositDenom    string
-	Timestamp       string
-	CurationEndTime string
-	Body            string
-	CreatedAt       string
-	UpdatedAt       string
-	DeletedAt       string
+	ID               string
+	Height           string
+	VendorID         string
+	PostID           string
+	Creator          string
+	RewardAddress    string
+	DepositAmount    string
+	DepositDenom     string
+	Timestamp        string
+	CurationEndTime  string
+	Body             string
+	TotalVotes       string
+	TotalVotesAmount string
+	TotalVotesDenom  string
+	CreatedAt        string
+	UpdatedAt        string
+	DeletedAt        string
 }{
-	ID:              "id",
-	Height:          "height",
-	VendorID:        "vendor_id",
-	PostID:          "post_id",
-	Creator:         "creator",
-	RewardAddress:   "reward_address",
-	DepositAmount:   "deposit_amount",
-	DepositDenom:    "deposit_denom",
-	Timestamp:       "timestamp",
-	CurationEndTime: "curation_end_time",
-	Body:            "body",
-	CreatedAt:       "created_at",
-	UpdatedAt:       "updated_at",
-	DeletedAt:       "deleted_at",
+	ID:               "id",
+	Height:           "height",
+	VendorID:         "vendor_id",
+	PostID:           "post_id",
+	Creator:          "creator",
+	RewardAddress:    "reward_address",
+	DepositAmount:    "deposit_amount",
+	DepositDenom:     "deposit_denom",
+	Timestamp:        "timestamp",
+	CurationEndTime:  "curation_end_time",
+	Body:             "body",
+	TotalVotes:       "total_votes",
+	TotalVotesAmount: "total_votes_amount",
+	TotalVotesDenom:  "total_votes_denom",
+	CreatedAt:        "created_at",
+	UpdatedAt:        "updated_at",
+	DeletedAt:        "deleted_at",
 }
 
 // Generated where
 
 var PostWhere = struct {
-	ID              whereHelperstring
-	Height          whereHelperint64
-	VendorID        whereHelperint
-	PostID          whereHelperstring
-	Creator         whereHelperstring
-	RewardAddress   whereHelperstring
-	DepositAmount   whereHelperint64
-	DepositDenom    whereHelperstring
-	Timestamp       whereHelpertime_Time
-	CurationEndTime whereHelpertime_Time
-	Body            whereHelperstring
-	CreatedAt       whereHelpertime_Time
-	UpdatedAt       whereHelpertime_Time
-	DeletedAt       whereHelpernull_Time
+	ID               whereHelperstring
+	Height           whereHelperint64
+	VendorID         whereHelperint
+	PostID           whereHelperstring
+	Creator          whereHelperstring
+	RewardAddress    whereHelperstring
+	DepositAmount    whereHelperint64
+	DepositDenom     whereHelperstring
+	Timestamp        whereHelpertime_Time
+	CurationEndTime  whereHelpertime_Time
+	Body             whereHelperstring
+	TotalVotes       whereHelperint
+	TotalVotesAmount whereHelperint64
+	TotalVotesDenom  whereHelperstring
+	CreatedAt        whereHelpertime_Time
+	UpdatedAt        whereHelpertime_Time
+	DeletedAt        whereHelpernull_Time
 }{
-	ID:              whereHelperstring{field: "\"posts\".\"id\""},
-	Height:          whereHelperint64{field: "\"posts\".\"height\""},
-	VendorID:        whereHelperint{field: "\"posts\".\"vendor_id\""},
-	PostID:          whereHelperstring{field: "\"posts\".\"post_id\""},
-	Creator:         whereHelperstring{field: "\"posts\".\"creator\""},
-	RewardAddress:   whereHelperstring{field: "\"posts\".\"reward_address\""},
-	DepositAmount:   whereHelperint64{field: "\"posts\".\"deposit_amount\""},
-	DepositDenom:    whereHelperstring{field: "\"posts\".\"deposit_denom\""},
-	Timestamp:       whereHelpertime_Time{field: "\"posts\".\"timestamp\""},
-	CurationEndTime: whereHelpertime_Time{field: "\"posts\".\"curation_end_time\""},
-	Body:            whereHelperstring{field: "\"posts\".\"body\""},
-	CreatedAt:       whereHelpertime_Time{field: "\"posts\".\"created_at\""},
-	UpdatedAt:       whereHelpertime_Time{field: "\"posts\".\"updated_at\""},
-	DeletedAt:       whereHelpernull_Time{field: "\"posts\".\"deleted_at\""},
+	ID:               whereHelperstring{field: "\"posts\".\"id\""},
+	Height:           whereHelperint64{field: "\"posts\".\"height\""},
+	VendorID:         whereHelperint{field: "\"posts\".\"vendor_id\""},
+	PostID:           whereHelperstring{field: "\"posts\".\"post_id\""},
+	Creator:          whereHelperstring{field: "\"posts\".\"creator\""},
+	RewardAddress:    whereHelperstring{field: "\"posts\".\"reward_address\""},
+	DepositAmount:    whereHelperint64{field: "\"posts\".\"deposit_amount\""},
+	DepositDenom:     whereHelperstring{field: "\"posts\".\"deposit_denom\""},
+	Timestamp:        whereHelpertime_Time{field: "\"posts\".\"timestamp\""},
+	CurationEndTime:  whereHelpertime_Time{field: "\"posts\".\"curation_end_time\""},
+	Body:             whereHelperstring{field: "\"posts\".\"body\""},
+	TotalVotes:       whereHelperint{field: "\"posts\".\"total_votes\""},
+	TotalVotesAmount: whereHelperint64{field: "\"posts\".\"total_votes_amount\""},
+	TotalVotesDenom:  whereHelperstring{field: "\"posts\".\"total_votes_denom\""},
+	CreatedAt:        whereHelpertime_Time{field: "\"posts\".\"created_at\""},
+	UpdatedAt:        whereHelpertime_Time{field: "\"posts\".\"updated_at\""},
+	DeletedAt:        whereHelpernull_Time{field: "\"posts\".\"deleted_at\""},
 }
 
 // PostRels is where relationship names are stored.
@@ -126,9 +141,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "created_at", "updated_at", "deleted_at"}
-	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "deleted_at"}
-	postColumnsWithDefault    = []string{"created_at", "updated_at"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at"}
+	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
+	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 

@@ -16,6 +16,7 @@ import (
 	"github.com/rs/zerolog/log"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"
+	"github.com/volatiletech/sqlboiler/v4/queries"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gofrs/uuid"
@@ -194,17 +195,20 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		return err
 	}
 	p := &models.Post{
-		ID:              id.String(),
-		VendorID:        vendorID,
-		Height:          height,
-		PostID:          attrs["post_id"],
-		Body:            attrs["body"],
-		Creator:         attrs["creator"],
-		RewardAddress:   attrs["reward_account"],
-		DepositAmount:   deposit.Amount.Int64(),
-		DepositDenom:    deposit.Denom,
-		CurationEndTime: endTime,
-		Timestamp:       ts,
+		ID:               id.String(),
+		VendorID:         vendorID,
+		Height:           height,
+		PostID:           attrs["post_id"],
+		Body:             attrs["body"],
+		Creator:          attrs["creator"],
+		RewardAddress:    attrs["reward_account"],
+		DepositAmount:    deposit.Amount.Int64(),
+		DepositDenom:     deposit.Denom,
+		TotalVotes:       0,
+		TotalVotesAmount: 0,
+		TotalVotesDenom:  deposit.Denom,
+		CurationEndTime:  endTime,
+		Timestamp:        ts,
 	}
 	return p.Insert(ctx, db, boil.Infer())
 }
@@ -245,7 +249,29 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 		VoteNumber:    voteNum,
 		Timestamp:     ts,
 	}
-	return p.Insert(ctx, db, boil.Infer())
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+	err = p.Insert(ctx, tx, boil.Infer())
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	updatePostQuery := `UPDATE posts SET total_votes = total_votes + $1,
+											total_votes_amount = total_votes_amount + $2, 
+											updated_at = $3
+											WHERE vendor_id=$4 and post_id=$5`
+	_, err = queries.
+		Raw(updatePostQuery, p.VoteNumber, p.DepositAmount, time.Now().UTC(), p.VendorID, p.PostID).
+		ExecContext(ctx, tx)
+	if err != nil {
+		tx.Rollback()
+		return err
+	}
+	tx.Commit()
+	return nil
+
 }
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
