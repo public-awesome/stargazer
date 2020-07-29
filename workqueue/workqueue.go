@@ -255,22 +255,21 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 	}
 	err = p.Insert(ctx, tx, boil.Infer())
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
 	updatePostQuery := `UPDATE posts SET total_votes = total_votes + $1,
-											total_votes_amount = total_votes_amount + $2, 
-											updated_at = $3
-											WHERE vendor_id=$4 and post_id=$5`
+	  total_votes_amount = total_votes_amount + $2, 
+	  updated_at = $3
+    WHERE vendor_id=$4 and post_id=$5`
 	_, err = queries.
 		Raw(updatePostQuery, p.VoteNumber, p.DepositAmount, time.Now().UTC(), p.VendorID, p.PostID).
 		ExecContext(ctx, tx)
 	if err != nil {
-		tx.Rollback()
+		_ = tx.Rollback()
 		return err
 	}
-	tx.Commit()
-	return nil
+	return tx.Commit()
 
 }
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
