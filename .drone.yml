@@ -25,7 +25,7 @@ steps:
       password:
         from_secret: docker_password
     when:
-      branch: feature/updates
+      branch: master
       event:
         - push
   - name: slack
@@ -38,4 +38,6 @@ steps:
 
 ---
 kind: signature
-hmac: 65acc299269a99760a6a3a96fc6de20244f07bb30af67fefeb29a8a6b72935fc
+hmac: ae43e521c7c5e39cc9a8bc7923069448c242176a599b55d2f3497e4d50fee6c1
+
+...
