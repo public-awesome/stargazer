@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testPosts(t *testing.T) {
+func testUpvotes(t *testing.T) {
 	t.Parallel()
 
-	query := Posts()
+	query := Upvotes()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testPostsDelete(t *testing.T) {
+func testUpvotesDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testPostsDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testPostsDelete(t *testing.T) {
 	}
 }
 
-func testPostsQueryDeleteAll(t *testing.T) {
+func testUpvotesQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testPostsQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := Posts().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := Upvotes().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testPostsQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testPostsSliceDeleteAll(t *testing.T) {
+func testUpvotesSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testPostsSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := PostSlice{o}
+	slice := UpvoteSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testPostsSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testPostsSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testPostsExists(t *testing.T) {
+func testUpvotesExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testPostsExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := PostExists(ctx, tx, o.ID)
+	e, err := UpvoteExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if Post exists: %s", err)
+		t.Errorf("Unable to check if Upvote exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected PostExists to return true, but got false.")
+		t.Errorf("Expected UpvoteExists to return true, but got false.")
 	}
 }
 
-func testPostsFind(t *testing.T) {
+func testUpvotesFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testPostsFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	postFound, err := FindPost(ctx, tx, o.ID)
+	upvoteFound, err := FindUpvote(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if postFound == nil {
+	if upvoteFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testPostsBind(t *testing.T) {
+func testUpvotesBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testPostsBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = Posts().Bind(ctx, tx, o); err != nil {
+	if err = Upvotes().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testPostsOne(t *testing.T) {
+func testUpvotesOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testPostsOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := Posts().One(ctx, tx); err != nil {
+	if x, err := Upvotes().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testPostsAll(t *testing.T) {
+func testUpvotesAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	postOne := &Post{}
-	postTwo := &Post{}
-	if err = randomize.Struct(seed, postOne, postDBTypes, false, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	upvoteOne := &Upvote{}
+	upvoteTwo := &Upvote{}
+	if err = randomize.Struct(seed, upvoteOne, upvoteDBTypes, false, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
-	if err = randomize.Struct(seed, postTwo, postDBTypes, false, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	if err = randomize.Struct(seed, upvoteTwo, upvoteDBTypes, false, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = postOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = upvoteOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = postTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = upvoteTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := Posts().All(ctx, tx)
+	slice, err := Upvotes().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testPostsAll(t *testing.T) {
 	}
 }
 
-func testPostsCount(t *testing.T) {
+func testUpvotesCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	postOne := &Post{}
-	postTwo := &Post{}
-	if err = randomize.Struct(seed, postOne, postDBTypes, false, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	upvoteOne := &Upvote{}
+	upvoteTwo := &Upvote{}
+	if err = randomize.Struct(seed, upvoteOne, upvoteDBTypes, false, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
-	if err = randomize.Struct(seed, postTwo, postDBTypes, false, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	if err = randomize.Struct(seed, upvoteTwo, upvoteDBTypes, false, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = postOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = upvoteOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = postTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = upvoteTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,14 +299,14 @@ func testPostsCount(t *testing.T) {
 	}
 }
 
-func testPostsInsert(t *testing.T) {
+func testUpvotesInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -316,7 +316,7 @@ func testPostsInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -326,24 +326,24 @@ func testPostsInsert(t *testing.T) {
 	}
 }
 
-func testPostsInsertWhitelist(t *testing.T) {
+func testUpvotesInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(postColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(upvoteColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -353,14 +353,14 @@ func testPostsInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testPostsReload(t *testing.T) {
+func testUpvotesReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -375,14 +375,14 @@ func testPostsReload(t *testing.T) {
 	}
 }
 
-func testPostsReloadAll(t *testing.T) {
+func testUpvotesReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -392,21 +392,21 @@ func testPostsReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := PostSlice{o}
+	slice := UpvoteSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testPostsSelect(t *testing.T) {
+func testUpvotesSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -416,7 +416,7 @@ func testPostsSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := Posts().All(ctx, tx)
+	slice, err := Upvotes().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -427,25 +427,25 @@ func testPostsSelect(t *testing.T) {
 }
 
 var (
-	postDBTypes = map[string]string{`ID`: `uuid`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `Creator`: `text`, `RewardAddress`: `text`, `DepositAmount`: `bigint`, `DepositDenom`: `text`, `Timestamp`: `timestamp without time zone`, `CurationEndTime`: `timestamp without time zone`, `Body`: `text`, `TotalVotes`: `integer`, `TotalVotesAmount`: `bigint`, `TotalVotesDenom`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
-	_           = bytes.MinRead
+	upvoteDBTypes = map[string]string{`ID`: `uuid`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `Creator`: `text`, `RewardAddress`: `text`, `VoteNumber`: `integer`, `VoteAmount`: `bigint`, `VoteDenom`: `text`, `DepositAmount`: `bigint`, `DepositDenom`: `text`, `Timestamp`: `timestamp without time zone`, `Body`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	_             = bytes.MinRead
 )
 
-func testPostsUpdate(t *testing.T) {
+func testUpvotesUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(postPrimaryKeyColumns) {
+	if 0 == len(upvotePrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(postAllColumns) == len(postPrimaryKeyColumns) {
+	if len(upvoteAllColumns) == len(upvotePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -455,7 +455,7 @@ func testPostsUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -464,8 +464,8 @@ func testPostsUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, postDBTypes, true, postPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvotePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -475,18 +475,18 @@ func testPostsUpdate(t *testing.T) {
 	}
 }
 
-func testPostsSliceUpdateAll(t *testing.T) {
+func testUpvotesSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(postAllColumns) == len(postPrimaryKeyColumns) {
+	if len(upvoteAllColumns) == len(upvotePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &Post{}
-	if err = randomize.Struct(seed, o, postDBTypes, true, postColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := &Upvote{}
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvoteColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -496,7 +496,7 @@ func testPostsSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -505,18 +505,18 @@ func testPostsSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, postDBTypes, true, postPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	if err = randomize.Struct(seed, o, upvoteDBTypes, true, upvotePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(postAllColumns, postPrimaryKeyColumns) {
-		fields = postAllColumns
+	if strmangle.StringSliceMatch(upvoteAllColumns, upvotePrimaryKeyColumns) {
+		fields = upvoteAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			postAllColumns,
-			postPrimaryKeyColumns,
+			upvoteAllColumns,
+			upvotePrimaryKeyColumns,
 		)
 	}
 
@@ -534,7 +534,7 @@ func testPostsSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := PostSlice{o}
+	slice := UpvoteSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -542,29 +542,29 @@ func testPostsSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testPostsUpsert(t *testing.T) {
+func testUpvotesUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(postAllColumns) == len(postPrimaryKeyColumns) {
+	if len(upvoteAllColumns) == len(upvotePrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := Post{}
-	if err = randomize.Struct(seed, &o, postDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	o := Upvote{}
+	if err = randomize.Struct(seed, &o, upvoteDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Post: %s", err)
+		t.Errorf("Unable to upsert Upvote: %s", err)
 	}
 
-	count, err := Posts().Count(ctx, tx)
+	count, err := Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -573,15 +573,15 @@ func testPostsUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, postDBTypes, false, postPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize Post struct: %s", err)
+	if err = randomize.Struct(seed, &o, upvoteDBTypes, false, upvotePrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize Upvote struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert Post: %s", err)
+		t.Errorf("Unable to upsert Upvote: %s", err)
 	}
 
-	count, err = Posts().Count(ctx, tx)
+	count, err = Upvotes().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

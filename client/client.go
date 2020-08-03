@@ -119,6 +119,7 @@ func (p *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 // if the transaction exists. An error is returned if the tx doesn't exist or
 // decoding fails.
 func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
+
 	resp, err := p.httpClient.Get(fmt.Sprintf("%s/txs/%s", p.restNode, hash))
 	if err != nil {
 		return sdk.TxResponse{}, err
@@ -130,13 +131,13 @@ func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
 	if err != nil {
 		return sdk.TxResponse{}, err
 	}
-
+	if resp.StatusCode != http.StatusOK {
+		return sdk.TxResponse{}, fmt.Errorf("response error fetching transaction with status [%d] -  %s ", resp.StatusCode, resp.Status)
+	}
 	var tx sdk.TxResponse
-
 	if err := p.cdc.UnmarshalJSON(bz, &tx); err != nil {
 		return sdk.TxResponse{}, err
 	}
-
 	return tx, nil
 }
 
@@ -144,7 +145,7 @@ func (p *Proxy) Tx(hash string) (sdk.TxResponse, error) {
 // in the sdk.TxResponse format which internally contains an sdk.Tx. An error is
 // returned if any query fails.
 func (p *Proxy) Txs(block *tmctypes.ResultBlock) ([]sdk.TxResponse, error) {
-	txResponses := make([]sdk.TxResponse, len(block.Block.Txs), len(block.Block.Txs))
+	txResponses := make([]sdk.TxResponse, len(block.Block.Txs))
 
 	for i, tmTx := range block.Block.Txs {
 		txResponse, err := p.Tx(fmt.Sprintf("%X", tmTx.Hash()))

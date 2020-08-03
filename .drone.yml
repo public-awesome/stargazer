@@ -1,0 +1,41 @@
+---
+kind: pipeline
+type: docker
+name: default
+
+steps:
+  - name: lint
+    image: golangci/golangci-lint:v1.29
+    commands:
+      - go mod download
+      - golangci-lint run -v --timeout 3m
+  - name: build
+    image: golang:1.14.6
+    commands:
+      - apt-get update && apt-get install cmake -y
+      - make install-pkger
+      - make build-linux
+  - name: publish-docker
+    image: plugins/docker:18
+    settings:
+      dockerfile: Dockerfile
+      repo: publicawesome/stakewatcher
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+    when:
+      branch: feature/updates
+      event:
+        - push
+  - name: slack
+    image: plugins/slack
+    settings:
+      webhook:
+        from_secret: slack_webhook
+    when:
+      status: [success, failure]
+
+---
+kind: signature
+hmac: 65acc299269a99760a6a3a96fc6de20244f07bb30af67fefeb29a8a6b72935fc
