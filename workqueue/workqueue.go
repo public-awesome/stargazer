@@ -263,7 +263,7 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 	  updated_at = $3
     WHERE vendor_id=$4 and post_id=$5`
 	_, err = queries.
-		Raw(updatePostQuery, p.VoteNumber, p.DepositAmount, time.Now().UTC(), p.VendorID, p.PostID).
+		Raw(updatePostQuery, p.VoteNumber, p.VoteAmount, time.Now().UTC(), p.VendorID, p.PostID).
 		ExecContext(ctx, tx)
 	if err != nil {
 		_ = tx.Rollback()
