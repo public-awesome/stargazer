@@ -15,7 +15,7 @@ require (
 	github.com/public-awesome/stakebird v0.2.1-0.20200829230738-8457c9c2f28d
 	github.com/rs/zerolog v1.19.0
 	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351
-	github.com/spf13/viper v1.7.0
+	github.com/spf13/viper v1.7.1
 	github.com/tendermint/tendermint v0.33.4
 	github.com/volatiletech/null/v8 v8.1.0
 	github.com/volatiletech/randomize v0.0.1
