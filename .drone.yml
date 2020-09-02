@@ -15,6 +15,8 @@ steps:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
       - make build-linux
+    environment:
+      GOPROXY: http://goproxy
   - name: publish-docker
     image: plugins/docker:18
     settings:
@@ -38,6 +40,4 @@ steps:
 
 ---
 kind: signature
-hmac: ae43e521c7c5e39cc9a8bc7923069448c242176a599b55d2f3497e4d50fee6c1
-
-...
+hmac: 3e3c943f8fc17e31938ffd1782a50fdcb7eaf26f6898b5b3dd5599d55fc63bb5
