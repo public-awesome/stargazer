@@ -9,6 +9,8 @@ steps:
     commands:
       - go mod download
       - golangci-lint run -v --timeout 3m
+    environment:
+      GOPROXY: http://goproxy
   - name: build
     image: golang:1.14.6
     commands:
@@ -40,4 +42,6 @@ steps:
 
 ---
 kind: signature
-hmac: 3e3c943f8fc17e31938ffd1782a50fdcb7eaf26f6898b5b3dd5599d55fc63bb5
+hmac: 9439a1bdae4a43f6ff52d2af4ddb1ab441660e9a3c25b70fadec460801795e32
+
+...
