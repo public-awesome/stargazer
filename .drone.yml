@@ -9,12 +9,16 @@ steps:
     commands:
       - go mod download
       - golangci-lint run -v --timeout 3m
+    environment:
+      GOPROXY: http://goproxy
   - name: build
     image: golang:1.14.6
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
       - make build-linux
+    environment:
+      GOPROXY: http://goproxy
   - name: publish-docker
     image: plugins/docker:18
     settings:
@@ -38,6 +42,6 @@ steps:
 
 ---
 kind: signature
-hmac: ae43e521c7c5e39cc9a8bc7923069448c242176a599b55d2f3497e4d50fee6c1
+hmac: 9439a1bdae4a43f6ff52d2af4ddb1ab441660e9a3c25b70fadec460801795e32
 
 ...
