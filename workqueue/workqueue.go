@@ -206,7 +206,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		DepositDenom:     deposit.Denom,
 		TotalVotes:       0,
 		TotalVotesAmount: 0,
-		TotalVotesDenom:  deposit.Denom,
+		TotalVotesDenom:  attrs["vote_denom"],
 		CurationEndTime:  endTime,
 		Timestamp:        ts,
 	}
