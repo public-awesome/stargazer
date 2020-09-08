@@ -5,14 +5,14 @@ name: default
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.29
+    image: golangci/golangci-lint:v1.31
     commands:
       - go mod download
       - golangci-lint run -v --timeout 5m
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.14.6
+    image: golang:1.15.1
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
@@ -42,6 +42,6 @@ steps:
 
 ---
 kind: signature
-hmac: f217ff8815ae94bc7011f7718bc7a35959270c6ecb0b7a9e95d8facd1d3f65f5
+hmac: 874f5fc035474a9c035564eafe4a2367c5f4390064e563988797ec63d2b2da6a
 
 ...
