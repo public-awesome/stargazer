@@ -182,10 +182,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 	if err != nil {
 		return err
 	}
-	deposit, err := sdk.ParseCoin(attrs["deposit"])
-	if err != nil {
-		return err
-	}
+
 	endTime, err := time.Parse(time.RFC3339, attrs["curation_end_time"])
 	if err != nil {
 		return err
@@ -202,8 +199,6 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		Body:             attrs["body"],
 		Creator:          attrs["creator"],
 		RewardAddress:    attrs["reward_account"],
-		DepositAmount:    deposit.Amount.Int64(),
-		DepositDenom:     deposit.Denom,
 		TotalVotes:       0,
 		TotalVotesAmount: 0,
 		TotalVotesDenom:  attrs["vote_denom"],
