@@ -218,10 +218,6 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 	if err != nil {
 		return err
 	}
-	deposit, err := sdk.ParseCoin(attrs["deposit"])
-	if err != nil {
-		return err
-	}
 	voteAmount, err := sdk.ParseCoin(attrs["vote_amount"])
 	if err != nil {
 		return err
@@ -237,8 +233,6 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 		PostID:        attrs["post_id"],
 		Creator:       attrs["curator"],
 		RewardAddress: attrs["reward_account"],
-		DepositAmount: deposit.Amount.Int64(),
-		DepositDenom:  deposit.Denom,
 		VoteAmount:    voteAmount.Amount.Int64(),
 		VoteDenom:     voteAmount.Denom,
 		VoteNumber:    voteNum,
