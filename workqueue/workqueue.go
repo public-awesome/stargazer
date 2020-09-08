@@ -55,7 +55,7 @@ func (w *Worker) Start(ctx context.Context) {
 			err := w.process(ctx, blockHeight)
 			if err != nil {
 				log.Error().Err(err).Int64("height", blockHeight).Msg("error processing block")
-				// TODO: add retry
+
 				continue
 			}
 			log.Info().Int64("height", blockHeight).Msg("block synced")

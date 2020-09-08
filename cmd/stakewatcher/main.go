@@ -10,6 +10,7 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+	"time"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/lib/pq"
@@ -178,7 +179,7 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 		log.Fatal().Err(err).Msg("failed to subscribe to new blocks")
 	}
 	log.Info().Msg("listening for new block events")
-
+	t := time.NewTicker(time.Second * 10)
 	for {
 		select {
 		case <-ctx.Done():
@@ -196,6 +197,20 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 				panic(err)
 			}
 			exportQueue <- height
+		case <-t.C:
+			log.Info().Msg("retry pending blocks")
+			go retryBlocks(ctx, exportQueue, db)
 		}
+	}
+}
+
+func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
+	q := fmt.Sprintf("%s is null and %s < ?", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt)
+	blocks, err := models.SyncLogs(qm.Where(q, time.Now().Add(time.Second*-20))).All(ctx, db)
+	if err != nil {
+		log.Error().Err(err).Msg("error getting pending blocks")
+	}
+	for _, b := range blocks {
+		exportQueue <- b.BlockHeight
 	}
 }
