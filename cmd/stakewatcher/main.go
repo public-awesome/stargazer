@@ -209,6 +209,7 @@ func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
 	blocks, err := models.SyncLogs(qm.Where(q, time.Now().Add(time.Second*-20))).All(ctx, db)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting pending blocks")
+		return
 	}
 	for _, b := range blocks {
 		exportQueue <- b.BlockHeight
