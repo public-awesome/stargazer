@@ -205,7 +205,7 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 }
 
 func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
-	q := fmt.Sprintf("%s is null and %s < ?", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt)
+	q := fmt.Sprintf("%s is null and %s < ? and %s > 1 ", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt, models.SyncLogColumns.BlockHeight)
 	blocks, err := models.SyncLogs(qm.Where(q, time.Now().Add(time.Second*-20))).All(ctx, db)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting pending blocks")
