@@ -19,7 +19,7 @@ build-linux: pkger
 build-docker:
 	docker build -t publicawesome/stakewatcher .
 
-migrate: pkger
+run-migrate: pkger
 	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher migrate
 run:
 	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher

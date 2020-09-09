@@ -41,6 +41,7 @@ type Post struct {
 	CreatedAt        time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt        time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 	DeletedAt        null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	TotalVoterCount  int       `boil:"total_voter_count" json:"totalVoterCount" toml:"totalVoterCount" yaml:"totalVoterCount"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -64,6 +65,7 @@ var PostColumns = struct {
 	CreatedAt        string
 	UpdatedAt        string
 	DeletedAt        string
+	TotalVoterCount  string
 }{
 	ID:               "id",
 	Height:           "height",
@@ -82,6 +84,7 @@ var PostColumns = struct {
 	CreatedAt:        "created_at",
 	UpdatedAt:        "updated_at",
 	DeletedAt:        "deleted_at",
+	TotalVoterCount:  "total_voter_count",
 }
 
 // Generated where
@@ -104,6 +107,7 @@ var PostWhere = struct {
 	CreatedAt        whereHelpertime_Time
 	UpdatedAt        whereHelpertime_Time
 	DeletedAt        whereHelpernull_Time
+	TotalVoterCount  whereHelperint
 }{
 	ID:               whereHelperstring{field: "\"posts\".\"id\""},
 	Height:           whereHelperint64{field: "\"posts\".\"height\""},
@@ -122,6 +126,7 @@ var PostWhere = struct {
 	CreatedAt:        whereHelpertime_Time{field: "\"posts\".\"created_at\""},
 	UpdatedAt:        whereHelpertime_Time{field: "\"posts\".\"updated_at\""},
 	DeletedAt:        whereHelpernull_Time{field: "\"posts\".\"deleted_at\""},
+	TotalVoterCount:  whereHelperint{field: "\"posts\".\"total_voter_count\""},
 }
 
 // PostRels is where relationship names are stored.
@@ -141,9 +146,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count"}
 	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
-	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at"}
+	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 
