@@ -249,7 +249,8 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 		return err
 	}
 	updatePostQuery := `UPDATE posts SET total_votes = total_votes + $1,
-	  total_votes_amount = total_votes_amount + $2, 
+	  total_votes_amount = total_votes_amount + $2,
+	  total_voter_count = total_voter_count + 1, 
 	  updated_at = $3
     WHERE vendor_id=$4 and post_id=$5`
 	_, err = queries.
