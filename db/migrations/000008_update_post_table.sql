@@ -1,6 +1,6 @@
 -- +migrate Up
 ALTER TABLE posts
-  ADD COLUMN total_voter_count int DEFAULT 0;
+  ADD COLUMN total_voter_count int NOT NULL DEFAULT 0;
 
 -- +migrate Down
 ALTER TABLE posts
