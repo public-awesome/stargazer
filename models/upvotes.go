@@ -33,8 +33,6 @@ type Upvote struct {
 	VoteNumber    int       `boil:"vote_number" json:"voteNumber" toml:"voteNumber" yaml:"voteNumber"`
 	VoteAmount    int64     `boil:"vote_amount" json:"voteAmount" toml:"voteAmount" yaml:"voteAmount"`
 	VoteDenom     string    `boil:"vote_denom" json:"voteDenom" toml:"voteDenom" yaml:"voteDenom"`
-	DepositAmount int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
-	DepositDenom  string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
 	Timestamp     time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
 	Body          string    `boil:"body" json:"body" toml:"body" yaml:"body"`
 	CreatedAt     time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
@@ -55,8 +53,6 @@ var UpvoteColumns = struct {
 	VoteNumber    string
 	VoteAmount    string
 	VoteDenom     string
-	DepositAmount string
-	DepositDenom  string
 	Timestamp     string
 	Body          string
 	CreatedAt     string
@@ -72,8 +68,6 @@ var UpvoteColumns = struct {
 	VoteNumber:    "vote_number",
 	VoteAmount:    "vote_amount",
 	VoteDenom:     "vote_denom",
-	DepositAmount: "deposit_amount",
-	DepositDenom:  "deposit_denom",
 	Timestamp:     "timestamp",
 	Body:          "body",
 	CreatedAt:     "created_at",
@@ -93,8 +87,6 @@ var UpvoteWhere = struct {
 	VoteNumber    whereHelperint
 	VoteAmount    whereHelperint64
 	VoteDenom     whereHelperstring
-	DepositAmount whereHelperint64
-	DepositDenom  whereHelperstring
 	Timestamp     whereHelpertime_Time
 	Body          whereHelperstring
 	CreatedAt     whereHelpertime_Time
@@ -110,8 +102,6 @@ var UpvoteWhere = struct {
 	VoteNumber:    whereHelperint{field: "\"upvotes\".\"vote_number\""},
 	VoteAmount:    whereHelperint64{field: "\"upvotes\".\"vote_amount\""},
 	VoteDenom:     whereHelperstring{field: "\"upvotes\".\"vote_denom\""},
-	DepositAmount: whereHelperint64{field: "\"upvotes\".\"deposit_amount\""},
-	DepositDenom:  whereHelperstring{field: "\"upvotes\".\"deposit_denom\""},
 	Timestamp:     whereHelpertime_Time{field: "\"upvotes\".\"timestamp\""},
 	Body:          whereHelperstring{field: "\"upvotes\".\"body\""},
 	CreatedAt:     whereHelpertime_Time{field: "\"upvotes\".\"created_at\""},
@@ -136,8 +126,8 @@ func (*upvoteR) NewStruct() *upvoteR {
 type upvoteL struct{}
 
 var (
-	upvoteAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "body", "created_at", "updated_at", "deleted_at"}
-	upvoteColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "deposit_amount", "deposit_denom", "timestamp", "body", "deleted_at"}
+	upvoteAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "timestamp", "body", "created_at", "updated_at", "deleted_at"}
+	upvoteColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "vote_number", "vote_amount", "vote_denom", "timestamp", "body", "deleted_at"}
 	upvoteColumnsWithDefault    = []string{"created_at", "updated_at"}
 	upvotePrimaryKeyColumns     = []string{"id"}
 )
