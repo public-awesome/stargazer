@@ -30,8 +30,6 @@ type Post struct {
 	PostID           string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
 	Creator          string    `boil:"creator" json:"creator" toml:"creator" yaml:"creator"`
 	RewardAddress    string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
-	DepositAmount    int64     `boil:"deposit_amount" json:"depositAmount" toml:"depositAmount" yaml:"depositAmount"`
-	DepositDenom     string    `boil:"deposit_denom" json:"depositDenom" toml:"depositDenom" yaml:"depositDenom"`
 	Timestamp        time.Time `boil:"timestamp" json:"timestamp" toml:"timestamp" yaml:"timestamp"`
 	CurationEndTime  time.Time `boil:"curation_end_time" json:"curationEndTime" toml:"curationEndTime" yaml:"curationEndTime"`
 	Body             string    `boil:"body" json:"body" toml:"body" yaml:"body"`
@@ -54,8 +52,6 @@ var PostColumns = struct {
 	PostID           string
 	Creator          string
 	RewardAddress    string
-	DepositAmount    string
-	DepositDenom     string
 	Timestamp        string
 	CurationEndTime  string
 	Body             string
@@ -73,8 +69,6 @@ var PostColumns = struct {
 	PostID:           "post_id",
 	Creator:          "creator",
 	RewardAddress:    "reward_address",
-	DepositAmount:    "deposit_amount",
-	DepositDenom:     "deposit_denom",
 	Timestamp:        "timestamp",
 	CurationEndTime:  "curation_end_time",
 	Body:             "body",
@@ -96,8 +90,6 @@ var PostWhere = struct {
 	PostID           whereHelperstring
 	Creator          whereHelperstring
 	RewardAddress    whereHelperstring
-	DepositAmount    whereHelperint64
-	DepositDenom     whereHelperstring
 	Timestamp        whereHelpertime_Time
 	CurationEndTime  whereHelpertime_Time
 	Body             whereHelperstring
@@ -115,8 +107,6 @@ var PostWhere = struct {
 	PostID:           whereHelperstring{field: "\"posts\".\"post_id\""},
 	Creator:          whereHelperstring{field: "\"posts\".\"creator\""},
 	RewardAddress:    whereHelperstring{field: "\"posts\".\"reward_address\""},
-	DepositAmount:    whereHelperint64{field: "\"posts\".\"deposit_amount\""},
-	DepositDenom:     whereHelperstring{field: "\"posts\".\"deposit_denom\""},
 	Timestamp:        whereHelpertime_Time{field: "\"posts\".\"timestamp\""},
 	CurationEndTime:  whereHelpertime_Time{field: "\"posts\".\"curation_end_time\""},
 	Body:             whereHelperstring{field: "\"posts\".\"body\""},
@@ -146,8 +136,8 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count"}
-	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "deposit_amount", "deposit_denom", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count"}
+	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
 	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
