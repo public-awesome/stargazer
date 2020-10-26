@@ -9,13 +9,12 @@ import (
 	"time"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/std"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
-	libclient "github.com/tendermint/tendermint/rpc/lib/client"
+	libclient "github.com/tendermint/tendermint/rpc/jsonrpc/client"
 )
 
 var clientTimeout = 5 * time.Second
@@ -26,8 +25,8 @@ type Proxy struct {
 	rpcClient  rpcclient.Client // Tendermint (RPC client) node
 	httpClient *http.Client
 	restNode   string // Full (REST client) node
-	cdc        *codec.Codec
-	appCodec   *std.Codec
+	cdc        codec.Marshaler
+	amino      *codec.LegacyAmino
 }
 
 func newRPCClient(remote string) (*rpchttp.HTTP, error) {
@@ -49,7 +48,7 @@ func newRPCClient(remote string) (*rpchttp.HTTP, error) {
 }
 
 // NewProxy returns a new Proxy instance
-func NewProxy(rpcNode, restNode string, cdc *codec.Codec, appCodec *std.Codec) (*Proxy, error) {
+func NewProxy(rpcNode, restNode string, cdc codec.Marshaler, amino *codec.LegacyAmino) (*Proxy, error) {
 	rpcClient, err := newRPCClient(rpcNode)
 	if err != nil {
 		return nil, err
@@ -60,7 +59,7 @@ func NewProxy(rpcNode, restNode string, cdc *codec.Codec, appCodec *std.Codec) (
 			Timeout: clientTimeout,
 		},
 		restNode: restNode,
-		appCodec: appCodec,
+		amino:    amino,
 		cdc:      cdc,
 	}
 	return p, nil
@@ -69,7 +68,7 @@ func NewProxy(rpcNode, restNode string, cdc *codec.Codec, appCodec *std.Codec) (
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
 func (p *Proxy) LatestHeight() (int64, error) {
-	status, err := p.rpcClient.Status()
+	status, err := p.rpcClient.Status(context.TODO())
 	if err != nil {
 		return -1, err
 	}
@@ -80,7 +79,7 @@ func (p *Proxy) LatestHeight() (int64, error) {
 
 // Block queries for a block by height. An error is returned if the query fails.
 func (p *Proxy) Block(height int64) (*tmctypes.ResultBlock, error) {
-	return p.rpcClient.Block(&height)
+	return p.rpcClient.Block(context.TODO(), &height)
 }
 
 // TendermintTx queries for a transaction by hash. An error is returned if the
@@ -91,13 +90,15 @@ func (p *Proxy) TendermintTx(hash string) (*tmctypes.ResultTx, error) {
 		return nil, err
 	}
 
-	return p.rpcClient.Tx(hashRaw, false)
+	return p.rpcClient.Tx(context.TODO(), hashRaw, false)
 }
 
 // Validators returns all the known Tendermint validators for a given block
 // height. An error is returned if the query fails.
 func (p *Proxy) Validators(height int64) (*tmctypes.ResultValidators, error) {
-	return p.rpcClient.Validators(&height, 1, 10000)
+	page := 1
+	perPage := 1000
+	return p.rpcClient.Validators(context.TODO(), &height, &page, &perPage)
 }
 
 // Stop defers the node stop execution to the RPC client.

@@ -88,7 +88,7 @@ func main() {
 		runMigrations(db)
 	}
 
-	appCodec, cdc := app.MakeCodecs()
+	marshaler, amino := app.MakeCodecs()
 
 	config := sdk.GetConfig()
 	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
@@ -96,7 +96,7 @@ func main() {
 	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
 	config.Seal()
 
-	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, cdc, appCodec)
+	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, marshaler, amino)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
@@ -128,7 +128,7 @@ func main() {
 
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
-	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
+	wk := workqueue.NewWorker(marshaler, amino, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue, db)
 
