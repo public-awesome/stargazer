@@ -12,7 +12,6 @@ import (
 	"syscall"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/lib/pq"
 	"github.com/markbates/pkger"
 	"github.com/public-awesome/stakebird/app"
@@ -88,15 +87,11 @@ func main() {
 		runMigrations(db)
 	}
 
-	marshaler, amino := app.MakeCodecs()
+	config := app.MakeEncodingConfig()
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
-	config.Seal()
+	app.ConfigureAccountPrefixes()
 
-	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, marshaler, amino)
+	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, config.Marshaler, config.Amino)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
