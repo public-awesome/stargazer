@@ -588,6 +588,8 @@ github.com/public-awesome/stakebird v0.2.5-0.20201015032142-79e86d431c65 h1:IgSO
 github.com/public-awesome/stakebird v0.2.5-0.20201015032142-79e86d431c65/go.mod h1:wOS5Asi/OGlhpsIrNkJJlPjbJANmBhsISrcd3IPv5cY=
 github.com/public-awesome/stakebird v0.2.5-0.20201024200035-f95939ff2d99 h1:e+/aCRs6ctkz6TF6b5Df2xDZHOk959opYDkJqqmYqlo=
 github.com/public-awesome/stakebird v0.2.5-0.20201024200035-f95939ff2d99/go.mod h1:V2IjlHmn9476jV6aSMQfZSmZ6+z5fT2dOgSraevdryQ=
+github.com/public-awesome/stakebird v0.3.1 h1:Sv57W2c9oBdAVnnco+dEJD8ykT1Ufqb+//CYtShGIUI=
+github.com/public-awesome/stakebird v0.3.1/go.mod h1:V2IjlHmn9476jV6aSMQfZSmZ6+z5fT2dOgSraevdryQ=
 github.com/rakyll/statik v0.1.7 h1:OF3QCZUuyPxuGEP7B4ypUa7sB/iHtqOTDYZXGM8KOdQ=
 github.com/rakyll/statik v0.1.7/go.mod h1:AlZONWzMtEnMs7W4e/1LURLiI49pIMmp6V9Unghqrcc=
 github.com/rcrowley/go-metrics v0.0.0-20181016184325-3113b8401b8a/go.mod h1:bCqnVzQkZxMG4s8nGwiZ5l3QUCyqpo9Y+/ZMZ9VjZe4=

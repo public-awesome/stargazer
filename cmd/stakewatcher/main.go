@@ -91,7 +91,7 @@ func main() {
 
 	app.ConfigureAccountPrefixes()
 
-	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, config.Marshaler, config.Amino)
+	cp, err := client.NewProxy(rpcEndpoint, config)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
@@ -123,7 +123,7 @@ func main() {
 
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
-	wk := workqueue.NewWorker(marshaler, amino, exportQueue, db, cp)
+	wk := workqueue.NewWorker(config.Marshaler, config.Amino, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue, db)
 
@@ -201,7 +201,7 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 
 func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
 	q := fmt.Sprintf("%s is null and %s < ? and %s > 1 ", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt, models.SyncLogColumns.BlockHeight)
-	blocks, err := models.SyncLogs(qm.Where(q, time.Now().Add(time.Second*-20))).All(ctx, db)
+	blocks, err := models.SyncLogs(qm.Where(q, time.Now().UTC().Add(time.Second*-20))).All(ctx, db)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting pending blocks")
 		return

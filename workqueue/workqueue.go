@@ -12,7 +12,6 @@ import (
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/gogo/protobuf/proto"
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/models"
 	"github.com/rs/zerolog/log"
@@ -113,7 +112,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 }
 
 // ExportBlock exports a block by processing it.
-func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
+func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []*sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
 	totalGas := sumGasTxs(txs)
 	signatures := len(b.Block.LastCommit.Signatures)
 
@@ -138,9 +137,8 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 	}
 
 	for _, txResponse := range txs {
-
 		var tx txtypes.Tx
-		err := proto.Unmarshal(txResponse.Tx.Value, &tx)
+		err := w.cdc.UnmarshalBinaryBare(txResponse.Tx.Value, &tx)
 		if err != nil {
 			return fmt.Errorf("failed to JSON encode tx messages: %w", err)
 		}
@@ -294,7 +292,7 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 }
 
 // sumGasTxs returns the total gas consumed by a set of transactions.
-func sumGasTxs(txs []sdk.TxResponse) uint64 {
+func sumGasTxs(txs []*sdk.TxResponse) uint64 {
 	var totalGas uint64
 	for _, tx := range txs {
 		totalGas += uint64(tx.GasUsed)

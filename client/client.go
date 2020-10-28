@@ -29,7 +29,7 @@ var clientTimeout = 5 * time.Second
 type Proxy struct {
 	rpcClient      rpcclient.Client // Tendermint (RPC client) node
 	httpClient     *http.Client
-	restNode       string // Full (REST client) node
+	rpcNode        string
 	encodingConfig stakebirdparams.EncodingConfig
 }
 
@@ -52,7 +52,7 @@ func newRPCClient(remote string) (*rpchttp.HTTP, error) {
 }
 
 // NewProxy returns a new Proxy instance
-func NewProxy(rpcNode, restNode string, encodingConfig stakebirdparams.EncodingConfig) (*Proxy, error) {
+func NewProxy(rpcNode string, encodingConfig stakebirdparams.EncodingConfig) (*Proxy, error) {
 	rpcClient, err := newRPCClient(rpcNode)
 	if err != nil {
 		return nil, err
@@ -62,7 +62,7 @@ func NewProxy(rpcNode, restNode string, encodingConfig stakebirdparams.EncodingC
 		httpClient: &http.Client{
 			Timeout: clientTimeout,
 		},
-		restNode:       restNode,
+		rpcNode:        rpcNode,
 		encodingConfig: encodingConfig,
 	}
 	return p, nil
@@ -131,7 +131,7 @@ func (p *Proxy) Tx(hash string) (*sdk.TxResponse, error) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithNodeURI(p.restNode)
+		WithNodeURI(p.rpcNode)
 	return authclient.QueryTx(initClientCtx, hash)
 }
 
