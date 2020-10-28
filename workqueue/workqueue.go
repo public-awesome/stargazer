@@ -144,10 +144,6 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		}
 
 		msgs := tx.GetMsgs()
-		for _, msg := range msgs {
-			w.cdc.MarshalJSON(msg)
-		}
-
 		msgsBz, err := json.Marshal(msgs)
 
 		if err != nil {
