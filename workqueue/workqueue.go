@@ -3,14 +3,15 @@ package workqueue
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"strconv"
 	"strings"
 	"time"
 
+	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
+
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/cosmos/cosmos-sdk/std"
-	"github.com/cosmos/cosmos-sdk/x/auth"
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/models"
 	"github.com/rs/zerolog/log"
@@ -26,21 +27,21 @@ import (
 
 // Worker is the queue processor.
 type Worker struct {
-	q        <-chan int64
-	cdc      *codec.Codec
-	appCodec *std.Codec
-	db       *sql.DB
-	cp       *client.Proxy
+	q     <-chan int64
+	cdc   codec.Marshaler
+	amino *codec.LegacyAmino
+	db    *sql.DB
+	cp    *client.Proxy
 }
 
 // NewWorker returns an intialized worker
-func NewWorker(cdc *codec.Codec, appCodec *std.Codec, queue <-chan int64, db *sql.DB, cp *client.Proxy) *Worker {
+func NewWorker(cdc codec.Marshaler, amino *codec.LegacyAmino, queue <-chan int64, db *sql.DB, cp *client.Proxy) *Worker {
 	return &Worker{
-		q:        queue,
-		cdc:      cdc,
-		appCodec: appCodec,
-		db:       db,
-		cp:       cp,
+		q:     queue,
+		cdc:   cdc,
+		amino: amino,
+		db:    db,
+		cp:    cp,
 	}
 }
 
@@ -111,7 +112,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 }
 
 // ExportBlock exports a block by processing it.
-func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
+func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []*sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
 	totalGas := sumGasTxs(txs)
 	signatures := len(b.Block.LastCommit.Signatures)
 
@@ -135,33 +136,36 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		return fmt.Errorf("failed to insert block %w", err)
 	}
 
-	for _, t := range txs {
-		stdTx, ok := t.Tx.(auth.StdTx)
-		if !ok {
-			log.Warn().Msgf("unsupported tx type: %T", t.Tx)
-			continue
-		}
-		msgsBz, err := w.cdc.MarshalJSON(stdTx.GetMsgs())
+	for _, txResponse := range txs {
+		var tx txtypes.Tx
+		err := w.cdc.UnmarshalBinaryBare(txResponse.Tx.Value, &tx)
 		if err != nil {
 			return fmt.Errorf("failed to JSON encode tx messages: %w", err)
 		}
-		evtsBz, err := w.cdc.MarshalJSON(t.Logs)
+
+		msgs := tx.GetMsgs()
+		msgsBz, err := json.Marshal(msgs)
+
+		if err != nil {
+			return fmt.Errorf("failed to JSON encode tx messages: %w", err)
+		}
+		evtsBz, err := json.Marshal(txResponse.Logs)
 		if err != nil {
 			return fmt.Errorf("failed to JSON encode tx logs: %w", err)
 		}
-		tx := &models.Transaction{
+		t := &models.Transaction{
 			Height:    b.Block.Height,
-			Hash:      t.TxHash,
-			GasWanted: int(t.GasWanted),
-			GasUsed:   int(t.GasUsed),
+			Hash:      txResponse.TxHash,
+			GasWanted: int(txResponse.GasWanted),
+			GasUsed:   int(txResponse.GasUsed),
 			Messages:  msgsBz,
 			Events:    evtsBz,
 		}
-		err = tx.Insert(ctx, db, boil.Infer())
+		err = t.Insert(ctx, db, boil.Infer())
 		if err != nil {
 			return fmt.Errorf("error inserting tx %w", err)
 		}
-		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, t.Logs)
+		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, txResponse.Logs)
 		if err != nil {
 			return fmt.Errorf("error parsing logs %w", err)
 		}
@@ -284,7 +288,7 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 }
 
 // sumGasTxs returns the total gas consumed by a set of transactions.
-func sumGasTxs(txs []sdk.TxResponse) uint64 {
+func sumGasTxs(txs []*sdk.TxResponse) uint64 {
 	var totalGas uint64
 	for _, tx := range txs {
 		totalGas += uint64(tx.GasUsed)
@@ -320,7 +324,7 @@ func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validato
 func SetBlockSignature(ctx context.Context, commit *tmtypes.Commit, sig tmtypes.CommitSig, vp, pp int64, db *sql.DB) error {
 	s := &models.BlockSignature{
 		Height:           commit.GetHeight(),
-		Round:            commit.GetRound(),
+		Round:            int(commit.GetRound()),
 		ValidatorAddress: sdk.ConsAddress(sig.ValidatorAddress).String(),
 		VotingPower:      int(vp),
 		ProposerPriority: int(pp),

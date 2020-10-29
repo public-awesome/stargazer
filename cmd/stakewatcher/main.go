@@ -12,7 +12,6 @@ import (
 	"syscall"
 	"time"
 
-	sdk "github.com/cosmos/cosmos-sdk/types"
 	_ "github.com/lib/pq"
 	"github.com/markbates/pkger"
 	"github.com/public-awesome/stakebird/app"
@@ -88,15 +87,11 @@ func main() {
 		runMigrations(db)
 	}
 
-	appCodec, cdc := app.MakeCodecs()
+	config := app.MakeEncodingConfig()
 
-	config := sdk.GetConfig()
-	config.SetBech32PrefixForAccount(app.Bech32PrefixAccAddr, app.Bech32PrefixAccPub)
-	config.SetBech32PrefixForValidator(app.Bech32PrefixValAddr, app.Bech32PrefixValPub)
-	config.SetBech32PrefixForConsensusNode(app.Bech32PrefixConsAddr, app.Bech32PrefixConsPub)
-	config.Seal()
+	app.ConfigureAccountPrefixes()
 
-	cp, err := client.NewProxy(rpcEndpoint, restServerEndpoint, cdc, appCodec)
+	cp, err := client.NewProxy(rpcEndpoint, config)
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
@@ -128,7 +123,7 @@ func main() {
 
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
-	wk := workqueue.NewWorker(cdc, appCodec, exportQueue, db, cp)
+	wk := workqueue.NewWorker(config.Marshaler, config.Amino, exportQueue, db, cp)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue, db)
 
@@ -206,7 +201,7 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 
 func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
 	q := fmt.Sprintf("%s is null and %s < ? and %s > 1 ", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt, models.SyncLogColumns.BlockHeight)
-	blocks, err := models.SyncLogs(qm.Where(q, time.Now().Add(time.Second*-20))).All(ctx, db)
+	blocks, err := models.SyncLogs(qm.Where(q, time.Now().UTC().Add(time.Second*-20))).All(ctx, db)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting pending blocks")
 		return
