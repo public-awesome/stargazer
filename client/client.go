@@ -131,7 +131,8 @@ func (p *Proxy) Tx(hash string) (*sdk.TxResponse, error) {
 		WithInput(os.Stdin).
 		WithAccountRetriever(types.AccountRetriever{}).
 		WithBroadcastMode(flags.BroadcastBlock).
-		WithNodeURI(p.rpcNode)
+		WithNodeURI(p.rpcNode).
+		WithClient(p.rpcClient)
 	return authclient.QueryTx(initClientCtx, hash)
 }
 
