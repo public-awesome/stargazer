@@ -54,13 +54,13 @@ func getEnv(key, defaultValue string) string {
 
 func main() {
 	var (
-		rpcEndpoint        string
-		restServerEndpoint string
-		autoMigrate        bool
+		rpcEndpoint string
+		grpcAddress string
+		autoMigrate bool
 	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
 	fs.StringVar(&rpcEndpoint, "rpc-endpoint", getEnv("RPC_ENDPOINT", "http://localhost:26657"), "--rpc-endpoint specify the rpc endpoint")
-	fs.StringVar(&restServerEndpoint, "rest-server", getEnv("REST_SERVER", "http://localhost:1317"), "--rest-server specify the rest-server endpoint")
+	fs.StringVar(&grpcAddress, "grpc-address", getEnv("GRPC_ADDRESS", "localhost:9091"), "--grpc-address specify the grpc server address")
 	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
@@ -95,7 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
-	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", restServerEndpoint).Msg("client settings")
+	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", grpcAddress).Msg("client settings")
 
 	// context cancelation setup
 	ctx, cancel := context.WithCancel(context.Background())
