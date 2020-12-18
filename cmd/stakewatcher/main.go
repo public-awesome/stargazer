@@ -95,7 +95,7 @@ func main() {
 	if err != nil {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
-	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("rest-server", grpcAddress).Msg("client settings")
+	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("grpc-address", grpcAddress).Msg("client settings")
 
 	// context cancelation setup
 	ctx, cancel := context.WithCancel(context.Background())
@@ -184,10 +184,10 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 			newBlock := e.Data.(tmtypes.EventDataNewBlock).Block
 			height := newBlock.Header.Height
 			log.Info().Int64("height", height).Msg("enqueueing missing block")
-			l := &models.SyncLog{
+			sl := &models.SyncLog{
 				BlockHeight: height,
 			}
-			err := l.Insert(ctx, db, boil.Infer())
+			err := sl.Upsert(ctx, db, false, nil, boil.Whitelist(), boil.Infer())
 			if err != nil {
 				panic(err)
 			}
