@@ -498,6 +498,8 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 	if err != nil {
 		return err
 	}
+	updatedVoteAmount := voteAmount.Amount.Int64()
+	updatedVoteNumber := voteNum
 	p := &models.Upvote{
 		ID:            id.String(),
 		VendorID:      vendorID,
@@ -505,27 +507,49 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 		PostID:        attrs["post_id"],
 		Creator:       attrs["curator"],
 		RewardAddress: attrs["reward_account"],
-		VoteAmount:    voteAmount.Amount.Int64(),
+		VoteAmount:    updatedVoteAmount,
 		VoteDenom:     voteAmount.Denom,
-		VoteNumber:    voteNum,
+		VoteNumber:    updatedVoteNumber,
 		Timestamp:     ts,
 	}
 	tx, err := db.BeginTx(ctx, nil)
 	if err != nil {
 		return err
 	}
-	err = p.Insert(ctx, tx, boil.Infer())
-	if err != nil {
-		_ = tx.Rollback()
+
+	upvote, err := models.Upvotes(
+		models.UpvoteWhere.VendorID.EQ(vendorID),
+		models.UpvoteWhere.PostID.EQ(p.PostID),
+		models.UpvoteWhere.Creator.EQ(p.Creator),
+	).One(ctx, tx)
+	if err != nil && err != sql.ErrNoRows {
 		return err
 	}
+	if err == sql.ErrNoRows {
+		err = p.Insert(ctx, tx, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	} else {
+		updatedVoteAmount = upvote.VoteAmount + p.VoteAmount
+		updatedVoteNumber = upvote.VoteNumber + p.VoteNumber
+		upvote.VoteAmount = updatedVoteAmount
+		upvote.VoteNumber = updatedVoteNumber
+		_, err = upvote.Update(ctx, tx, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+
 	updatePostQuery := `UPDATE posts SET total_votes = total_votes + $1,
 	  total_votes_amount = total_votes_amount + $2,
 	  total_voter_count = total_voter_count + 1, 
 	  updated_at = $3
     WHERE vendor_id=$4 and post_id=$5`
 	_, err = queries.
-		Raw(updatePostQuery, p.VoteNumber, p.VoteAmount, time.Now().UTC(), p.VendorID, p.PostID).
+		Raw(updatePostQuery, updatedVoteNumber, updatedVoteAmount, time.Now().UTC(), p.VendorID, p.PostID).
 		ExecContext(ctx, tx)
 	if err != nil {
 		_ = tx.Rollback()
