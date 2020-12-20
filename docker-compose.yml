@@ -9,8 +9,10 @@ services:
       POSTGRES_PASSWORD: postgres
       POSTGRES_DB: stakewatcher
     volumes:
-      - ./db_data:/var/lib/postgresql/data
+      - db:/var/lib/postgresql/data
   adminer:
     image: adminer
     ports:
       - 9090:8080
+volumes:
+  db: {}

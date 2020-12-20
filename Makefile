@@ -19,8 +19,8 @@ build-linux: pkger
 build-docker:
 	docker build -t publicawesome/stakewatcher .
 
-run-migrate: pkger
-	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher migrate
+run-auto-migrate: pkger
+	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher --auto-migrate
 run:
 	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
@@ -43,3 +43,18 @@ install-sqlboiler:
 
 install-sqlmigrate:
 	go install github.com/rubenv/sql-migrate/sql-migrate
+
+sql-migrate:
+	sql-migrate up
+sql-migrate-down:
+	sql-migrate down 
+sql-reset:
+	sql-migrate down --limit=0
+	sql-migrate up
+
+docker-up:
+	docker-compose up -d
+docker-down:
+	docker-compose down
+docker-cleanup:
+	docker-compose down --volumes
