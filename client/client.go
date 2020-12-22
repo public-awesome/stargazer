@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"encoding/hex"
 	"fmt"
 	"net/http"
 	"os"
@@ -85,17 +84,6 @@ func (p *Proxy) Block(height int64) (*tmctypes.ResultBlock, error) {
 	return p.rpcClient.Block(context.TODO(), &height)
 }
 
-// TendermintTx queries for a transaction by hash. An error is returned if the
-// query fails.
-func (p *Proxy) TendermintTx(hash string) (*tmctypes.ResultTx, error) {
-	hashRaw, err := hex.DecodeString(hash)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.rpcClient.Tx(context.TODO(), hashRaw, false)
-}
-
 // Validators returns all the known Tendermint validators for a given block
 // height. An error is returned if the query fails.
 func (p *Proxy) Validators(height int64) (*tmctypes.ResultValidators, error) {
@@ -150,4 +138,9 @@ func (p *Proxy) Txs(block *tmctypes.ResultBlock) ([]*sdk.TxResponse, error) {
 	}
 
 	return txResponses, nil
+}
+
+// IsRunning returns status of the rpc client
+func (p *Proxy) IsRunning(ctx context.Context) bool {
+	return p.rpcClient.IsRunning()
 }
