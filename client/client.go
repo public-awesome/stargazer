@@ -139,3 +139,8 @@ func (p *Proxy) Txs(block *tmctypes.ResultBlock) ([]*sdk.TxResponse, error) {
 
 	return txResponses, nil
 }
+
+// IsRunning returns status of the rpc client
+func (p *Proxy) IsRunning(ctx context.Context) bool {
+	return p.rpcClient.IsRunning()
+}

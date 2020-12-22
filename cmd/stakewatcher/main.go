@@ -174,7 +174,10 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 		log.Fatal().Err(err).Msg("failed to subscribe to new blocks")
 	}
 	log.Info().Msg("listening for new block events")
-	t := time.NewTicker(time.Second * 10)
+	retryBlocksTicker := time.NewTicker(time.Second * 10)
+	defer retryBlocksTicker.Stop()
+	statusTicker := time.NewTicker(time.Second * 30)
+	defer statusTicker.Stop()
 	for {
 		select {
 		case <-ctx.Done():
@@ -192,9 +195,14 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 				panic(err)
 			}
 			exportQueue <- height
-		case <-t.C:
+		case <-retryBlocksTicker.C:
 			log.Info().Msg("retry pending blocks")
 			go retryBlocks(ctx, exportQueue, db)
+		case <-statusTicker.C:
+			if cp.IsRunning(ctx) {
+				continue
+			}
+			log.Warn().Msg("rpc client is not running")
 		}
 	}
 }
