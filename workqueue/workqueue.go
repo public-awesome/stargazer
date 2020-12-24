@@ -290,6 +290,9 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 			models.StakeWhere.PostID.EQ(postID),
 			models.StakeWhere.Delegator.EQ(delegator),
 		).One(ctx, db)
+		if err != nil {
+			return err
+		}
 
 		rowAff, err := s.Delete(ctx, db)
 		if (rowAff == 0) || (err != nil) {
