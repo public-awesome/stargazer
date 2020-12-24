@@ -290,6 +290,14 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		Amount:    amount,
 	}
 
+	if amount == 0 {
+		_, err = model.Delete(ctx, db)
+		if err != nil {
+			return err
+		}
+		return nil
+	}
+
 	return model.Upsert(ctx, db, true, []string{"vendor_id", "post_id"}, boil.Whitelist("amount"), boil.Infer())
 }
 
