@@ -280,22 +280,32 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 	if err != nil {
 		return err
 	}
+	postID := attrs["post_id"]
+	delegator := attrs["delegator"]
+	validator := attrs["validator"]
+
+	if amount == 0 {
+		s, err := models.Stakes(
+			models.StakeWhere.VendorID.EQ(vendorID),
+			models.StakeWhere.PostID.EQ(postID),
+			models.StakeWhere.Delegator.EQ(delegator),
+		).One(ctx, db)
+
+		rowAff, err := s.Delete(ctx, db)
+		if (rowAff == 0) || (err != nil) {
+			return err
+		}
+
+		return nil
+	}
 
 	model := &models.Stake{
 		Height:    height,
 		VendorID:  vendorID,
-		PostID:    attrs["post_id"],
-		Delegator: attrs["delegator"],
-		Validator: attrs["validator"],
+		PostID:    postID,
+		Delegator: delegator,
+		Validator: validator,
 		Amount:    amount,
-	}
-
-	if amount == 0 {
-		_, err = model.Delete(ctx, db)
-		if err != nil {
-			return err
-		}
-		return nil
 	}
 
 	return model.Upsert(ctx, db, true, []string{"vendor_id", "post_id"}, boil.Whitelist("amount"), boil.Infer())
