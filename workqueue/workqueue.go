@@ -311,6 +311,11 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 				if err != nil {
 					return err
 				}
+			case "unstake":
+				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
 			}
 		}
 	}
