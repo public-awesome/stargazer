@@ -10,7 +10,7 @@ require (
 	github.com/lib/pq v1.2.1-0.20191011153232-f91d3411e481
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
-	github.com/public-awesome/stakebird v0.3.3-0.20201207153433-06db6e2186e8
+	github.com/public-awesome/stakebird v0.4.0
 	github.com/rs/zerolog v1.20.0
 	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351
 	github.com/spf13/viper v1.7.1
