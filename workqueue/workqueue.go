@@ -311,7 +311,7 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		Amount:    amount,
 	}
 
-	return model.Upsert(ctx, db, true, []string{"vendor_id", "post_id"}, boil.Whitelist("amount", "updated_at"), boil.Infer())
+	return model.Upsert(ctx, db, true, []string{"vendor_id", "delegator", "validator", "post_id"}, boil.Whitelist("amount", "updated_at"), boil.Infer())
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
