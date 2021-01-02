@@ -10,7 +10,7 @@ CREATE TABLE stakes (
   created_at timestamp NOT NULL DEFAULT NOW(),
   updated_at timestamp NOT NULL DEFAULT NOW(),
   deleted_at timestamp,
-  UNIQUE (vendor_id, post_id)
+  CONSTRAINT stake_uq UNIQUE (vendor_id, post_id, delegator, validator)
 );
 
 -- +migrate Down
