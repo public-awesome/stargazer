@@ -5,14 +5,14 @@ name: default
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.31
+    image: golangci/golangci-lint:v1.34
     commands:
       - go mod download
       - golangci-lint run -v --timeout 5m
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.1
+    image: golang:1.15.6
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
@@ -42,14 +42,14 @@ steps:
   - name: discord
     image: appleboy/drone-discord
     settings:
-      webhook_id: 
+      webhook_id:
         from_secret: discord_webhook_id
-      webhook_token: 
+      webhook_token:
         from_secret: discord_webhook_token
     when:
       status: [success, failure]
 ---
 kind: signature
-hmac: 67c39cc347de9c545615624117eb575e7566ba5754e0080ad4dfdba7f2ba8c03
+hmac: 9aa92802d2aba1564b12633362b9d01784d69697626899b90eb1232b7b69a0dc
 
 ...

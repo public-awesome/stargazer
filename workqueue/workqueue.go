@@ -19,6 +19,7 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/boil"
 	"github.com/volatiletech/sqlboiler/v4/queries"
 
+	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gofrs/uuid"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -224,7 +225,7 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 	if err != nil {
 		return err
 	}
-	voteAmount, err := sdk.ParseCoin(attrs["vote_amount"])
+	voteAmount, err := sdk.ParseCoinNormalized(attrs["vote_amount"])
 	if err != nil {
 		return err
 	}
@@ -395,7 +396,11 @@ func SetBlockSignature(ctx context.Context, commit *tmtypes.Commit, sig tmtypes.
 // ExportValidator exports validator
 func ExportValidator(ctx context.Context, val *tmtypes.Validator, db *sql.DB) error {
 	address := sdk.ConsAddress(val.Address).String()
-	consPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, val.PubKey)
+	pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
+	if err != nil {
+		return err
+	}
+	consPubKey, err := sdk.Bech32ifyPubKey(sdk.Bech32PubKeyTypeConsPub, pk)
 
 	if err != nil {
 		return fmt.Errorf("failed to convert validator public key %w", err)
