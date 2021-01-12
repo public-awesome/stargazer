@@ -92,6 +92,11 @@ func (p *Proxy) Validators(height int64) (*tmctypes.ResultValidators, error) {
 	return p.rpcClient.Validators(context.TODO(), &height, &page, &perPage)
 }
 
+// Genesis retrieves the genesis from tendermint
+func (p *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
+	return p.rpcClient.Genesis(context.TODO())
+}
+
 // Stop defers the node stop execution to the RPC client.
 func (p *Proxy) Stop() error {
 	return p.rpcClient.Stop()
