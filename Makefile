@@ -9,7 +9,9 @@ install-pkger:
 
 pkger:
 	pkger -o cmd/stakewatcher
-	
+
+ci-sign:
+	drone sign public-awesome/stakewatcher --save
 build: pkger
 	go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
