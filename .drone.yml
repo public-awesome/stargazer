@@ -12,7 +12,7 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.6
+    image: golang:1.15.7
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
@@ -50,6 +50,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 9aa92802d2aba1564b12633362b9d01784d69697626899b90eb1232b7b69a0dc
+hmac: 0af3302c17df0f27dd3156a3202593d3f61faab308f68c9f9a4061dcc3c6144f
 
 ...
