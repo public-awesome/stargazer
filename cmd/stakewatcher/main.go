@@ -132,7 +132,7 @@ func main() {
 // enqueueMissingBlocks enqueues jobs (block heights) for missed blocks starting
 // at the startHeight up until the latest known height.
 func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, db *sql.DB, exportQueue chan<- int64) {
-	latestBlockHeight, err := cp.LatestHeight()
+	latestBlockHeight, err := cp.LatestHeight(ctx)
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to fetch latest block from RPC endpoint")
 	}
@@ -199,10 +199,10 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 			log.Info().Msg("retry pending blocks")
 			go retryBlocks(ctx, exportQueue, db)
 		case <-statusTicker.C:
-			if cp.IsRunning(ctx) {
-				continue
+			_, err := cp.Status(ctx)
+			if err != nil {
+				log.Err(err).Msg("rpc status failed")
 			}
-			log.Warn().Msg("rpc client is not running")
 		}
 	}
 }

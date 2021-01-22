@@ -77,7 +77,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	if exists {
 		return nil
 	}
-	block, err := w.cp.Block(height)
+	block, err := w.cp.Block(ctx, height)
 	if err != nil {
 		return fmt.Errorf("failed to fetch block: %w", err)
 	}
@@ -87,7 +87,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 		return fmt.Errorf("failed to fetch transactions for block: %w", err)
 	}
 
-	vals, err := w.cp.Validators(block.Block.LastCommit.GetHeight())
+	vals, err := w.cp.Validators(ctx, block.Block.LastCommit.GetHeight())
 	if err != nil {
 		return fmt.Errorf("failed to fetch validators for block: %w", err)
 	}

@@ -69,8 +69,8 @@ func NewProxy(rpcNode string, encodingConfig stakebirdparams.EncodingConfig) (*P
 
 // LatestHeight returns the latest block height on the active chain. An error
 // is returned if the query fails.
-func (p *Proxy) LatestHeight() (int64, error) {
-	status, err := p.rpcClient.Status(context.TODO())
+func (p *Proxy) LatestHeight(ctx context.Context) (int64, error) {
+	status, err := p.rpcClient.Status(ctx)
 	if err != nil {
 		return -1, err
 	}
@@ -80,21 +80,21 @@ func (p *Proxy) LatestHeight() (int64, error) {
 }
 
 // Block queries for a block by height. An error is returned if the query fails.
-func (p *Proxy) Block(height int64) (*tmctypes.ResultBlock, error) {
-	return p.rpcClient.Block(context.TODO(), &height)
+func (p *Proxy) Block(ctx context.Context, height int64) (*tmctypes.ResultBlock, error) {
+	return p.rpcClient.Block(ctx, &height)
 }
 
 // Validators returns all the known Tendermint validators for a given block
 // height. An error is returned if the query fails.
-func (p *Proxy) Validators(height int64) (*tmctypes.ResultValidators, error) {
+func (p *Proxy) Validators(ctx context.Context, height int64) (*tmctypes.ResultValidators, error) {
 	page := 1
 	perPage := 1000
-	return p.rpcClient.Validators(context.TODO(), &height, &page, &perPage)
+	return p.rpcClient.Validators(ctx, &height, &page, &perPage)
 }
 
 // Genesis retrieves the genesis from tendermint
-func (p *Proxy) Genesis() (*tmctypes.ResultGenesis, error) {
-	return p.rpcClient.Genesis(context.TODO())
+func (p *Proxy) Genesis(ctx context.Context) (*tmctypes.ResultGenesis, error) {
+	return p.rpcClient.Genesis(ctx)
 }
 
 // Stop defers the node stop execution to the RPC client.
@@ -145,7 +145,7 @@ func (p *Proxy) Txs(block *tmctypes.ResultBlock) ([]*sdk.TxResponse, error) {
 	return txResponses, nil
 }
 
-// IsRunning returns status of the rpc client
-func (p *Proxy) IsRunning(ctx context.Context) bool {
-	return p.rpcClient.IsRunning()
+// Status returns status of the rpc client
+func (p *Proxy) Status(ctx context.Context) (*tmctypes.ResultStatus, error) {
+	return p.rpcClient.Status(ctx)
 }
