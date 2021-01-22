@@ -41,7 +41,7 @@ install-tools: install-sqlboiler install-sqlmigrate
 
 
 install-sqlboiler:
-	VERSION=v4.2.0 ./contrib/dev/install-sqlboiler.sh
+	VERSION=v4.4.0 ./contrib/dev/install-sqlboiler.sh
 
 install-sqlmigrate:
 	go install github.com/rubenv/sql-migrate/sql-migrate
