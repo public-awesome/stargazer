@@ -243,6 +243,30 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.At
 	)
 }
 
+func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	postID := attrs["post_id"]
+	rewardAddress := attrs["reward_account"]
+	amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	ur := &models.UpvoteReward{
+		Height:        height,
+		VendorID:      vendorID,
+		PostID:        postID,
+		RewardAddress: rewardAddress,
+		RewardAmount:  amount,
+	}
+
+	return ur.Insert(ctx, db, boil.Infer())
+}
+
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
@@ -373,7 +397,7 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 					return err
 				}
 			case "protocol_reward":
-				err := handleCurationComplete(ctx, db, evt.Attributes, height, ts)
+				err := handleProtocolReward(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
