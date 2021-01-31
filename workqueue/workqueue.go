@@ -215,6 +215,16 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 	return p.Insert(ctx, db, boil.Infer())
 }
 
+func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	// attrs := parseAttributes(attributes)
+	// vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	// if err != nil {
+	// 	return err
+	// }
+
+	return nil
+}
+
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
@@ -336,6 +346,11 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 				}
 			case "unstake":
 				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			case "curation_complete":
+				err := handleCurationComplete(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
