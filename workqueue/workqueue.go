@@ -230,8 +230,9 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.At
 	}
 
 	p := &models.Post{
-		VendorID: vendorID,
-		PostID:   postID,
+		VendorID:          vendorID,
+		PostID:            postID,
+		TotalUpvoteReward: amount,
 	}
 
 	return nil

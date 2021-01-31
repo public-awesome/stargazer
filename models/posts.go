@@ -40,7 +40,7 @@ type Post struct {
 	UpdatedAt         time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 	DeletedAt         null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
 	TotalVoterCount   int       `boil:"total_voter_count" json:"totalVoterCount" toml:"totalVoterCount" yaml:"totalVoterCount"`
-	TotalUpvoteReward int       `boil:"total_upvote_reward" json:"totalUpvoteReward" toml:"totalUpvoteReward" yaml:"totalUpvoteReward"`
+	TotalUpvoteReward int64     `boil:"total_upvote_reward" json:"totalUpvoteReward" toml:"totalUpvoteReward" yaml:"totalUpvoteReward"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -103,7 +103,7 @@ var PostWhere = struct {
 	UpdatedAt         whereHelpertime_Time
 	DeletedAt         whereHelpernull_Time
 	TotalVoterCount   whereHelperint
-	TotalUpvoteReward whereHelperint
+	TotalUpvoteReward whereHelperint64
 }{
 	ID:                whereHelperstring{field: "\"posts\".\"id\""},
 	Height:            whereHelperint64{field: "\"posts\".\"height\""},
@@ -121,7 +121,7 @@ var PostWhere = struct {
 	UpdatedAt:         whereHelpertime_Time{field: "\"posts\".\"updated_at\""},
 	DeletedAt:         whereHelpernull_Time{field: "\"posts\".\"deleted_at\""},
 	TotalVoterCount:   whereHelperint{field: "\"posts\".\"total_voter_count\""},
-	TotalUpvoteReward: whereHelperint{field: "\"posts\".\"total_upvote_reward\""},
+	TotalUpvoteReward: whereHelperint64{field: "\"posts\".\"total_upvote_reward\""},
 }
 
 // PostRels is where relationship names are stored.
