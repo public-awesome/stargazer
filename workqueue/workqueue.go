@@ -221,9 +221,7 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.At
 	if err != nil {
 		return err
 	}
-
 	postID := attrs["post_id"]
-
 	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
 	if err != nil {
 		return err
@@ -235,7 +233,14 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.At
 		TotalUpvoteReward: amount,
 	}
 
-	return nil
+	return p.Upsert(
+		ctx,
+		db,
+		true,
+		[]string{models.PostColumns.TotalUpvoteReward},
+		boil.Whitelist(models.PostColumns.TotalUpvoteReward, models.PostColumns.UpdatedAt),
+		boil.Infer(),
+	)
 }
 
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
