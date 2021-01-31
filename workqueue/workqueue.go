@@ -216,11 +216,23 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 }
 
 func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
-	// attrs := parseAttributes(attributes)
-	// vendorID, err := strconv.Atoi(attrs["vendor_id"])
-	// if err != nil {
-	// 	return err
-	// }
+	attrs := parseAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+
+	postID := attrs["post_id"]
+
+	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	p := &models.Post{
+		VendorID: vendorID,
+		PostID:   postID,
+	}
 
 	return nil
 }

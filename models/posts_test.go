@@ -427,7 +427,7 @@ func testPostsSelect(t *testing.T) {
 }
 
 var (
-	postDBTypes = map[string]string{`ID`: `uuid`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `Creator`: `text`, `RewardAddress`: `text`, `Timestamp`: `timestamp without time zone`, `CurationEndTime`: `timestamp without time zone`, `Body`: `text`, `TotalVotes`: `integer`, `TotalVotesAmount`: `bigint`, `TotalVotesDenom`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`, `TotalVoterCount`: `integer`}
+	postDBTypes = map[string]string{`ID`: `uuid`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `Creator`: `text`, `RewardAddress`: `text`, `Timestamp`: `timestamp without time zone`, `CurationEndTime`: `timestamp without time zone`, `Body`: `text`, `TotalVotes`: `integer`, `TotalVotesAmount`: `bigint`, `TotalVotesDenom`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`, `TotalVoterCount`: `integer`, `TotalUpvoteReward`: `integer`}
 	_           = bytes.MinRead
 )
 
