@@ -272,11 +272,15 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 		return err
 	}
 
-	p.TotalUpvoteReward = amount
+	p.TotalUpvoteRewardAmount = amount.Amount.Int64()
+	p.TotalUpvoteRewardDenom = amount.Denom
 	_, err = p.Update(
 		ctx,
 		db,
-		boil.Whitelist(models.PostColumns.TotalUpvoteReward, models.PostColumns.UpdatedAt),
+		boil.Whitelist(
+			models.PostColumns.TotalUpvoteRewardAmount,
+			models.PostColumns.TotalUpvoteRewardDenom,
+			models.PostColumns.UpdatedAt),
 	)
 
 	return err
