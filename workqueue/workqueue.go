@@ -123,13 +123,7 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 }
 
 func (w *Worker) processBlockEvents(ctx context.Context, br *tmctypes.ResultBlockResults, height int64) error {
-	for _, evt := range br.BeginBlockEvents {
-		fmt.Printf("found a begin block event: %v", evt)
-		return nil
-	}
-
 	for _, evt := range br.EndBlockEvents {
-		fmt.Printf("found an end block event: %v", evt.String())
 		switch evt.Type {
 		case "curation_complete":
 			err := handleCurationComplete(ctx, w.db, evt.Attributes, height)
@@ -265,7 +259,7 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 		return err
 	}
 	postID := attrs["post_id"]
-	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
+	amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
 	if err != nil {
 		return err
 	}
@@ -278,9 +272,6 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 		return err
 	}
 
-	// fmt.Println("amount", amount)
-	// panic("stop")
-
 	p.TotalUpvoteReward = amount
 	_, err = p.Update(
 		ctx,
@@ -292,28 +283,27 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 }
 
 func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
-	// attrs := parseAttributes(attributes)
-	// vendorID, err := strconv.Atoi(attrs["vendor_id"])
-	// if err != nil {
-	// 	return err
-	// }
-	// postID := attrs["post_id"]
-	// rewardAddress := attrs["reward_account"]
-	// amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
-	// if err != nil {
-	// 	return err
-	// }
+	attrs := parseEventAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	postID := attrs["post_id"]
+	rewardAddress := attrs["reward_account"]
+	amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
+	if err != nil {
+		return err
+	}
 
-	// ur := &models.UpvoteReward{
-	// 	Height:        height,
-	// 	VendorID:      vendorID,
-	// 	PostID:        postID,
-	// 	RewardAddress: rewardAddress,
-	// 	RewardAmount:  amount,
-	// }
+	ur := &models.UpvoteReward{
+		Height:        height,
+		VendorID:      vendorID,
+		PostID:        postID,
+		RewardAddress: rewardAddress,
+		RewardAmount:  amount,
+	}
 
-	// return ur.Insert(ctx, db, boil.Infer())
-	return nil
+	return ur.Insert(ctx, db, boil.Infer())
 }
 
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
