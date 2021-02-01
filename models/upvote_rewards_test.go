@@ -427,7 +427,7 @@ func testUpvoteRewardsSelect(t *testing.T) {
 }
 
 var (
-	upvoteRewardDBTypes = map[string]string{`ID`: `integer`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `RewardAddress`: `text`, `RewardAmount`: `bigint`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	upvoteRewardDBTypes = map[string]string{`ID`: `integer`, `Height`: `bigint`, `VendorID`: `integer`, `PostID`: `text`, `RewardAddress`: `text`, `RewardAmount`: `bigint`, `RewardDenom`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
 	_                   = bytes.MinRead
 )
 

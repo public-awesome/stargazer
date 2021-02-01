@@ -30,6 +30,7 @@ type UpvoteReward struct {
 	PostID        string    `boil:"post_id" json:"postID" toml:"postID" yaml:"postID"`
 	RewardAddress string    `boil:"reward_address" json:"rewardAddress" toml:"rewardAddress" yaml:"rewardAddress"`
 	RewardAmount  int64     `boil:"reward_amount" json:"rewardAmount" toml:"rewardAmount" yaml:"rewardAmount"`
+	RewardDenom   string    `boil:"reward_denom" json:"rewardDenom" toml:"rewardDenom" yaml:"rewardDenom"`
 	CreatedAt     time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
 	UpdatedAt     time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
 	DeletedAt     null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
@@ -45,6 +46,7 @@ var UpvoteRewardColumns = struct {
 	PostID        string
 	RewardAddress string
 	RewardAmount  string
+	RewardDenom   string
 	CreatedAt     string
 	UpdatedAt     string
 	DeletedAt     string
@@ -55,6 +57,7 @@ var UpvoteRewardColumns = struct {
 	PostID:        "post_id",
 	RewardAddress: "reward_address",
 	RewardAmount:  "reward_amount",
+	RewardDenom:   "reward_denom",
 	CreatedAt:     "created_at",
 	UpdatedAt:     "updated_at",
 	DeletedAt:     "deleted_at",
@@ -69,6 +72,7 @@ var UpvoteRewardWhere = struct {
 	PostID        whereHelperstring
 	RewardAddress whereHelperstring
 	RewardAmount  whereHelperint64
+	RewardDenom   whereHelperstring
 	CreatedAt     whereHelpertime_Time
 	UpdatedAt     whereHelpertime_Time
 	DeletedAt     whereHelpernull_Time
@@ -79,6 +83,7 @@ var UpvoteRewardWhere = struct {
 	PostID:        whereHelperstring{field: "\"upvote_rewards\".\"post_id\""},
 	RewardAddress: whereHelperstring{field: "\"upvote_rewards\".\"reward_address\""},
 	RewardAmount:  whereHelperint64{field: "\"upvote_rewards\".\"reward_amount\""},
+	RewardDenom:   whereHelperstring{field: "\"upvote_rewards\".\"reward_denom\""},
 	CreatedAt:     whereHelpertime_Time{field: "\"upvote_rewards\".\"created_at\""},
 	UpdatedAt:     whereHelpertime_Time{field: "\"upvote_rewards\".\"updated_at\""},
 	DeletedAt:     whereHelpernull_Time{field: "\"upvote_rewards\".\"deleted_at\""},
@@ -101,8 +106,8 @@ func (*upvoteRewardR) NewStruct() *upvoteRewardR {
 type upvoteRewardL struct{}
 
 var (
-	upvoteRewardAllColumns            = []string{"id", "height", "vendor_id", "post_id", "reward_address", "reward_amount", "created_at", "updated_at", "deleted_at"}
-	upvoteRewardColumnsWithoutDefault = []string{"height", "vendor_id", "post_id", "reward_address", "reward_amount", "deleted_at"}
+	upvoteRewardAllColumns            = []string{"id", "height", "vendor_id", "post_id", "reward_address", "reward_amount", "reward_denom", "created_at", "updated_at", "deleted_at"}
+	upvoteRewardColumnsWithoutDefault = []string{"height", "vendor_id", "post_id", "reward_address", "reward_amount", "reward_denom", "deleted_at"}
 	upvoteRewardColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	upvoteRewardPrimaryKeyColumns     = []string{"id"}
 )

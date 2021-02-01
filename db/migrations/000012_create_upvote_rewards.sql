@@ -6,6 +6,7 @@ CREATE TABLE upvote_rewards (
   post_id text NOT NULL,
   reward_address text NOT NULL,
   reward_amount bigint NOT NULL,
+  reward_denom text NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),
   updated_at timestamp NOT NULL DEFAULT NOW(),
   deleted_at timestamp
