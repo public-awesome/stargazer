@@ -84,6 +84,11 @@ func (p *Proxy) Block(ctx context.Context, height int64) (*tmctypes.ResultBlock,
 	return p.rpcClient.Block(ctx, &height)
 }
 
+// BlockResults queries for block results by height. An error is returned if the query fails.
+func (p *Proxy) BlockResults(ctx context.Context, height int64) (*tmctypes.ResultBlockResults, error) {
+	return p.rpcClient.BlockResults(ctx, &height)
+}
+
 // Validators returns all the known Tendermint validators for a given block
 // height. An error is returned if the query fails.
 func (p *Proxy) Validators(ctx context.Context, height int64) (*tmctypes.ResultValidators, error) {
