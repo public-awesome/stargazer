@@ -259,7 +259,7 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 		return err
 	}
 	postID := attrs["post_id"]
-	amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
+	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
 	if err != nil {
 		return err
 	}
