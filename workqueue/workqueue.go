@@ -294,7 +294,7 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 	}
 	postID := attrs["post_id"]
 	rewardAddress := attrs["reward_account"]
-	amount, err := strconv.ParseInt(attrs["reward_amount"], 10, 64)
+	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
 	if err != nil {
 		return err
 	}
@@ -304,7 +304,8 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 		VendorID:      vendorID,
 		PostID:        postID,
 		RewardAddress: rewardAddress,
-		RewardAmount:  amount,
+		RewardAmount:  amount.Amount.Int64(),
+		RewardDenom:   amount.Denom,
 	}
 
 	return ur.Insert(ctx, db, boil.Infer())
