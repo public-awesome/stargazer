@@ -18,6 +18,8 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("Transactions", testTransactionsUpsert)
 
+	t.Run("UpvoteRewards", testUpvoteRewardsUpsert)
+
 	t.Run("Upvotes", testUpvotesUpsert)
 
 	t.Run("Validators", testValidatorsUpsert)

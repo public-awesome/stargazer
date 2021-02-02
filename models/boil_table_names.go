@@ -10,6 +10,7 @@ var TableNames = struct {
 	Stakes          string
 	SyncLogs        string
 	Transactions    string
+	UpvoteRewards   string
 	Upvotes         string
 	Validators      string
 }{
@@ -19,6 +20,7 @@ var TableNames = struct {
 	Stakes:          "stakes",
 	SyncLogs:        "sync_logs",
 	Transactions:    "transactions",
+	UpvoteRewards:   "upvote_rewards",
 	Upvotes:         "upvotes",
 	Validators:      "validators",
 }

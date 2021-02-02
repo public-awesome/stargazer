@@ -22,6 +22,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/gofrs/uuid"
+	abcitypes "github.com/tendermint/tendermint/abci/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	tmtypes "github.com/tendermint/tendermint/types"
 )
@@ -82,6 +83,15 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 		return fmt.Errorf("failed to fetch block: %w", err)
 	}
 
+	blockResults, err := w.cp.BlockResults(ctx, height)
+	if err != nil {
+		return fmt.Errorf("failed to fetch block result: %w", err)
+	}
+	err = w.processBlockEvents(ctx, blockResults, height)
+	if err != nil {
+		return fmt.Errorf("failed to process block events: %w", err)
+	}
+
 	txs, err := w.cp.Txs(block)
 	if err != nil {
 		return fmt.Errorf("failed to fetch transactions for block: %w", err)
@@ -110,6 +120,25 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 
 	_, err = sl.Update(ctx, w.db, boil.Infer())
 	return err
+}
+
+func (w *Worker) processBlockEvents(ctx context.Context, br *tmctypes.ResultBlockResults, height int64) error {
+	for _, evt := range br.EndBlockEvents {
+		switch evt.Type {
+		case "curation_complete":
+			err := handleCurationComplete(ctx, w.db, evt.Attributes, height)
+			if err != nil {
+				return err
+			}
+		case "protocol_reward":
+			err := handleProtocolReward(ctx, w.db, evt.Attributes, height)
+			if err != nil {
+				return err
+			}
+		}
+	}
+
+	return nil
 }
 
 // ExportBlock exports a block by processing it.
@@ -182,6 +211,14 @@ func parseAttributes(attributes []sdk.Attribute) map[string]string {
 	return attrs
 }
 
+func parseEventAttributes(attributes []abcitypes.EventAttribute) map[string]string {
+	attrs := make(map[string]string)
+	for _, a := range attributes {
+		attrs[string(a.Key)] = string(a.Value)
+	}
+	return attrs
+}
+
 func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
@@ -213,6 +250,65 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		Timestamp:        ts,
 	}
 	return p.Insert(ctx, db, boil.Infer())
+}
+
+func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
+	attrs := parseEventAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	postID := attrs["post_id"]
+	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
+	if err != nil {
+		return err
+	}
+
+	p, err := models.Posts(
+		models.PostWhere.VendorID.EQ(vendorID),
+		models.PostWhere.PostID.EQ(postID),
+	).One(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	p.TotalUpvoteRewardAmount = amount.Amount.Int64()
+	p.TotalUpvoteRewardDenom = amount.Denom
+	_, err = p.Update(
+		ctx,
+		db,
+		boil.Whitelist(
+			models.PostColumns.TotalUpvoteRewardAmount,
+			models.PostColumns.TotalUpvoteRewardDenom,
+			models.PostColumns.UpdatedAt),
+	)
+
+	return err
+}
+
+func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
+	attrs := parseEventAttributes(attributes)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	if err != nil {
+		return err
+	}
+	postID := attrs["post_id"]
+	rewardAddress := attrs["reward_account"]
+	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
+	if err != nil {
+		return err
+	}
+
+	ur := &models.UpvoteReward{
+		Height:        height,
+		VendorID:      vendorID,
+		PostID:        postID,
+		RewardAddress: rewardAddress,
+		RewardAmount:  amount.Amount.Int64(),
+		RewardDenom:   amount.Denom,
+	}
+
+	return ur.Insert(ctx, db, boil.Infer())
 }
 
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {

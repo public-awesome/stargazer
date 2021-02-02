@@ -18,6 +18,7 @@ func TestParent(t *testing.T) {
 	t.Run("Stakes", testStakes)
 	t.Run("SyncLogs", testSyncLogs)
 	t.Run("Transactions", testTransactions)
+	t.Run("UpvoteRewards", testUpvoteRewards)
 	t.Run("Upvotes", testUpvotes)
 	t.Run("Validators", testValidators)
 }
@@ -29,6 +30,7 @@ func TestDelete(t *testing.T) {
 	t.Run("Stakes", testStakesDelete)
 	t.Run("SyncLogs", testSyncLogsDelete)
 	t.Run("Transactions", testTransactionsDelete)
+	t.Run("UpvoteRewards", testUpvoteRewardsDelete)
 	t.Run("Upvotes", testUpvotesDelete)
 	t.Run("Validators", testValidatorsDelete)
 }
@@ -40,6 +42,7 @@ func TestQueryDeleteAll(t *testing.T) {
 	t.Run("Stakes", testStakesQueryDeleteAll)
 	t.Run("SyncLogs", testSyncLogsQueryDeleteAll)
 	t.Run("Transactions", testTransactionsQueryDeleteAll)
+	t.Run("UpvoteRewards", testUpvoteRewardsQueryDeleteAll)
 	t.Run("Upvotes", testUpvotesQueryDeleteAll)
 	t.Run("Validators", testValidatorsQueryDeleteAll)
 }
@@ -51,6 +54,7 @@ func TestSliceDeleteAll(t *testing.T) {
 	t.Run("Stakes", testStakesSliceDeleteAll)
 	t.Run("SyncLogs", testSyncLogsSliceDeleteAll)
 	t.Run("Transactions", testTransactionsSliceDeleteAll)
+	t.Run("UpvoteRewards", testUpvoteRewardsSliceDeleteAll)
 	t.Run("Upvotes", testUpvotesSliceDeleteAll)
 	t.Run("Validators", testValidatorsSliceDeleteAll)
 }
@@ -62,6 +66,7 @@ func TestExists(t *testing.T) {
 	t.Run("Stakes", testStakesExists)
 	t.Run("SyncLogs", testSyncLogsExists)
 	t.Run("Transactions", testTransactionsExists)
+	t.Run("UpvoteRewards", testUpvoteRewardsExists)
 	t.Run("Upvotes", testUpvotesExists)
 	t.Run("Validators", testValidatorsExists)
 }
@@ -73,6 +78,7 @@ func TestFind(t *testing.T) {
 	t.Run("Stakes", testStakesFind)
 	t.Run("SyncLogs", testSyncLogsFind)
 	t.Run("Transactions", testTransactionsFind)
+	t.Run("UpvoteRewards", testUpvoteRewardsFind)
 	t.Run("Upvotes", testUpvotesFind)
 	t.Run("Validators", testValidatorsFind)
 }
@@ -84,6 +90,7 @@ func TestBind(t *testing.T) {
 	t.Run("Stakes", testStakesBind)
 	t.Run("SyncLogs", testSyncLogsBind)
 	t.Run("Transactions", testTransactionsBind)
+	t.Run("UpvoteRewards", testUpvoteRewardsBind)
 	t.Run("Upvotes", testUpvotesBind)
 	t.Run("Validators", testValidatorsBind)
 }
@@ -95,6 +102,7 @@ func TestOne(t *testing.T) {
 	t.Run("Stakes", testStakesOne)
 	t.Run("SyncLogs", testSyncLogsOne)
 	t.Run("Transactions", testTransactionsOne)
+	t.Run("UpvoteRewards", testUpvoteRewardsOne)
 	t.Run("Upvotes", testUpvotesOne)
 	t.Run("Validators", testValidatorsOne)
 }
@@ -106,6 +114,7 @@ func TestAll(t *testing.T) {
 	t.Run("Stakes", testStakesAll)
 	t.Run("SyncLogs", testSyncLogsAll)
 	t.Run("Transactions", testTransactionsAll)
+	t.Run("UpvoteRewards", testUpvoteRewardsAll)
 	t.Run("Upvotes", testUpvotesAll)
 	t.Run("Validators", testValidatorsAll)
 }
@@ -117,6 +126,7 @@ func TestCount(t *testing.T) {
 	t.Run("Stakes", testStakesCount)
 	t.Run("SyncLogs", testSyncLogsCount)
 	t.Run("Transactions", testTransactionsCount)
+	t.Run("UpvoteRewards", testUpvoteRewardsCount)
 	t.Run("Upvotes", testUpvotesCount)
 	t.Run("Validators", testValidatorsCount)
 }
@@ -134,6 +144,8 @@ func TestInsert(t *testing.T) {
 	t.Run("SyncLogs", testSyncLogsInsertWhitelist)
 	t.Run("Transactions", testTransactionsInsert)
 	t.Run("Transactions", testTransactionsInsertWhitelist)
+	t.Run("UpvoteRewards", testUpvoteRewardsInsert)
+	t.Run("UpvoteRewards", testUpvoteRewardsInsertWhitelist)
 	t.Run("Upvotes", testUpvotesInsert)
 	t.Run("Upvotes", testUpvotesInsertWhitelist)
 	t.Run("Validators", testValidatorsInsert)
@@ -203,6 +215,7 @@ func TestReload(t *testing.T) {
 	t.Run("Stakes", testStakesReload)
 	t.Run("SyncLogs", testSyncLogsReload)
 	t.Run("Transactions", testTransactionsReload)
+	t.Run("UpvoteRewards", testUpvoteRewardsReload)
 	t.Run("Upvotes", testUpvotesReload)
 	t.Run("Validators", testValidatorsReload)
 }
@@ -214,6 +227,7 @@ func TestReloadAll(t *testing.T) {
 	t.Run("Stakes", testStakesReloadAll)
 	t.Run("SyncLogs", testSyncLogsReloadAll)
 	t.Run("Transactions", testTransactionsReloadAll)
+	t.Run("UpvoteRewards", testUpvoteRewardsReloadAll)
 	t.Run("Upvotes", testUpvotesReloadAll)
 	t.Run("Validators", testValidatorsReloadAll)
 }
@@ -225,6 +239,7 @@ func TestSelect(t *testing.T) {
 	t.Run("Stakes", testStakesSelect)
 	t.Run("SyncLogs", testSyncLogsSelect)
 	t.Run("Transactions", testTransactionsSelect)
+	t.Run("UpvoteRewards", testUpvoteRewardsSelect)
 	t.Run("Upvotes", testUpvotesSelect)
 	t.Run("Validators", testValidatorsSelect)
 }
@@ -236,6 +251,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("Stakes", testStakesUpdate)
 	t.Run("SyncLogs", testSyncLogsUpdate)
 	t.Run("Transactions", testTransactionsUpdate)
+	t.Run("UpvoteRewards", testUpvoteRewardsUpdate)
 	t.Run("Upvotes", testUpvotesUpdate)
 	t.Run("Validators", testValidatorsUpdate)
 }
@@ -247,6 +263,7 @@ func TestSliceUpdateAll(t *testing.T) {
 	t.Run("Stakes", testStakesSliceUpdateAll)
 	t.Run("SyncLogs", testSyncLogsSliceUpdateAll)
 	t.Run("Transactions", testTransactionsSliceUpdateAll)
+	t.Run("UpvoteRewards", testUpvoteRewardsSliceUpdateAll)
 	t.Run("Upvotes", testUpvotesSliceUpdateAll)
 	t.Run("Validators", testValidatorsSliceUpdateAll)
 }
