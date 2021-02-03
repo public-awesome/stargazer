@@ -120,6 +120,7 @@ func main() {
 		// terminate the binary.
 		signal.Stop(sigC)
 	}()
+	go startHTTP(ctx)
 
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
