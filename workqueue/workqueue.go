@@ -367,7 +367,7 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 }
 
 // This works for both stake and unstake commands since they both send only the total amount, which is upserted.
-func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time, addStake bool) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -408,7 +408,46 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		Amount:    amount,
 	}
 
-	return model.Upsert(ctx, db, true, []string{"vendor_id", "post_id", "delegator", "validator"}, boil.Whitelist("amount", "updated_at"), boil.Infer())
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = model.Upsert(
+		ctx,
+		tx,
+		true,
+		[]string{"vendor_id", "post_id", "delegator", "validator"},
+		boil.Whitelist("amount", "updated_at"),
+		boil.Infer(),
+	)
+	if err != nil {
+		return err
+	}
+
+	post, err := models.Posts(
+		models.PostWhere.VendorID.EQ(vendorID),
+		models.PostWhere.PostID.EQ(postID),
+	).One(ctx, db)
+	if err != nil {
+		return err
+	}
+
+	if addStake {
+		post.TotalStakedAmount = post.TotalStakedAmount + amount
+	} else {
+		post.TotalStakedAmount = post.TotalStakedAmount - amount
+	}
+
+	_, err = post.Update(
+		ctx,
+		tx,
+		boil.Whitelist(
+			models.PostColumns.TotalStakedAmount,
+			models.PostColumns.UpdatedAt),
+	)
+
+	return nil
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
@@ -426,12 +465,12 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 					return err
 				}
 			case "stake":
-				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				err := handleStake(ctx, db, evt.Attributes, height, ts, true)
 				if err != nil {
 					return err
 				}
 			case "unstake":
-				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				err := handleStake(ctx, db, evt.Attributes, height, ts, false)
 				if err != nil {
 					return err
 				}
