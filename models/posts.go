@@ -43,7 +43,6 @@ type Post struct {
 	TotalUpvoteRewardAmount int64     `boil:"total_upvote_reward_amount" json:"totalUpvoteRewardAmount" toml:"totalUpvoteRewardAmount" yaml:"totalUpvoteRewardAmount"`
 	TotalUpvoteRewardDenom  string    `boil:"total_upvote_reward_denom" json:"totalUpvoteRewardDenom" toml:"totalUpvoteRewardDenom" yaml:"totalUpvoteRewardDenom"`
 	TotalStakedAmount       int64     `boil:"total_staked_amount" json:"totalStakedAmount" toml:"totalStakedAmount" yaml:"totalStakedAmount"`
-	TotalStakedDenom        string    `boil:"total_staked_denom" json:"totalStakedDenom" toml:"totalStakedDenom" yaml:"totalStakedDenom"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -69,7 +68,6 @@ var PostColumns = struct {
 	TotalUpvoteRewardAmount string
 	TotalUpvoteRewardDenom  string
 	TotalStakedAmount       string
-	TotalStakedDenom        string
 }{
 	ID:                      "id",
 	Height:                  "height",
@@ -90,7 +88,6 @@ var PostColumns = struct {
 	TotalUpvoteRewardAmount: "total_upvote_reward_amount",
 	TotalUpvoteRewardDenom:  "total_upvote_reward_denom",
 	TotalStakedAmount:       "total_staked_amount",
-	TotalStakedDenom:        "total_staked_denom",
 }
 
 // Generated where
@@ -115,7 +112,6 @@ var PostWhere = struct {
 	TotalUpvoteRewardAmount whereHelperint64
 	TotalUpvoteRewardDenom  whereHelperstring
 	TotalStakedAmount       whereHelperint64
-	TotalStakedDenom        whereHelperstring
 }{
 	ID:                      whereHelperstring{field: "\"posts\".\"id\""},
 	Height:                  whereHelperint64{field: "\"posts\".\"height\""},
@@ -136,7 +132,6 @@ var PostWhere = struct {
 	TotalUpvoteRewardAmount: whereHelperint64{field: "\"posts\".\"total_upvote_reward_amount\""},
 	TotalUpvoteRewardDenom:  whereHelperstring{field: "\"posts\".\"total_upvote_reward_denom\""},
 	TotalStakedAmount:       whereHelperint64{field: "\"posts\".\"total_staked_amount\""},
-	TotalStakedDenom:        whereHelperstring{field: "\"posts\".\"total_staked_denom\""},
 }
 
 // PostRels is where relationship names are stored.
@@ -156,9 +151,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "total_staked_denom"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount"}
 	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
-	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "total_staked_denom"}
+	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 
