@@ -408,7 +408,47 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		Amount:    amount,
 	}
 
-	return model.Upsert(ctx, db, true, []string{"vendor_id", "post_id", "delegator", "validator"}, boil.Whitelist("amount", "updated_at"), boil.Infer())
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	err = model.Upsert(
+		ctx,
+		tx,
+		true,
+		[]string{"vendor_id", "post_id", "delegator", "validator"},
+		boil.Whitelist("amount", "updated_at"),
+		boil.Infer(),
+	)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	post, err := models.Posts(
+		models.PostWhere.VendorID.EQ(vendorID),
+		models.PostWhere.PostID.EQ(postID),
+	).One(ctx, db)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	post.TotalStakedAmount = amount
+	_, err = post.Update(
+		ctx,
+		tx,
+		boil.Whitelist(
+			models.PostColumns.TotalStakedAmount,
+			models.PostColumns.UpdatedAt),
+	)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
