@@ -291,7 +291,7 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 
 func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
-	if attrs["vendor_id"] == "" || attrs["reward_account"] == "" || attrs["post_id"] == "" {
+	if attrs["vendor_id"] == "" || attrs["reward_account"] == "" || attrs["post_id"] == "" || attrs["reward_amount"] == "" {
 		return nil
 	}
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
