@@ -254,13 +254,12 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 
 func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
-	vendorIDStr, ok := attrs["vendor_id"]
-	if !ok {
-		vendorIDStr = "1"
+	if attrs["vendor_id"] == "" || attrs["reward_amount"] == "" || attrs["post_id"] == "" {
+		return nil
 	}
-	vendorID, err := strconv.Atoi(vendorIDStr)
+	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
-		return fmt.Errorf("curation_complete: error parsing vendor id %s %w", vendorIDStr, err)
+		return fmt.Errorf("curation_complete: error parsing vendor id %s %w", attrs["vendor_id"], err)
 	}
 	postID := attrs["post_id"]
 	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
@@ -292,6 +291,9 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 
 func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
+	if attrs["vendor_id"] == "" || attrs["reward_account"] == "" || attrs["post_id"] == "" {
+		return nil
+	}
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
 		return fmt.Errorf("protocol_reward: error parsing vendor id %s %w", attrs["vendor_id"], err)
