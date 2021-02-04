@@ -254,14 +254,18 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 
 func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
-	vendorID, err := strconv.Atoi(attrs["vendor_id"])
+	vendorIDStr, ok := attrs["vendor_id"]
+	if !ok {
+		vendorIDStr = "1"
+	}
+	vendorID, err := strconv.Atoi(vendorIDStr)
 	if err != nil {
-		return err
+		return fmt.Errorf("curation_complete: error parsing vendor id %s %w", vendorIDStr, err)
 	}
 	postID := attrs["post_id"]
 	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
 	if err != nil {
-		return err
+		return fmt.Errorf("curation_complete: error parsing reward_amount %s %w", attrs["reward_amount"], err)
 	}
 
 	p, err := models.Posts(
@@ -269,7 +273,7 @@ func handleCurationComplete(ctx context.Context, db *sql.DB, attributes []abcity
 		models.PostWhere.PostID.EQ(postID),
 	).One(ctx, db)
 	if err != nil {
-		return err
+		return fmt.Errorf("curation_complete: error retrieving post %s %w", postID, err)
 	}
 
 	p.TotalUpvoteRewardAmount = amount.Amount.Int64()
@@ -290,13 +294,13 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 	attrs := parseEventAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
-		return err
+		return fmt.Errorf("protocol_reward: error parsing vendor id %s %w", attrs["vendor_id"], err)
 	}
 	postID := attrs["post_id"]
 	rewardAddress := attrs["reward_account"]
 	amount, err := sdk.ParseCoinNormalized(attrs["reward_amount"])
 	if err != nil {
-		return err
+		return fmt.Errorf("protocol_reward: error parsing reward_amount %s %w", attrs["reward_amount"], err)
 	}
 
 	ur := &models.UpvoteReward{
@@ -308,7 +312,11 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 		RewardDenom:   amount.Denom,
 	}
 
-	return ur.Insert(ctx, db, boil.Infer())
+	err = ur.Insert(ctx, db, boil.Infer())
+	if err != nil {
+		return fmt.Errorf("protocol_reward: error inserting upvote reward (%s) %w", postID, err)
+	}
+	return nil
 }
 
 func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
