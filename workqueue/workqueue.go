@@ -367,7 +367,7 @@ func handleUpvote(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, h
 }
 
 // This works for both stake and unstake commands since they both send only the total amount, which is upserted.
-func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time, addStake bool) error {
+func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -422,6 +422,7 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		boil.Infer(),
 	)
 	if err != nil {
+		_ = tx.Rollback()
 		return err
 	}
 
@@ -430,15 +431,11 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 		models.PostWhere.PostID.EQ(postID),
 	).One(ctx, db)
 	if err != nil {
+		_ = tx.Rollback()
 		return err
 	}
 
-	if addStake {
-		post.TotalStakedAmount = post.TotalStakedAmount + amount
-	} else {
-		post.TotalStakedAmount = post.TotalStakedAmount - amount
-	}
-
+	post.TotalStakedAmount = amount
 	_, err = post.Update(
 		ctx,
 		tx,
@@ -446,8 +443,12 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 			models.PostColumns.TotalStakedAmount,
 			models.PostColumns.UpdatedAt),
 	)
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
 
-	return nil
+	return tx.Commit()
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
@@ -465,12 +466,12 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 					return err
 				}
 			case "stake":
-				err := handleStake(ctx, db, evt.Attributes, height, ts, true)
+				err := handleStake(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
 			case "unstake":
-				err := handleStake(ctx, db, evt.Attributes, height, ts, false)
+				err := handleStake(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
