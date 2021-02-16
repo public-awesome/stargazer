@@ -54,17 +54,23 @@ func getEnv(key, defaultValue string) string {
 
 func main() {
 	var (
-		rpcEndpoint string
-		grpcAddress string
-		autoMigrate bool
+		rpcEndpoint   string
+		grpcAddress   string
+		autoMigrate   bool
+		genesisHeight int64
 	)
 	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
 	fs.StringVar(&rpcEndpoint, "rpc-endpoint", getEnv("RPC_ENDPOINT", "http://localhost:26657"), "--rpc-endpoint specify the rpc endpoint")
 	fs.StringVar(&grpcAddress, "grpc-address", getEnv("GRPC_ADDRESS", "localhost:9091"), "--grpc-address specify the grpc server address")
 	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
+	fs.Int64Var(&genesisHeight, "genesis-height", 1, "--genesis-height specificy genesis height if chain is not starting from height 1")
 	err := fs.Parse(os.Args[1:])
 	if err != nil {
 		log.Fatal().Err(err).Msg("error parsing arguments")
+	}
+
+	if genesisHeight <= 0 {
+		genesisHeight = 1
 	}
 
 	dbSourceName := os.Getenv("DB_SOURCE")
@@ -125,6 +131,7 @@ func main() {
 	exportQueue := make(chan int64, 100)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
 	wk := workqueue.NewWorker(config.Marshaler, config.Amino, exportQueue, db, cp)
+	wk.WithGenesisHeight(genesisHeight)
 	go wk.Start(ctx)
 	startNewBlockListener(ctx, cp, exportQueue, db)
 
