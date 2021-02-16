@@ -32,13 +32,6 @@ steps:
       branch: master
       event:
         - push
-  - name: slack
-    image: plugins/slack
-    settings:
-      webhook:
-        from_secret: slack_webhook
-    when:
-      status: [success, failure]
   - name: discord
     image: appleboy/drone-discord
     settings:
@@ -50,6 +43,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 0af3302c17df0f27dd3156a3202593d3f61faab308f68c9f9a4061dcc3c6144f
+hmac: e9a9dbb9c74295299555b01a06caa15c3f53c83cc6e210521c04907fab6a8bc8
 
 ...
