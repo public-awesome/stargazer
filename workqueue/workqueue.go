@@ -29,22 +29,29 @@ import (
 
 // Worker is the queue processor.
 type Worker struct {
-	q     <-chan int64
-	cdc   codec.Marshaler
-	amino *codec.LegacyAmino
-	db    *sql.DB
-	cp    *client.Proxy
+	q             <-chan int64
+	cdc           codec.Marshaler
+	amino         *codec.LegacyAmino
+	db            *sql.DB
+	cp            *client.Proxy
+	genesisHeight int64
 }
 
 // NewWorker returns an intialized worker
 func NewWorker(cdc codec.Marshaler, amino *codec.LegacyAmino, queue <-chan int64, db *sql.DB, cp *client.Proxy) *Worker {
 	return &Worker{
-		q:     queue,
-		cdc:   cdc,
-		amino: amino,
-		db:    db,
-		cp:    cp,
+		q:             queue,
+		cdc:           cdc,
+		amino:         amino,
+		db:            db,
+		cp:            cp,
+		genesisHeight: 1,
 	}
+}
+
+// WithGenesisHeight sets the first block height
+func (w *Worker) WithGenesisHeight(height int64) {
+	w.genesisHeight = height
 }
 
 // Start runs the listener that process blocks.
@@ -67,8 +74,8 @@ func (w *Worker) Start(ctx context.Context) {
 }
 
 func (w *Worker) process(ctx context.Context, height int64) error {
-	// skip block 1
-	if height == 1 {
+	// skip genesis height
+	if height == w.genesisHeight {
 		return nil
 	}
 	exists, err := models.BlockExists(ctx, w.db, height)
