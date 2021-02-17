@@ -13,12 +13,11 @@ import (
 
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	stargazeparams "github.com/public-awesome/stargaze/app/params"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
 	libclient "github.com/tendermint/tendermint/rpc/jsonrpc/client"
-
-	stakebirdparams "github.com/public-awesome/stakebird/app/params"
 )
 
 var clientTimeout = 5 * time.Second
@@ -29,7 +28,7 @@ type Proxy struct {
 	rpcClient      rpcclient.Client // Tendermint (RPC client) node
 	httpClient     *http.Client
 	rpcNode        string
-	encodingConfig stakebirdparams.EncodingConfig
+	encodingConfig stargazeparams.EncodingConfig
 }
 
 func newRPCClient(remote string) (*rpchttp.HTTP, error) {
@@ -51,7 +50,7 @@ func newRPCClient(remote string) (*rpchttp.HTTP, error) {
 }
 
 // NewProxy returns a new Proxy instance
-func NewProxy(rpcNode string, encodingConfig stakebirdparams.EncodingConfig) (*Proxy, error) {
+func NewProxy(rpcNode string, encodingConfig stargazeparams.EncodingConfig) (*Proxy, error) {
 	rpcClient, err := newRPCClient(rpcNode)
 	if err != nil {
 		return nil, err

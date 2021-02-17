@@ -14,10 +14,10 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/markbates/pkger"
-	"github.com/public-awesome/stakebird/app"
 	"github.com/public-awesome/stakewatcher/client"
 	"github.com/public-awesome/stakewatcher/models"
 	"github.com/public-awesome/stakewatcher/workqueue"
+	"github.com/public-awesome/stargaze/app"
 	"github.com/rs/zerolog/log"
 	migrate "github.com/rubenv/sql-migrate"
 	tmtypes "github.com/tendermint/tendermint/types"
