@@ -12,11 +12,12 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.7
+    image: golang:1.15.8-alpine3.13
     commands:
-      - apt-get update && apt-get install cmake -y
+      - apk add --no-cache ca-certificates build-base
+      - wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
       - make install-pkger
-      - make build-linux
+      - make build-alpine
     environment:
       GOPROXY: http://goproxy
   - name: publish-docker
@@ -29,7 +30,8 @@ steps:
       password:
         from_secret: docker_password
     when:
-      branch: master
+      branch: 
+        - master
       event:
         - push
   - name: discord
@@ -43,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: e9a9dbb9c74295299555b01a06caa15c3f53c83cc6e210521c04907fab6a8bc8
+hmac: 757f3dde022d98cead2ea54ea9ef5097f26a9eae19289cc3f77907ffab9004c3
 
 ...
