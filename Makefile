@@ -16,7 +16,7 @@ build: pkger
 	go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
 build-linux: pkger
-	CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
+	GOOS=linux GOARCH=amd64 go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
 build-docker:
 	docker build -t publicawesome/stakewatcher .

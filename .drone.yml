@@ -12,7 +12,7 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.7
+    image: 1.15.8-alpine3.13
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
@@ -29,7 +29,9 @@ steps:
       password:
         from_secret: docker_password
     when:
-      branch: master
+      branch: 
+        - master
+        - shanev/update-stargaze-build
       event:
         - push
   - name: discord
@@ -43,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: e9a9dbb9c74295299555b01a06caa15c3f53c83cc6e210521c04907fab6a8bc8
+hmac: 7ceb1926685141ac708136d5e8ea70217408c73b97d67b569cfba42454f05789
 
 ...
