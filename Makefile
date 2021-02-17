@@ -1,4 +1,4 @@
-.PHONY: build test run pkger
+.PHONY: build test run pkger build-alpine
 
 
 generate-models:
@@ -18,6 +18,9 @@ build: pkger
 build-linux: pkger
 	GOOS=linux GOARCH=amd64 go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
 
+build-alpine: pkger
+	GOOS=linux GOARCH=amd64 go build -tags muslc -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
+ 
 build-docker:
 	docker build -t publicawesome/stakewatcher .
 
