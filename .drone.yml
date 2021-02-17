@@ -14,7 +14,7 @@ steps:
   - name: build
     image: golang:1.15.8-alpine3.13
     commands:
-      - apt-get update && apt-get install cmake -y
+      - apk add --no-cache ca-certificates build-base
       - make install-pkger
       - make build-linux
     environment:
@@ -45,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 7ceb1926685141ac708136d5e8ea70217408c73b97d67b569cfba42454f05789
+hmac: 2c415fbc4777b13f69cc6b646faedb20618a02f13932b4783d5697e8ac924da8
 
 ...
