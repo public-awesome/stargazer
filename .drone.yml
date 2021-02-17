@@ -12,7 +12,7 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: 1.15.8-alpine3.13
+    image: golang:1.15.8-alpine3.13
     commands:
       - apt-get update && apt-get install cmake -y
       - make install-pkger
