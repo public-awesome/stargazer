@@ -32,7 +32,6 @@ steps:
     when:
       branch: 
         - master
-        - shanev/update-stargaze-build
       event:
         - push
   - name: discord
@@ -46,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: d78c2b45eb856a706f1bb284a184ef70089ad53ef473a4fc431d503b23178876
+hmac: 757f3dde022d98cead2ea54ea9ef5097f26a9eae19289cc3f77907ffab9004c3
 
 ...
