@@ -8,7 +8,7 @@ steps:
     image: golangci/golangci-lint:v1.34
     commands:
       - go mod download
-      - golangci-lint run -v --timeout 5m
+      - golangci-lint run -v --timeout 10m
     environment:
       GOPROXY: http://goproxy
   - name: build
