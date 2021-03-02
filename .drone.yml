@@ -24,7 +24,7 @@ steps:
     image: plugins/docker:18
     settings:
       dockerfile: Dockerfile
-      repo: publicawesome/stakewatcher
+      repo: publicawesome/stargazer
       username:
         from_secret: docker_username
       password:

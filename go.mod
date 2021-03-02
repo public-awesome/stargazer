@@ -1,4 +1,4 @@
-module github.com/public-awesome/stakewatcher
+module github.com/public-awesome/stargazer
 
 go 1.15
 

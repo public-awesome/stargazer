@@ -1,6 +1,6 @@
 # thie config file is used by sql-migrate
 development:
   dialect: postgres
-  datasource: sslmode=disable dbname=stakewatcher user=postgres password=postgres
+  datasource: sslmode=disable dbname=stargazer user=postgres password=postgres
   dir: db/migrations/
   table: migrations

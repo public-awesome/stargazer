@@ -1,13 +1,12 @@
-# StakeWatcher
+# Stargazer
 
 ### A [Fission Labs Juno](https://github.com/fissionlabsio/juno) Fork
-
-
 
 > Juno is a Cosmos Hub blockchain data aggregator and exporter that provides the
 > ability for developers and clients to query for indexed chain data.
 
 ## Table of Contents
+
 - [Contributing](#contributing)
 - [License](#license)
 
