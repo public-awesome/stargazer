@@ -3,7 +3,7 @@ module github.com/public-awesome/stakewatcher
 go 1.15
 
 require (
-	github.com/cosmos/cosmos-sdk v0.41.4
+	github.com/cosmos/cosmos-sdk v0.42.0
 	github.com/friendsofgo/errors v0.9.2
 	github.com/gofrs/uuid v3.4.0+incompatible
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
