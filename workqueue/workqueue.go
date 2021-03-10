@@ -247,6 +247,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		Height:           height,
 		PostID:           attrs["post_id"],
 		Body:             attrs["body"],
+		BodyHash:         attrs["body_hash"],
 		Creator:          attrs["creator"],
 		RewardAddress:    attrs["reward_account"],
 		TotalVotes:       0,
