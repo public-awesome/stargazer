@@ -44,6 +44,12 @@ type Post struct {
 	TotalUpvoteRewardDenom  string    `boil:"total_upvote_reward_denom" json:"totalUpvoteRewardDenom" toml:"totalUpvoteRewardDenom" yaml:"totalUpvoteRewardDenom"`
 	TotalStakedAmount       int64     `boil:"total_staked_amount" json:"totalStakedAmount" toml:"totalStakedAmount" yaml:"totalStakedAmount"`
 	BodyHash                string    `boil:"body_hash" json:"bodyHash" toml:"bodyHash" yaml:"bodyHash"`
+	ChainID                 string    `boil:"chain_id" json:"chainID" toml:"chainID" yaml:"chainID"`
+	Owner                   string    `boil:"owner" json:"owner" toml:"owner" yaml:"owner"`
+	ContractAddress         string    `boil:"contract_address" json:"contractAddress" toml:"contractAddress" yaml:"contractAddress"`
+	Metadata                string    `boil:"metadata" json:"metadata" toml:"metadata" yaml:"metadata"`
+	Locked                  bool      `boil:"locked" json:"locked" toml:"locked" yaml:"locked"`
+	ParentID                string    `boil:"parent_id" json:"parentID" toml:"parentID" yaml:"parentID"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -70,6 +76,12 @@ var PostColumns = struct {
 	TotalUpvoteRewardDenom  string
 	TotalStakedAmount       string
 	BodyHash                string
+	ChainID                 string
+	Owner                   string
+	ContractAddress         string
+	Metadata                string
+	Locked                  string
+	ParentID                string
 }{
 	ID:                      "id",
 	Height:                  "height",
@@ -91,9 +103,24 @@ var PostColumns = struct {
 	TotalUpvoteRewardDenom:  "total_upvote_reward_denom",
 	TotalStakedAmount:       "total_staked_amount",
 	BodyHash:                "body_hash",
+	ChainID:                 "chain_id",
+	Owner:                   "owner",
+	ContractAddress:         "contract_address",
+	Metadata:                "metadata",
+	Locked:                  "locked",
+	ParentID:                "parent_id",
 }
 
 // Generated where
+
+type whereHelperbool struct{ field string }
+
+func (w whereHelperbool) EQ(x bool) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.EQ, x) }
+func (w whereHelperbool) NEQ(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.NEQ, x) }
+func (w whereHelperbool) LT(x bool) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.LT, x) }
+func (w whereHelperbool) LTE(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.LTE, x) }
+func (w whereHelperbool) GT(x bool) qm.QueryMod  { return qmhelper.Where(w.field, qmhelper.GT, x) }
+func (w whereHelperbool) GTE(x bool) qm.QueryMod { return qmhelper.Where(w.field, qmhelper.GTE, x) }
 
 var PostWhere = struct {
 	ID                      whereHelperstring
@@ -116,6 +143,12 @@ var PostWhere = struct {
 	TotalUpvoteRewardDenom  whereHelperstring
 	TotalStakedAmount       whereHelperint64
 	BodyHash                whereHelperstring
+	ChainID                 whereHelperstring
+	Owner                   whereHelperstring
+	ContractAddress         whereHelperstring
+	Metadata                whereHelperstring
+	Locked                  whereHelperbool
+	ParentID                whereHelperstring
 }{
 	ID:                      whereHelperstring{field: "\"posts\".\"id\""},
 	Height:                  whereHelperint64{field: "\"posts\".\"height\""},
@@ -137,6 +170,12 @@ var PostWhere = struct {
 	TotalUpvoteRewardDenom:  whereHelperstring{field: "\"posts\".\"total_upvote_reward_denom\""},
 	TotalStakedAmount:       whereHelperint64{field: "\"posts\".\"total_staked_amount\""},
 	BodyHash:                whereHelperstring{field: "\"posts\".\"body_hash\""},
+	ChainID:                 whereHelperstring{field: "\"posts\".\"chain_id\""},
+	Owner:                   whereHelperstring{field: "\"posts\".\"owner\""},
+	ContractAddress:         whereHelperstring{field: "\"posts\".\"contract_address\""},
+	Metadata:                whereHelperstring{field: "\"posts\".\"metadata\""},
+	Locked:                  whereHelperbool{field: "\"posts\".\"locked\""},
+	ParentID:                whereHelperstring{field: "\"posts\".\"parent_id\""},
 }
 
 // PostRels is where relationship names are stored.
@@ -156,9 +195,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id"}
 	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
-	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash"}
+	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 
