@@ -233,10 +233,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		return err
 	}
 
-	locked, err := strconv.ParseBool(attrs["locked"])
-	if err != nil {
-		return err
-	}
+	locked := attrs["locked"] == "true"
 
 	endTime, err := time.Parse(time.RFC3339, attrs["curation_end_time"])
 	if err != nil {
