@@ -233,6 +233,8 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		return err
 	}
 
+	locked := attrs["locked"] == "true"
+
 	endTime, err := time.Parse(time.RFC3339, attrs["curation_end_time"])
 	if err != nil {
 		return err
@@ -243,12 +245,19 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 	}
 	p := &models.Post{
 		ID:               id.String(),
-		VendorID:         vendorID,
+		ChainID:          attrs["chain_id"],
 		Height:           height,
+		VendorID:         vendorID,
 		PostID:           attrs["post_id"],
 		Body:             attrs["body"],
+		BodyHash:         attrs["body_hash"],
+		ContractAddress:  attrs["contract_address"],
 		Creator:          attrs["creator"],
+		Locked:           locked,
+		Metadata:         attrs["metadata"],
+		Owner:            attrs["owner"],
 		RewardAddress:    attrs["reward_account"],
+		ParentID:         attrs["parent_id"],
 		TotalVotes:       0,
 		TotalVotesAmount: 0,
 		TotalVoterCount:  0,
