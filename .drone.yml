@@ -12,7 +12,7 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.8-alpine3.13
+    image: golang:1.16.2-alpine3.13
     commands:
       - apk add --no-cache ca-certificates build-base
       - wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
@@ -45,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 87dce4394bff2ad026ed76beb1506674c2032bdecc5e409c5f32d0183584ec3a
+hmac: 2a2f78054e57eed4a74ac998060fa1b67fe79fc62b529e24b4ced7951c74f1a4
 
 ...
