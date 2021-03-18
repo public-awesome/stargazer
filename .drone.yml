@@ -5,7 +5,7 @@ name: default
 
 steps:
   - name: lint
-    image: golangci/golangci-lint:v1.34
+    image: golangci/golangci-lint:v1.36.0
     commands:
       - go mod download
       - golangci-lint run -v --timeout 10m
@@ -29,11 +29,26 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
+    tags:
+      - develop
     when:
       branch: 
-        - master
+        - develop
       event:
         - push
+  - name: docker_release
+    image: plugins/docker:18
+    settings:
+      dockerfile: Dockerfile
+      repo: publicawesome/stargazer
+      username:
+        from_secret: docker_username
+      password:
+        from_secret: docker_password
+      auto_tag: true
+    when:
+      event:
+        - tag
   - name: discord
     image: appleboy/drone-discord
     settings:
@@ -45,6 +60,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 2a2f78054e57eed4a74ac998060fa1b67fe79fc62b529e24b4ced7951c74f1a4
+hmac: 3c233f6514206564e9f332403613009955c09dd83a0923c9bb5e2119ef48e619
 
 ...
