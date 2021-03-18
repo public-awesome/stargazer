@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	envPrefix = "stargazer"
+	envPrefix = "STARGAZER"
 )
 
 func runMigrations(db *sql.DB) {
