@@ -8,29 +8,29 @@ install-pkger:
 	go install github.com/markbates/pkger/cmd/pkger
 
 pkger:
-	pkger -o cmd/stakewatcher
+	pkger -o cmd/stargazer
 
 ci-sign:
-	drone sign public-awesome/stakewatcher --save
+	drone sign public-awesome/stargazer --save
 build: pkger
-	go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
+	go build -o build/stargazer github.com/public-awesome/stargazer/cmd/stargazer
 
 build-linux: pkger
-	GOOS=linux GOARCH=amd64 go build -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
+	GOOS=linux GOARCH=amd64 go build -o build/stargazer github.com/public-awesome/stargazer/cmd/stargazer
 
 build-alpine: pkger
-	GOOS=linux GOARCH=amd64 go build -tags muslc -o build/stakewatcher github.com/public-awesome/stakewatcher/cmd/stakewatcher
+	GOOS=linux GOARCH=amd64 go build -tags muslc -o build/stargazer github.com/public-awesome/stargazer/cmd/stargazer
  
 build-docker:
-	docker build -t publicawesome/stakewatcher .
+	docker build -t publicawesome/stargazer .
 
 run-auto-migrate: pkger
-	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher --auto-migrate
+	go run github.com/public-awesome/stargazer/cmd/stargazer --auto-migrate
 run:
-	go run github.com/public-awesome/stakewatcher/cmd/stakewatcher
+	go run github.com/public-awesome/stargazer/cmd/stargazer
 
 start:
-	./build/stakewatcher
+	./build/stargazer
 	
 fake-post:
 	stakecli tx curating post  1 $(POST_ID) "post body"  --from validator --keyring-backend test --trust-node --chain-id $(shell stakecli status | jq '.node_info.network') -b block -y
@@ -44,7 +44,7 @@ install-tools: install-sqlboiler install-sqlmigrate
 
 
 install-sqlboiler:
-	VERSION=v4.4.0 ./contrib/dev/install-sqlboiler.sh
+	VERSION=v4.5.0 ./contrib/dev/install-sqlboiler.sh
 
 install-sqlmigrate:
 	go install github.com/rubenv/sql-migrate/sql-migrate

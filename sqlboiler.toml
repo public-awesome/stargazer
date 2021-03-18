@@ -1,5 +1,5 @@
 [psql]
-  dbname = "stakewatcher"
+  dbname = "stargazer"
   host   = "localhost"
   port   = 5432
   user   = "postgres"

@@ -12,7 +12,7 @@ steps:
     environment:
       GOPROXY: http://goproxy
   - name: build
-    image: golang:1.15.8-alpine3.13
+    image: golang:1.16.2-alpine3.13
     commands:
       - apk add --no-cache ca-certificates build-base
       - wget https://github.com/CosmWasm/wasmvm/releases/download/v0.13.0/libwasmvm_muslc.a -O /lib/libwasmvm_muslc.a
@@ -24,7 +24,7 @@ steps:
     image: plugins/docker:18
     settings:
       dockerfile: Dockerfile
-      repo: publicawesome/stakewatcher
+      repo: publicawesome/stargazer
       username:
         from_secret: docker_username
       password:
@@ -45,6 +45,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 3221404ed531743db2f2a559ff7aff8f0c57590fbbcc6422f9457d90c1d088ec
+hmac: 2a2f78054e57eed4a74ac998060fa1b67fe79fc62b529e24b4ced7951c74f1a4
 
 ...

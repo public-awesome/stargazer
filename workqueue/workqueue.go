@@ -12,8 +12,8 @@ import (
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
 
 	"github.com/cosmos/cosmos-sdk/codec"
-	"github.com/public-awesome/stakewatcher/client"
-	"github.com/public-awesome/stakewatcher/models"
+	"github.com/public-awesome/stargazer/client"
+	"github.com/public-awesome/stargazer/models"
 	"github.com/rs/zerolog/log"
 	"github.com/volatiletech/null/v8"
 	"github.com/volatiletech/sqlboiler/v4/boil"

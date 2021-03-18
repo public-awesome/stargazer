@@ -14,10 +14,10 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/markbates/pkger"
-	"github.com/public-awesome/stakewatcher/client"
-	"github.com/public-awesome/stakewatcher/models"
-	"github.com/public-awesome/stakewatcher/workqueue"
 	"github.com/public-awesome/stargaze/app"
+	"github.com/public-awesome/stargazer/client"
+	"github.com/public-awesome/stargazer/models"
+	"github.com/public-awesome/stargazer/workqueue"
 	"github.com/rs/zerolog/log"
 	migrate "github.com/rubenv/sql-migrate"
 	tmtypes "github.com/tendermint/tendermint/types"
@@ -26,7 +26,7 @@ import (
 )
 
 const (
-	envPrefix = "STAKEWATCHER"
+	envPrefix = "STARGAZER"
 )
 
 func runMigrations(db *sql.DB) {
@@ -59,7 +59,7 @@ func main() {
 		autoMigrate   bool
 		genesisHeight int64
 	)
-	fs := flag.NewFlagSet("stakewatcher", flag.ExitOnError)
+	fs := flag.NewFlagSet("stargazer", flag.ExitOnError)
 	fs.StringVar(&rpcEndpoint, "rpc-endpoint", getEnv("RPC_ENDPOINT", "http://localhost:26657"), "--rpc-endpoint specify the rpc endpoint")
 	fs.StringVar(&grpcAddress, "grpc-address", getEnv("GRPC_ADDRESS", "localhost:9091"), "--grpc-address specify the grpc server address")
 	fs.BoolVar(&autoMigrate, "auto-migrate", false, "--auto-migrate specificy if should perform database migration on start")
@@ -76,7 +76,7 @@ func main() {
 	dbSourceName := os.Getenv("DB_SOURCE")
 	if dbSourceName == "" {
 		log.Info().Msg("using default db settings")
-		dbSourceName = "dbname=stakewatcher user=postgres password=postgres sslmode=disable"
+		dbSourceName = "dbname=stargazer user=postgres password=postgres sslmode=disable"
 	}
 	// Open handle to database like normal
 	db, err := sql.Open("postgres", dbSourceName)
@@ -176,7 +176,7 @@ func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, db *sql.DB, exp
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.
 func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64, db *sql.DB) {
-	eventCh, cancel, err := cp.SubscribeNewBlocks("stakewatcher-client")
+	eventCh, cancel, err := cp.SubscribeNewBlocks("stargazer-client")
 	defer cancel()
 	if err != nil {
 		log.Fatal().Err(err).Msg("failed to subscribe to new blocks")

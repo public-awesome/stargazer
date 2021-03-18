@@ -9,7 +9,7 @@ import (
 
 func startHTTP(ctx context.Context) {
 	m := &http.ServeMux{}
-	m.HandleFunc("/stakewatcher/healthz", func(rw http.ResponseWriter, r *http.Request) {
+	m.HandleFunc("/stargazer/healthz", func(rw http.ResponseWriter, r *http.Request) {
 		rw.WriteHeader(http.StatusOK)
 	})
 	server := &http.Server{Addr: ":1670", Handler: m}

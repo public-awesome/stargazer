@@ -1,1 +1,1 @@
-package stakewatcher
+package stargazer
