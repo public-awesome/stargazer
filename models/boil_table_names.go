@@ -7,6 +7,7 @@ var TableNames = struct {
 	BlockSignatures string
 	Blocks          string
 	Posts           string
+	SlashingEvents  string
 	Stakes          string
 	SyncLogs        string
 	Transactions    string
@@ -17,6 +18,7 @@ var TableNames = struct {
 	BlockSignatures: "block_signatures",
 	Blocks:          "blocks",
 	Posts:           "posts",
+	SlashingEvents:  "slashing_events",
 	Stakes:          "stakes",
 	SyncLogs:        "sync_logs",
 	Transactions:    "transactions",

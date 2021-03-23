@@ -78,15 +78,18 @@ var ValidatorWhere = struct {
 var ValidatorRels = struct {
 	ValidatorAddressBlockSignatures string
 	ProposerAddressBlocks           string
+	ValidatorAddressSlashingEvents  string
 }{
 	ValidatorAddressBlockSignatures: "ValidatorAddressBlockSignatures",
 	ProposerAddressBlocks:           "ProposerAddressBlocks",
+	ValidatorAddressSlashingEvents:  "ValidatorAddressSlashingEvents",
 }
 
 // validatorR is where relationships are stored.
 type validatorR struct {
 	ValidatorAddressBlockSignatures BlockSignatureSlice `boil:"ValidatorAddressBlockSignatures" json:"ValidatorAddressBlockSignatures" toml:"ValidatorAddressBlockSignatures" yaml:"ValidatorAddressBlockSignatures"`
 	ProposerAddressBlocks           BlockSlice          `boil:"ProposerAddressBlocks" json:"ProposerAddressBlocks" toml:"ProposerAddressBlocks" yaml:"ProposerAddressBlocks"`
+	ValidatorAddressSlashingEvents  SlashingEventSlice  `boil:"ValidatorAddressSlashingEvents" json:"ValidatorAddressSlashingEvents" toml:"ValidatorAddressSlashingEvents" yaml:"ValidatorAddressSlashingEvents"`
 }
 
 // NewStruct creates a new relationship struct
@@ -232,6 +235,27 @@ func (o *Validator) ProposerAddressBlocks(mods ...qm.QueryMod) blockQuery {
 
 	if len(queries.GetSelect(query.Query)) == 0 {
 		queries.SetSelect(query.Query, []string{"\"blocks\".*"})
+	}
+
+	return query
+}
+
+// ValidatorAddressSlashingEvents retrieves all the slashing_event's SlashingEvents with an executor via validator_address column.
+func (o *Validator) ValidatorAddressSlashingEvents(mods ...qm.QueryMod) slashingEventQuery {
+	var queryMods []qm.QueryMod
+	if len(mods) != 0 {
+		queryMods = append(queryMods, mods...)
+	}
+
+	queryMods = append(queryMods,
+		qm.Where("\"slashing_events\".\"validator_address\"=?", o.Address),
+	)
+
+	query := SlashingEvents(queryMods...)
+	queries.SetFrom(query.Query, "\"slashing_events\"")
+
+	if len(queries.GetSelect(query.Query)) == 0 {
+		queries.SetSelect(query.Query, []string{"\"slashing_events\".*"})
 	}
 
 	return query
@@ -419,6 +443,97 @@ func (validatorL) LoadProposerAddressBlocks(ctx context.Context, e boil.ContextE
 	return nil
 }
 
+// LoadValidatorAddressSlashingEvents allows an eager lookup of values, cached into the
+// loaded structs of the objects. This is for a 1-M or N-M relationship.
+func (validatorL) LoadValidatorAddressSlashingEvents(ctx context.Context, e boil.ContextExecutor, singular bool, maybeValidator interface{}, mods queries.Applicator) error {
+	var slice []*Validator
+	var object *Validator
+
+	if singular {
+		object = maybeValidator.(*Validator)
+	} else {
+		slice = *maybeValidator.(*[]*Validator)
+	}
+
+	args := make([]interface{}, 0, 1)
+	if singular {
+		if object.R == nil {
+			object.R = &validatorR{}
+		}
+		args = append(args, object.Address)
+	} else {
+	Outer:
+		for _, obj := range slice {
+			if obj.R == nil {
+				obj.R = &validatorR{}
+			}
+
+			for _, a := range args {
+				if a == obj.Address {
+					continue Outer
+				}
+			}
+
+			args = append(args, obj.Address)
+		}
+	}
+
+	if len(args) == 0 {
+		return nil
+	}
+
+	query := NewQuery(
+		qm.From(`slashing_events`),
+		qm.WhereIn(`slashing_events.validator_address in ?`, args...),
+	)
+	if mods != nil {
+		mods.Apply(query)
+	}
+
+	results, err := query.QueryContext(ctx, e)
+	if err != nil {
+		return errors.Wrap(err, "failed to eager load slashing_events")
+	}
+
+	var resultSlice []*SlashingEvent
+	if err = queries.Bind(results, &resultSlice); err != nil {
+		return errors.Wrap(err, "failed to bind eager loaded slice slashing_events")
+	}
+
+	if err = results.Close(); err != nil {
+		return errors.Wrap(err, "failed to close results in eager load on slashing_events")
+	}
+	if err = results.Err(); err != nil {
+		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for slashing_events")
+	}
+
+	if singular {
+		object.R.ValidatorAddressSlashingEvents = resultSlice
+		for _, foreign := range resultSlice {
+			if foreign.R == nil {
+				foreign.R = &slashingEventR{}
+			}
+			foreign.R.ValidatorAddressValidator = object
+		}
+		return nil
+	}
+
+	for _, foreign := range resultSlice {
+		for _, local := range slice {
+			if local.Address == foreign.ValidatorAddress {
+				local.R.ValidatorAddressSlashingEvents = append(local.R.ValidatorAddressSlashingEvents, foreign)
+				if foreign.R == nil {
+					foreign.R = &slashingEventR{}
+				}
+				foreign.R.ValidatorAddressValidator = local
+				break
+			}
+		}
+	}
+
+	return nil
+}
+
 // AddValidatorAddressBlockSignatures adds the given related objects to the existing relationships
 // of the validator, optionally inserting them as new records.
 // Appends related to o.R.ValidatorAddressBlockSignatures.
@@ -520,6 +635,59 @@ func (o *Validator) AddProposerAddressBlocks(ctx context.Context, exec boil.Cont
 			}
 		} else {
 			rel.R.Proposer = o
+		}
+	}
+	return nil
+}
+
+// AddValidatorAddressSlashingEvents adds the given related objects to the existing relationships
+// of the validator, optionally inserting them as new records.
+// Appends related to o.R.ValidatorAddressSlashingEvents.
+// Sets related.R.ValidatorAddressValidator appropriately.
+func (o *Validator) AddValidatorAddressSlashingEvents(ctx context.Context, exec boil.ContextExecutor, insert bool, related ...*SlashingEvent) error {
+	var err error
+	for _, rel := range related {
+		if insert {
+			rel.ValidatorAddress = o.Address
+			if err = rel.Insert(ctx, exec, boil.Infer()); err != nil {
+				return errors.Wrap(err, "failed to insert into foreign table")
+			}
+		} else {
+			updateQuery := fmt.Sprintf(
+				"UPDATE \"slashing_events\" SET %s WHERE %s",
+				strmangle.SetParamNames("\"", "\"", 1, []string{"validator_address"}),
+				strmangle.WhereClause("\"", "\"", 2, slashingEventPrimaryKeyColumns),
+			)
+			values := []interface{}{o.Address, rel.ID}
+
+			if boil.IsDebug(ctx) {
+				writer := boil.DebugWriterFrom(ctx)
+				fmt.Fprintln(writer, updateQuery)
+				fmt.Fprintln(writer, values)
+			}
+			if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
+				return errors.Wrap(err, "failed to update foreign table")
+			}
+
+			rel.ValidatorAddress = o.Address
+		}
+	}
+
+	if o.R == nil {
+		o.R = &validatorR{
+			ValidatorAddressSlashingEvents: related,
+		}
+	} else {
+		o.R.ValidatorAddressSlashingEvents = append(o.R.ValidatorAddressSlashingEvents, related...)
+	}
+
+	for _, rel := range related {
+		if rel.R == nil {
+			rel.R = &slashingEventR{
+				ValidatorAddressValidator: o,
+			}
+		} else {
+			rel.R.ValidatorAddressValidator = o
 		}
 	}
 	return nil

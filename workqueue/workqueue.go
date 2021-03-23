@@ -22,6 +22,7 @@ import (
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
 	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	slashingtypes "github.com/cosmos/cosmos-sdk/x/slashing/types"
 	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/gofrs/uuid"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
@@ -208,7 +209,20 @@ func (w *Worker) processBlockEvents(ctx context.Context, br *tmctypes.ResultBloc
 			}
 		}
 	}
-
+	for _, evt := range br.BeginBlockEvents {
+		switch evt.Type {
+		case slashingtypes.EventTypeLiveness:
+			err := handleLiveness(ctx, w.db, evt.Attributes, height)
+			if err != nil {
+				return err
+			}
+		case slashingtypes.EventTypeSlash:
+			err := handleSlash(ctx, w.db, evt.Attributes, height)
+			if err != nil {
+				return err
+			}
+		}
+	}
 	return nil
 }
 
@@ -397,6 +411,51 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 	err = ur.Insert(ctx, db, boil.Infer())
 	if err != nil {
 		return fmt.Errorf("protocol_reward: error inserting upvote reward (%s) %w", postID, err)
+	}
+	return nil
+}
+func handleLiveness(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
+	attrs := parseEventAttributes(attributes)
+	if attrs[slashingtypes.AttributeKeyAddress] == "" || attrs[slashingtypes.AttributeKeyMissedBlocks] == "" {
+		return nil
+	}
+	addr := attrs[slashingtypes.AttributeKeyAddress]
+
+	blocksCounter, err := strconv.Atoi(attrs[slashingtypes.AttributeKeyMissedBlocks])
+	if err != nil {
+		log.Warn().Msg(fmt.Sprintf("can not parse block counter [%s] [%s]", addr, slashingtypes.AttributeKeyMissedBlocks))
+	}
+	se := &models.SlashingEvent{
+		Height:           height,
+		ValidatorAddress: addr,
+		EventType:        slashingtypes.EventTypeLiveness,
+		Counter:          int64(blocksCounter),
+	}
+	err = se.Insert(ctx, db, boil.Infer())
+	if err != nil {
+		return fmt.Errorf("slashing_event: error inserting liveness %s", addr)
+	}
+	return nil
+}
+
+func handleSlash(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
+	attrs := parseEventAttributes(attributes)
+	if attrs[slashingtypes.AttributeKeyAddress] == "" {
+		return nil
+	}
+	addr := attrs[slashingtypes.AttributeKeyAddress]
+	reason := attrs[slashingtypes.AttributeKeyReason]
+
+	se := &models.SlashingEvent{
+		Height:           height,
+		ValidatorAddress: addr,
+		EventType:        slashingtypes.EventTypeSlash,
+		Counter:          0,
+		Reason:           reason,
+	}
+	err := se.Insert(ctx, db, boil.Infer())
+	if err != nil {
+		return fmt.Errorf("slashing_event: error inserting liveness %s", addr)
 	}
 	return nil
 }
