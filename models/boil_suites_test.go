@@ -15,6 +15,7 @@ func TestParent(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignatures)
 	t.Run("Blocks", testBlocks)
 	t.Run("Posts", testPosts)
+	t.Run("SlashingEvents", testSlashingEvents)
 	t.Run("Stakes", testStakes)
 	t.Run("SyncLogs", testSyncLogs)
 	t.Run("Transactions", testTransactions)
@@ -27,6 +28,7 @@ func TestDelete(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesDelete)
 	t.Run("Blocks", testBlocksDelete)
 	t.Run("Posts", testPostsDelete)
+	t.Run("SlashingEvents", testSlashingEventsDelete)
 	t.Run("Stakes", testStakesDelete)
 	t.Run("SyncLogs", testSyncLogsDelete)
 	t.Run("Transactions", testTransactionsDelete)
@@ -39,6 +41,7 @@ func TestQueryDeleteAll(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesQueryDeleteAll)
 	t.Run("Blocks", testBlocksQueryDeleteAll)
 	t.Run("Posts", testPostsQueryDeleteAll)
+	t.Run("SlashingEvents", testSlashingEventsQueryDeleteAll)
 	t.Run("Stakes", testStakesQueryDeleteAll)
 	t.Run("SyncLogs", testSyncLogsQueryDeleteAll)
 	t.Run("Transactions", testTransactionsQueryDeleteAll)
@@ -51,6 +54,7 @@ func TestSliceDeleteAll(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesSliceDeleteAll)
 	t.Run("Blocks", testBlocksSliceDeleteAll)
 	t.Run("Posts", testPostsSliceDeleteAll)
+	t.Run("SlashingEvents", testSlashingEventsSliceDeleteAll)
 	t.Run("Stakes", testStakesSliceDeleteAll)
 	t.Run("SyncLogs", testSyncLogsSliceDeleteAll)
 	t.Run("Transactions", testTransactionsSliceDeleteAll)
@@ -63,6 +67,7 @@ func TestExists(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesExists)
 	t.Run("Blocks", testBlocksExists)
 	t.Run("Posts", testPostsExists)
+	t.Run("SlashingEvents", testSlashingEventsExists)
 	t.Run("Stakes", testStakesExists)
 	t.Run("SyncLogs", testSyncLogsExists)
 	t.Run("Transactions", testTransactionsExists)
@@ -75,6 +80,7 @@ func TestFind(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesFind)
 	t.Run("Blocks", testBlocksFind)
 	t.Run("Posts", testPostsFind)
+	t.Run("SlashingEvents", testSlashingEventsFind)
 	t.Run("Stakes", testStakesFind)
 	t.Run("SyncLogs", testSyncLogsFind)
 	t.Run("Transactions", testTransactionsFind)
@@ -87,6 +93,7 @@ func TestBind(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesBind)
 	t.Run("Blocks", testBlocksBind)
 	t.Run("Posts", testPostsBind)
+	t.Run("SlashingEvents", testSlashingEventsBind)
 	t.Run("Stakes", testStakesBind)
 	t.Run("SyncLogs", testSyncLogsBind)
 	t.Run("Transactions", testTransactionsBind)
@@ -99,6 +106,7 @@ func TestOne(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesOne)
 	t.Run("Blocks", testBlocksOne)
 	t.Run("Posts", testPostsOne)
+	t.Run("SlashingEvents", testSlashingEventsOne)
 	t.Run("Stakes", testStakesOne)
 	t.Run("SyncLogs", testSyncLogsOne)
 	t.Run("Transactions", testTransactionsOne)
@@ -111,6 +119,7 @@ func TestAll(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesAll)
 	t.Run("Blocks", testBlocksAll)
 	t.Run("Posts", testPostsAll)
+	t.Run("SlashingEvents", testSlashingEventsAll)
 	t.Run("Stakes", testStakesAll)
 	t.Run("SyncLogs", testSyncLogsAll)
 	t.Run("Transactions", testTransactionsAll)
@@ -123,6 +132,7 @@ func TestCount(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesCount)
 	t.Run("Blocks", testBlocksCount)
 	t.Run("Posts", testPostsCount)
+	t.Run("SlashingEvents", testSlashingEventsCount)
 	t.Run("Stakes", testStakesCount)
 	t.Run("SyncLogs", testSyncLogsCount)
 	t.Run("Transactions", testTransactionsCount)
@@ -138,6 +148,8 @@ func TestInsert(t *testing.T) {
 	t.Run("Blocks", testBlocksInsertWhitelist)
 	t.Run("Posts", testPostsInsert)
 	t.Run("Posts", testPostsInsertWhitelist)
+	t.Run("SlashingEvents", testSlashingEventsInsert)
+	t.Run("SlashingEvents", testSlashingEventsInsertWhitelist)
 	t.Run("Stakes", testStakesInsert)
 	t.Run("Stakes", testStakesInsertWhitelist)
 	t.Run("SyncLogs", testSyncLogsInsert)
@@ -157,6 +169,7 @@ func TestInsert(t *testing.T) {
 func TestToOne(t *testing.T) {
 	t.Run("BlockSignatureToValidatorUsingValidator", testBlockSignatureToOneValidatorUsingValidator)
 	t.Run("BlockToValidatorUsingProposer", testBlockToOneValidatorUsingProposer)
+	t.Run("SlashingEventToValidatorUsingValidatorAddressValidator", testSlashingEventToOneValidatorUsingValidatorAddressValidator)
 	t.Run("TransactionToBlockUsingBlock", testTransactionToOneBlockUsingBlock)
 }
 
@@ -170,6 +183,7 @@ func TestToMany(t *testing.T) {
 	t.Run("BlockToHeightTransactions", testBlockToManyHeightTransactions)
 	t.Run("ValidatorToValidatorAddressBlockSignatures", testValidatorToManyValidatorAddressBlockSignatures)
 	t.Run("ValidatorToProposerAddressBlocks", testValidatorToManyProposerAddressBlocks)
+	t.Run("ValidatorToValidatorAddressSlashingEvents", testValidatorToManyValidatorAddressSlashingEvents)
 }
 
 // TestToOneSet tests cannot be run in parallel
@@ -177,6 +191,7 @@ func TestToMany(t *testing.T) {
 func TestToOneSet(t *testing.T) {
 	t.Run("BlockSignatureToValidatorUsingValidatorAddressBlockSignatures", testBlockSignatureToOneSetOpValidatorUsingValidator)
 	t.Run("BlockToValidatorUsingProposerAddressBlocks", testBlockToOneSetOpValidatorUsingProposer)
+	t.Run("SlashingEventToValidatorUsingValidatorAddressSlashingEvents", testSlashingEventToOneSetOpValidatorUsingValidatorAddressValidator)
 	t.Run("TransactionToBlockUsingHeightTransactions", testTransactionToOneSetOpBlockUsingBlock)
 }
 
@@ -198,6 +213,7 @@ func TestToManyAdd(t *testing.T) {
 	t.Run("BlockToHeightTransactions", testBlockToManyAddOpHeightTransactions)
 	t.Run("ValidatorToValidatorAddressBlockSignatures", testValidatorToManyAddOpValidatorAddressBlockSignatures)
 	t.Run("ValidatorToProposerAddressBlocks", testValidatorToManyAddOpProposerAddressBlocks)
+	t.Run("ValidatorToValidatorAddressSlashingEvents", testValidatorToManyAddOpValidatorAddressSlashingEvents)
 }
 
 // TestToManySet tests cannot be run in parallel
@@ -212,6 +228,7 @@ func TestReload(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesReload)
 	t.Run("Blocks", testBlocksReload)
 	t.Run("Posts", testPostsReload)
+	t.Run("SlashingEvents", testSlashingEventsReload)
 	t.Run("Stakes", testStakesReload)
 	t.Run("SyncLogs", testSyncLogsReload)
 	t.Run("Transactions", testTransactionsReload)
@@ -224,6 +241,7 @@ func TestReloadAll(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesReloadAll)
 	t.Run("Blocks", testBlocksReloadAll)
 	t.Run("Posts", testPostsReloadAll)
+	t.Run("SlashingEvents", testSlashingEventsReloadAll)
 	t.Run("Stakes", testStakesReloadAll)
 	t.Run("SyncLogs", testSyncLogsReloadAll)
 	t.Run("Transactions", testTransactionsReloadAll)
@@ -236,6 +254,7 @@ func TestSelect(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesSelect)
 	t.Run("Blocks", testBlocksSelect)
 	t.Run("Posts", testPostsSelect)
+	t.Run("SlashingEvents", testSlashingEventsSelect)
 	t.Run("Stakes", testStakesSelect)
 	t.Run("SyncLogs", testSyncLogsSelect)
 	t.Run("Transactions", testTransactionsSelect)
@@ -248,6 +267,7 @@ func TestUpdate(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesUpdate)
 	t.Run("Blocks", testBlocksUpdate)
 	t.Run("Posts", testPostsUpdate)
+	t.Run("SlashingEvents", testSlashingEventsUpdate)
 	t.Run("Stakes", testStakesUpdate)
 	t.Run("SyncLogs", testSyncLogsUpdate)
 	t.Run("Transactions", testTransactionsUpdate)
@@ -260,6 +280,7 @@ func TestSliceUpdateAll(t *testing.T) {
 	t.Run("BlockSignatures", testBlockSignaturesSliceUpdateAll)
 	t.Run("Blocks", testBlocksSliceUpdateAll)
 	t.Run("Posts", testPostsSliceUpdateAll)
+	t.Run("SlashingEvents", testSlashingEventsSliceUpdateAll)
 	t.Run("Stakes", testStakesSliceUpdateAll)
 	t.Run("SyncLogs", testSyncLogsSliceUpdateAll)
 	t.Run("Transactions", testTransactionsSliceUpdateAll)
