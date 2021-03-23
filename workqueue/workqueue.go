@@ -433,7 +433,7 @@ func handleLiveness(ctx context.Context, db *sql.DB, attributes []abcitypes.Even
 	}
 	err = se.Insert(ctx, db, boil.Infer())
 	if err != nil {
-		return fmt.Errorf("slashing_event: error inserting liveness %s", addr)
+		return fmt.Errorf("slashing_event: error inserting liveness %s %w", addr, err)
 	}
 	return nil
 }
@@ -455,7 +455,7 @@ func handleSlash(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAt
 	}
 	err := se.Insert(ctx, db, boil.Infer())
 	if err != nil {
-		return fmt.Errorf("slashing_event: error inserting liveness %s", addr)
+		return fmt.Errorf("slashing_event: error inserting liveness %s %w", addr, err)
 	}
 	return nil
 }

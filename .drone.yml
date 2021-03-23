@@ -29,8 +29,9 @@ steps:
         from_secret: docker_username
       password:
         from_secret: docker_password
-    tags:
-      - develop
+      tags:
+        - develop
+        - latest
     when:
       branch: 
         - develop
@@ -60,6 +61,6 @@ steps:
       status: [success, failure]
 ---
 kind: signature
-hmac: 3c233f6514206564e9f332403613009955c09dd83a0923c9bb5e2119ef48e619
+hmac: 4d37d2988b058fe4b396138277c10e11c2534289f3a934cf3a04c753b294d496
 
 ...
