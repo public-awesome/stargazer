@@ -8,7 +8,7 @@ CREATE TABLE slashing_events (
   reason text NOT NULL DEFAULT '',
   created_at timestamp NOT NULL DEFAULT NOW(),
   updated_at timestamp NOT NULL DEFAULT NOW(),
-  deleted_at timestamp,
+  deleted_at timestamp
 );
 
 CREATE INDEX slashing_events_height_address ON slashing_events (height, validator_address);
