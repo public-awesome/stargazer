@@ -11,8 +11,10 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
+	"github.com/cosmos/cosmos-sdk/types/query"
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
 	"github.com/cosmos/cosmos-sdk/x/auth/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	stargazeparams "github.com/public-awesome/stargaze/app/params"
 	rpcclient "github.com/tendermint/tendermint/rpc/client"
 	rpchttp "github.com/tendermint/tendermint/rpc/client/http"
@@ -94,6 +96,32 @@ func (p *Proxy) Validators(ctx context.Context, height int64) (*tmctypes.ResultV
 	page := 1
 	perPage := 1000
 	return p.rpcClient.Validators(ctx, &height, &page, &perPage)
+}
+
+// AppValidators returns the list of validators from the state machine
+func (p *Proxy) AppValidators(ctx context.Context, height int64) ([]stakingtypes.Validator, error) {
+	initClientCtx := client.Context{}.
+		WithJSONMarshaler(p.encodingConfig.Marshaler).
+		WithInterfaceRegistry(p.encodingConfig.InterfaceRegistry).
+		WithTxConfig(p.encodingConfig.TxConfig).
+		WithLegacyAmino(p.encodingConfig.Amino).
+		WithInput(os.Stdin).
+		WithAccountRetriever(types.AccountRetriever{}).
+		WithBroadcastMode(flags.BroadcastBlock).
+		WithNodeURI(p.rpcNode).
+		WithClient(p.rpcClient).WithHeight(height)
+
+	pageReq := &query.PageRequest{}
+
+	result, err := stakingtypes.NewQueryClient(initClientCtx).Validators(ctx, &stakingtypes.QueryValidatorsRequest{
+		// Leaving status empty on purpose to query all validators.
+		Pagination: pageReq,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return result.Validators, nil
 }
 
 // Genesis retrieves the genesis from tendermint

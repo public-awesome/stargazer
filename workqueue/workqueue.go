@@ -20,7 +20,9 @@ import (
 	"github.com/volatiletech/sqlboiler/v4/queries"
 
 	cryptocodec "github.com/cosmos/cosmos-sdk/crypto/codec"
+	cryptotypes "github.com/cosmos/cosmos-sdk/crypto/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	stakingtypes "github.com/cosmos/cosmos-sdk/x/staking/types"
 	"github.com/gofrs/uuid"
 	abcitypes "github.com/tendermint/tendermint/abci/types"
 	tmctypes "github.com/tendermint/tendermint/rpc/core/types"
@@ -90,7 +92,11 @@ func (w *Worker) processGenesisBlock(ctx context.Context, height int64) error {
 	if err != nil {
 		return fmt.Errorf("failed to fetch validators for block: %w", err)
 	}
-	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, w.db)
+	appValidators, err := w.appValidators(ctx, block.Block.LastCommit.GetHeight())
+	if err != nil {
+		log.Err(err).Msg("error retrieving app validators")
+	}
+	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, appValidators, w.db)
 	if err != nil {
 		return fmt.Errorf("failed to export block signatures %w", err)
 	}
@@ -104,7 +110,30 @@ func (w *Worker) processGenesisBlock(ctx context.Context, height int64) error {
 	_, err = sl.Update(ctx, w.db, boil.Infer())
 	return err
 }
+func (w *Worker) appValidators(ctx context.Context, height int64) (map[string]stakingtypes.Validator, error) {
+	appValidators, err := w.cp.AppValidators(ctx, height)
+	validators := make(map[string]stakingtypes.Validator)
+	if err != nil {
+		return validators, fmt.Errorf("failed to fetch app validators for block: %w", err)
+	}
 
+	for _, validator := range appValidators {
+		v := validator
+		err = w.cdc.UnpackAny(v.ConsensusPubkey, new(cryptotypes.PubKey))
+		if err != nil {
+			log.Err(err).Msg("failed to unpack val consensus pub key")
+			continue
+		}
+		consAddr, err := v.GetConsAddr()
+		if err != nil {
+			log.Err(err).Msg("failed retrieving cons addr")
+			continue
+		}
+		validators[consAddr.String()] = v
+	}
+
+	return validators, nil
+}
 func (w *Worker) process(ctx context.Context, height int64) error {
 	// skip genesis height
 	if height == w.genesisHeight {
@@ -140,8 +169,11 @@ func (w *Worker) process(ctx context.Context, height int64) error {
 	if err != nil {
 		return fmt.Errorf("failed to fetch validators for block: %w", err)
 	}
-
-	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, w.db)
+	appValidators, err := w.appValidators(ctx, block.Block.LastCommit.GetHeight())
+	if err != nil {
+		log.Err(err).Msg("error retrieving app validators")
+	}
+	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, appValidators, w.db)
 	if err != nil {
 		return fmt.Errorf("failed to export block signatures %w", err)
 	}
@@ -549,7 +581,7 @@ func sumGasTxs(txs []*sdk.TxResponse) uint64 {
 }
 
 // ExportBlockSignatures ...
-func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validators *tmctypes.ResultValidators, db *sql.DB) error {
+func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validators *tmctypes.ResultValidators, appValidators map[string]stakingtypes.Validator, db *sql.DB) error {
 	for _, sig := range commit.Signatures {
 		if sig.Signature == nil {
 			continue
@@ -559,7 +591,7 @@ func ExportBlockSignatures(ctx context.Context, commit *tmtypes.Commit, validato
 		if val == nil {
 			return fmt.Errorf("failed to find validator by address %s for block %d", addr, commit.GetHeight())
 		}
-		err := ExportValidator(ctx, val, db)
+		err := ExportValidator(ctx, val, appValidators, db)
 		if err != nil {
 			return fmt.Errorf("failed to export validator %w", err)
 		}
@@ -588,7 +620,7 @@ func SetBlockSignature(ctx context.Context, commit *tmtypes.Commit, sig tmtypes.
 }
 
 // ExportValidator exports validator
-func ExportValidator(ctx context.Context, val *tmtypes.Validator, db *sql.DB) error {
+func ExportValidator(ctx context.Context, val *tmtypes.Validator, appValidators map[string]stakingtypes.Validator, db *sql.DB) error {
 	address := sdk.ConsAddress(val.Address).String()
 	pk, err := cryptocodec.FromTmPubKeyInterface(val.PubKey)
 	if err != nil {
@@ -603,7 +635,12 @@ func ExportValidator(ctx context.Context, val *tmtypes.Validator, db *sql.DB) er
 		Address: address,
 		PubKey:  consPubKey,
 	}
-	return validator.Upsert(ctx, db, false, []string{}, boil.Columns{}, boil.Infer())
+	appValidator, ok := appValidators[address]
+	if ok {
+		validator.Moniker = appValidator.Description.Moniker
+		validator.OperatorAddress = appValidator.OperatorAddress
+	}
+	return validator.Upsert(ctx, db, true, []string{}, boil.Whitelist("operator_address", "moniker"), boil.Infer())
 }
 
 // findValidatorByAddr finds a validator by address given a set of
