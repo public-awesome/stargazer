@@ -9,7 +9,6 @@ CREATE TABLE slashing_events (
   created_at timestamp NOT NULL DEFAULT NOW(),
   updated_at timestamp NOT NULL DEFAULT NOW(),
   deleted_at timestamp,
-  CONSTRAINT slashing_events_validators_validator_address_fkey FOREIGN KEY (validator_address) REFERENCES validators (address)
 );
 
 CREATE INDEX slashing_events_height_address ON slashing_events (height, validator_address);
