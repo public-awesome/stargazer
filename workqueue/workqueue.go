@@ -73,10 +73,42 @@ func (w *Worker) Start(ctx context.Context) {
 	}
 }
 
+func (w *Worker) processGenesisBlock(ctx context.Context, height int64) error {
+	exists, err := models.BlockExists(ctx, w.db, height)
+	if err != nil {
+		return err
+	}
+	if exists {
+		return nil
+	}
+	block, err := w.cp.Block(ctx, height)
+	if err != nil {
+		return fmt.Errorf("failed to fetch block: %w", err)
+	}
+
+	vals, err := w.cp.Validators(ctx, block.Block.LastCommit.GetHeight())
+	if err != nil {
+		return fmt.Errorf("failed to fetch validators for block: %w", err)
+	}
+	err = ExportBlockSignatures(ctx, block.Block.LastCommit, vals, w.db)
+	if err != nil {
+		return fmt.Errorf("failed to export block signatures %w", err)
+	}
+	sl, err := models.FindSyncLog(ctx, w.db, height)
+	if err != nil {
+		return fmt.Errorf("error finding sync log: %w", err)
+	}
+	sl.Processed = true
+	sl.SyncedAt = null.NewTime(time.Now(), true)
+
+	_, err = sl.Update(ctx, w.db, boil.Infer())
+	return err
+}
+
 func (w *Worker) process(ctx context.Context, height int64) error {
 	// skip genesis height
 	if height == w.genesisHeight {
-		return nil
+		return w.processGenesisBlock(ctx, height)
 	}
 	exists, err := models.BlockExists(ctx, w.db, height)
 	if err != nil {
