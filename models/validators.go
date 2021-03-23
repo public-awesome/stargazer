@@ -24,44 +24,54 @@ import (
 
 // Validator is an object representing the database table.
 type Validator struct {
-	Address   string    `boil:"address" json:"address" toml:"address" yaml:"address"`
-	PubKey    string    `boil:"pub_key" json:"pubKey" toml:"pubKey" yaml:"pubKey"`
-	CreatedAt time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
-	UpdatedAt time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
-	DeletedAt null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	Address         string    `boil:"address" json:"address" toml:"address" yaml:"address"`
+	PubKey          string    `boil:"pub_key" json:"pubKey" toml:"pubKey" yaml:"pubKey"`
+	CreatedAt       time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
+	UpdatedAt       time.Time `boil:"updated_at" json:"updatedAt" toml:"updatedAt" yaml:"updatedAt"`
+	DeletedAt       null.Time `boil:"deleted_at" json:"deletedAt,omitempty" toml:"deletedAt" yaml:"deletedAt,omitempty"`
+	OperatorAddress string    `boil:"operator_address" json:"operatorAddress" toml:"operatorAddress" yaml:"operatorAddress"`
+	Moniker         string    `boil:"moniker" json:"moniker" toml:"moniker" yaml:"moniker"`
 
 	R *validatorR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L validatorL  `boil:"-" json:"-" toml:"-" yaml:"-"`
 }
 
 var ValidatorColumns = struct {
-	Address   string
-	PubKey    string
-	CreatedAt string
-	UpdatedAt string
-	DeletedAt string
+	Address         string
+	PubKey          string
+	CreatedAt       string
+	UpdatedAt       string
+	DeletedAt       string
+	OperatorAddress string
+	Moniker         string
 }{
-	Address:   "address",
-	PubKey:    "pub_key",
-	CreatedAt: "created_at",
-	UpdatedAt: "updated_at",
-	DeletedAt: "deleted_at",
+	Address:         "address",
+	PubKey:          "pub_key",
+	CreatedAt:       "created_at",
+	UpdatedAt:       "updated_at",
+	DeletedAt:       "deleted_at",
+	OperatorAddress: "operator_address",
+	Moniker:         "moniker",
 }
 
 // Generated where
 
 var ValidatorWhere = struct {
-	Address   whereHelperstring
-	PubKey    whereHelperstring
-	CreatedAt whereHelpertime_Time
-	UpdatedAt whereHelpertime_Time
-	DeletedAt whereHelpernull_Time
+	Address         whereHelperstring
+	PubKey          whereHelperstring
+	CreatedAt       whereHelpertime_Time
+	UpdatedAt       whereHelpertime_Time
+	DeletedAt       whereHelpernull_Time
+	OperatorAddress whereHelperstring
+	Moniker         whereHelperstring
 }{
-	Address:   whereHelperstring{field: "\"validators\".\"address\""},
-	PubKey:    whereHelperstring{field: "\"validators\".\"pub_key\""},
-	CreatedAt: whereHelpertime_Time{field: "\"validators\".\"created_at\""},
-	UpdatedAt: whereHelpertime_Time{field: "\"validators\".\"updated_at\""},
-	DeletedAt: whereHelpernull_Time{field: "\"validators\".\"deleted_at\""},
+	Address:         whereHelperstring{field: "\"validators\".\"address\""},
+	PubKey:          whereHelperstring{field: "\"validators\".\"pub_key\""},
+	CreatedAt:       whereHelpertime_Time{field: "\"validators\".\"created_at\""},
+	UpdatedAt:       whereHelpertime_Time{field: "\"validators\".\"updated_at\""},
+	DeletedAt:       whereHelpernull_Time{field: "\"validators\".\"deleted_at\""},
+	OperatorAddress: whereHelperstring{field: "\"validators\".\"operator_address\""},
+	Moniker:         whereHelperstring{field: "\"validators\".\"moniker\""},
 }
 
 // ValidatorRels is where relationship names are stored.
@@ -88,9 +98,9 @@ func (*validatorR) NewStruct() *validatorR {
 type validatorL struct{}
 
 var (
-	validatorAllColumns            = []string{"address", "pub_key", "created_at", "updated_at", "deleted_at"}
+	validatorAllColumns            = []string{"address", "pub_key", "created_at", "updated_at", "deleted_at", "operator_address", "moniker"}
 	validatorColumnsWithoutDefault = []string{"address", "pub_key", "deleted_at"}
-	validatorColumnsWithDefault    = []string{"created_at", "updated_at"}
+	validatorColumnsWithDefault    = []string{"created_at", "updated_at", "operator_address", "moniker"}
 	validatorPrimaryKeyColumns     = []string{"address"}
 )
 

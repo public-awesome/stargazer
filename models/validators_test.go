@@ -734,7 +734,7 @@ func testValidatorsSelect(t *testing.T) {
 }
 
 var (
-	validatorDBTypes = map[string]string{`Address`: `text`, `PubKey`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	validatorDBTypes = map[string]string{`Address`: `text`, `PubKey`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`, `OperatorAddress`: `text`, `Moniker`: `text`}
 	_                = bytes.MinRead
 )
 
