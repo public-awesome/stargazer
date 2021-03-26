@@ -111,7 +111,9 @@ func (p *Proxy) AppValidators(ctx context.Context, height int64) ([]stakingtypes
 		WithNodeURI(p.rpcNode).
 		WithClient(p.rpcClient).WithHeight(height)
 
-	pageReq := &query.PageRequest{}
+	pageReq := &query.PageRequest{
+		Limit: 200,
+	}
 
 	result, err := stakingtypes.NewQueryClient(initClientCtx).Validators(ctx, &stakingtypes.QueryValidatorsRequest{
 		// Leaving status empty on purpose to query all validators.
