@@ -1,6 +1,7 @@
 package workqueue
 
 import (
+	"bytes"
 	"context"
 	"database/sql"
 	"encoding/json"
@@ -68,7 +69,6 @@ func (w *Worker) Start(ctx context.Context) {
 			err := w.process(ctx, blockHeight)
 			if err != nil {
 				log.Error().Err(err).Int64("height", blockHeight).Msg("error processing block")
-
 				continue
 			}
 			log.Info().Int64("height", blockHeight).Msg("block synced")
@@ -226,6 +226,23 @@ func (w *Worker) processBlockEvents(ctx context.Context, br *tmctypes.ResultBloc
 	return nil
 }
 
+func (w *Worker) MarshalMsgs(msgs []sdk.Msg) ([]byte, error) {
+	resp := bytes.NewBuffer(make([]byte, 0))
+	resp.Write([]byte("["))
+	for _, msg := range msgs {
+		msgBz, err := w.cdc.MarshalJSON(msg)
+		if err != nil {
+			return nil, err
+		}
+		_, err = resp.Write(msgBz)
+		if err != nil {
+			return nil, err
+		}
+	}
+	resp.Write([]byte("]"))
+	return resp.Bytes(), nil
+}
+
 // ExportBlock exports a block by processing it.
 func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs []*sdk.TxResponse, validators *tmctypes.ResultValidators, db *sql.DB) error {
 	totalGas := sumGasTxs(txs)
@@ -259,8 +276,7 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		}
 
 		msgs := tx.GetMsgs()
-		msgsBz, err := json.Marshal(msgs)
-
+		msgsBz, err := w.MarshalMsgs(msgs)
 		if err != nil {
 			return fmt.Errorf("failed to JSON encode tx messages: %w", err)
 		}
