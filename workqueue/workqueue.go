@@ -229,7 +229,8 @@ func (w *Worker) processBlockEvents(ctx context.Context, br *tmctypes.ResultBloc
 func (w *Worker) MarshalMsgs(msgs []sdk.Msg) ([]byte, error) {
 	resp := bytes.NewBuffer(make([]byte, 0))
 	resp.Write([]byte("["))
-	for _, msg := range msgs {
+	total := len(msgs)
+	for i, msg := range msgs {
 		msgBz, err := w.cdc.MarshalJSON(msg)
 		if err != nil {
 			return nil, err
@@ -237,6 +238,9 @@ func (w *Worker) MarshalMsgs(msgs []sdk.Msg) ([]byte, error) {
 		_, err = resp.Write(msgBz)
 		if err != nil {
 			return nil, err
+		}
+		if i != total-1 {
+			resp.Write([]byte(","))
 		}
 	}
 	resp.Write([]byte("]"))
