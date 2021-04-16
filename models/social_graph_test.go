@@ -427,7 +427,7 @@ func testSocialGraphsSelect(t *testing.T) {
 }
 
 var (
-	socialGraphDBTypes = map[string]string{`ID`: `bigint`, `Amount`: `bigint`, `BuyerAddress`: `text`, `CreatorAddress`: `text`, `Username`: `text`, `ValidatorAddress`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	socialGraphDBTypes = map[string]string{`ID`: `bigint`, `Amount`: `bigint`, `BuyerAddress`: `text`, `CreatorAddress`: `text`, `Height`: `bigint`, `Username`: `text`, `ValidatorAddress`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
 	_                  = bytes.MinRead
 )
 

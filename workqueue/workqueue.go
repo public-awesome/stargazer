@@ -11,7 +11,6 @@ import (
 	"time"
 
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
-	"github.com/davecgh/go-spew/spew"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/public-awesome/stargazer/client"
@@ -661,41 +660,58 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 
 func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
 	attrs := parseAttributes(attributes)
-	// MsgBuyCreatorCoin{
-	// 	Username:  username,
-	// 	Creator:   creator.String(),
-	// 	Buyer:     buyer.String(),
-	// 	Validator: validator.String(),
-	// 	Amount:    amount,
-	// }
 
-	spew.Dump(attrs)
-	// if attrs[slashingtypes.AttributeKeyAddress] == "" || attrs[slashingtypes.AttributeKeyMissedBlocks] == "" {
-	// 	return nil
-	// }
-	// addr := attrs[slashingtypes.AttributeKeyAddress]
+	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
+	if err != nil {
+		return err
+	}
 
-	// blocksCounter, err := strconv.Atoi(attrs[slashingtypes.AttributeKeyMissedBlocks])
-	// if err != nil {
-	// 	log.Warn().Msg(fmt.Sprintf("can not parse block counter [%s] [%s]", addr, slashingtypes.AttributeKeyMissedBlocks))
-	// }
-	// se := &models.SlashingEvent{
-	// 	Height:           height,
-	// 	ValidatorAddress: addr,
-	// 	EventType:        slashingtypes.EventTypeLiveness,
-	// 	Counter:          int64(blocksCounter),
-	// }
-	// err = se.Insert(ctx, db, boil.Infer())
-	// if err != nil {
-	// 	return fmt.Errorf("slashing_event: error inserting liveness %s %w", addr, err)
-	// }
-	return nil
+	buyer := attrs["buyer"]
+	creator := attrs["creator"]
+	username := attrs["username"]
+	validator := attrs["validator"]
+
+	cc, err := models.SocialGraphs(
+		models.SocialGraphWhere.BuyerAddress.EQ(buyer),
+		models.SocialGraphWhere.CreatorAddress.EQ(creator),
+		models.SocialGraphWhere.Username.EQ(username),
+		models.SocialGraphWhere.ValidatorAddress.EQ(validator),
+	).One(ctx, db)
+
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if err == sql.ErrNoRows {
+		cc := &models.SocialGraph{
+			Amount:           amount,
+			BuyerAddress:     buyer,
+			CreatorAddress:   creator,
+			Height:           height,
+			Username:         username,
+			ValidatorAddress: validator,
+		}
+
+		err = cc.Insert(ctx, db, boil.Infer())
+		if err != nil {
+			// _ = tx.Rollback()
+			return err
+		}
+		return nil
+	} else {
+		cc.Amount = cc.Amount + amount
+		_, err = cc.Update(ctx, db, boil.Infer())
+		if err != nil {
+			// _ = tx.Rollback()
+			return err
+		}
+		return nil
+	}
+	// return tx.Commit()
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
 		for _, evt := range l.Events {
-			fmt.Println(evt.Type)
 			switch evt.Type {
 			case "post":
 				err := handlePost(ctx, db, evt.Attributes, height, ts)

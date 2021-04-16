@@ -28,6 +28,7 @@ type SocialGraph struct {
 	Amount           int64     `boil:"amount" json:"amount" toml:"amount" yaml:"amount"`
 	BuyerAddress     string    `boil:"buyer_address" json:"buyerAddress" toml:"buyerAddress" yaml:"buyerAddress"`
 	CreatorAddress   string    `boil:"creator_address" json:"creatorAddress" toml:"creatorAddress" yaml:"creatorAddress"`
+	Height           int64     `boil:"height" json:"height" toml:"height" yaml:"height"`
 	Username         string    `boil:"username" json:"username" toml:"username" yaml:"username"`
 	ValidatorAddress string    `boil:"validator_address" json:"validatorAddress" toml:"validatorAddress" yaml:"validatorAddress"`
 	CreatedAt        time.Time `boil:"created_at" json:"createdAt" toml:"createdAt" yaml:"createdAt"`
@@ -43,6 +44,7 @@ var SocialGraphColumns = struct {
 	Amount           string
 	BuyerAddress     string
 	CreatorAddress   string
+	Height           string
 	Username         string
 	ValidatorAddress string
 	CreatedAt        string
@@ -53,6 +55,7 @@ var SocialGraphColumns = struct {
 	Amount:           "amount",
 	BuyerAddress:     "buyer_address",
 	CreatorAddress:   "creator_address",
+	Height:           "height",
 	Username:         "username",
 	ValidatorAddress: "validator_address",
 	CreatedAt:        "created_at",
@@ -67,6 +70,7 @@ var SocialGraphWhere = struct {
 	Amount           whereHelperint64
 	BuyerAddress     whereHelperstring
 	CreatorAddress   whereHelperstring
+	Height           whereHelperint64
 	Username         whereHelperstring
 	ValidatorAddress whereHelperstring
 	CreatedAt        whereHelpertime_Time
@@ -77,6 +81,7 @@ var SocialGraphWhere = struct {
 	Amount:           whereHelperint64{field: "\"social_graph\".\"amount\""},
 	BuyerAddress:     whereHelperstring{field: "\"social_graph\".\"buyer_address\""},
 	CreatorAddress:   whereHelperstring{field: "\"social_graph\".\"creator_address\""},
+	Height:           whereHelperint64{field: "\"social_graph\".\"height\""},
 	Username:         whereHelperstring{field: "\"social_graph\".\"username\""},
 	ValidatorAddress: whereHelperstring{field: "\"social_graph\".\"validator_address\""},
 	CreatedAt:        whereHelpertime_Time{field: "\"social_graph\".\"created_at\""},
@@ -101,8 +106,8 @@ func (*socialGraphR) NewStruct() *socialGraphR {
 type socialGraphL struct{}
 
 var (
-	socialGraphAllColumns            = []string{"id", "amount", "buyer_address", "creator_address", "username", "validator_address", "created_at", "updated_at", "deleted_at"}
-	socialGraphColumnsWithoutDefault = []string{"amount", "buyer_address", "creator_address", "username", "validator_address", "deleted_at"}
+	socialGraphAllColumns            = []string{"id", "amount", "buyer_address", "creator_address", "height", "username", "validator_address", "created_at", "updated_at", "deleted_at"}
+	socialGraphColumnsWithoutDefault = []string{"amount", "buyer_address", "creator_address", "height", "username", "validator_address", "deleted_at"}
 	socialGraphColumnsWithDefault    = []string{"id", "created_at", "updated_at"}
 	socialGraphPrimaryKeyColumns     = []string{"id"}
 )

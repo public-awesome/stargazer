@@ -4,6 +4,7 @@ CREATE TABLE social_graph (
   amount bigint NOT NULL,
   buyer_address text NOT NULL,
   creator_address text NOT NULL,
+  height bigint NOT NULL,
   username text NOT NULL,
   validator_address text NOT NULL,
   created_at timestamp NOT NULL DEFAULT NOW(),

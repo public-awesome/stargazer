@@ -4,7 +4,6 @@ go 1.16
 
 require (
 	github.com/cosmos/cosmos-sdk v0.42.4
-	github.com/davecgh/go-spew v1.1.1
 	github.com/friendsofgo/errors v0.9.2
 	github.com/gofrs/uuid v3.4.0+incompatible
 	github.com/kat-co/vala v0.0.0-20170210184112-42e1d8b61f12
