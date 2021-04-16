@@ -86,14 +86,10 @@ var SlashingEventWhere = struct {
 
 // SlashingEventRels is where relationship names are stored.
 var SlashingEventRels = struct {
-	ValidatorAddressValidator string
-}{
-	ValidatorAddressValidator: "ValidatorAddressValidator",
-}
+}{}
 
 // slashingEventR is where relationships are stored.
 type slashingEventR struct {
-	ValidatorAddressValidator *Validator `boil:"ValidatorAddressValidator" json:"ValidatorAddressValidator" toml:"ValidatorAddressValidator" yaml:"ValidatorAddressValidator"`
 }
 
 // NewStruct creates a new relationship struct
@@ -200,163 +196,6 @@ func (q slashingEventQuery) Exists(ctx context.Context, exec boil.ContextExecuto
 	}
 
 	return count > 0, nil
-}
-
-// ValidatorAddressValidator pointed to by the foreign key.
-func (o *SlashingEvent) ValidatorAddressValidator(mods ...qm.QueryMod) validatorQuery {
-	queryMods := []qm.QueryMod{
-		qm.Where("\"address\" = ?", o.ValidatorAddress),
-	}
-
-	queryMods = append(queryMods, mods...)
-
-	query := Validators(queryMods...)
-	queries.SetFrom(query.Query, "\"validators\"")
-
-	return query
-}
-
-// LoadValidatorAddressValidator allows an eager lookup of values, cached into the
-// loaded structs of the objects. This is for an N-1 relationship.
-func (slashingEventL) LoadValidatorAddressValidator(ctx context.Context, e boil.ContextExecutor, singular bool, maybeSlashingEvent interface{}, mods queries.Applicator) error {
-	var slice []*SlashingEvent
-	var object *SlashingEvent
-
-	if singular {
-		object = maybeSlashingEvent.(*SlashingEvent)
-	} else {
-		slice = *maybeSlashingEvent.(*[]*SlashingEvent)
-	}
-
-	args := make([]interface{}, 0, 1)
-	if singular {
-		if object.R == nil {
-			object.R = &slashingEventR{}
-		}
-		args = append(args, object.ValidatorAddress)
-
-	} else {
-	Outer:
-		for _, obj := range slice {
-			if obj.R == nil {
-				obj.R = &slashingEventR{}
-			}
-
-			for _, a := range args {
-				if a == obj.ValidatorAddress {
-					continue Outer
-				}
-			}
-
-			args = append(args, obj.ValidatorAddress)
-
-		}
-	}
-
-	if len(args) == 0 {
-		return nil
-	}
-
-	query := NewQuery(
-		qm.From(`validators`),
-		qm.WhereIn(`validators.address in ?`, args...),
-	)
-	if mods != nil {
-		mods.Apply(query)
-	}
-
-	results, err := query.QueryContext(ctx, e)
-	if err != nil {
-		return errors.Wrap(err, "failed to eager load Validator")
-	}
-
-	var resultSlice []*Validator
-	if err = queries.Bind(results, &resultSlice); err != nil {
-		return errors.Wrap(err, "failed to bind eager loaded slice Validator")
-	}
-
-	if err = results.Close(); err != nil {
-		return errors.Wrap(err, "failed to close results of eager load for validators")
-	}
-	if err = results.Err(); err != nil {
-		return errors.Wrap(err, "error occurred during iteration of eager loaded relations for validators")
-	}
-
-	if len(resultSlice) == 0 {
-		return nil
-	}
-
-	if singular {
-		foreign := resultSlice[0]
-		object.R.ValidatorAddressValidator = foreign
-		if foreign.R == nil {
-			foreign.R = &validatorR{}
-		}
-		foreign.R.ValidatorAddressSlashingEvents = append(foreign.R.ValidatorAddressSlashingEvents, object)
-		return nil
-	}
-
-	for _, local := range slice {
-		for _, foreign := range resultSlice {
-			if local.ValidatorAddress == foreign.Address {
-				local.R.ValidatorAddressValidator = foreign
-				if foreign.R == nil {
-					foreign.R = &validatorR{}
-				}
-				foreign.R.ValidatorAddressSlashingEvents = append(foreign.R.ValidatorAddressSlashingEvents, local)
-				break
-			}
-		}
-	}
-
-	return nil
-}
-
-// SetValidatorAddressValidator of the slashingEvent to the related item.
-// Sets o.R.ValidatorAddressValidator to related.
-// Adds o to related.R.ValidatorAddressSlashingEvents.
-func (o *SlashingEvent) SetValidatorAddressValidator(ctx context.Context, exec boil.ContextExecutor, insert bool, related *Validator) error {
-	var err error
-	if insert {
-		if err = related.Insert(ctx, exec, boil.Infer()); err != nil {
-			return errors.Wrap(err, "failed to insert into foreign table")
-		}
-	}
-
-	updateQuery := fmt.Sprintf(
-		"UPDATE \"slashing_events\" SET %s WHERE %s",
-		strmangle.SetParamNames("\"", "\"", 1, []string{"validator_address"}),
-		strmangle.WhereClause("\"", "\"", 2, slashingEventPrimaryKeyColumns),
-	)
-	values := []interface{}{related.Address, o.ID}
-
-	if boil.IsDebug(ctx) {
-		writer := boil.DebugWriterFrom(ctx)
-		fmt.Fprintln(writer, updateQuery)
-		fmt.Fprintln(writer, values)
-	}
-	if _, err = exec.ExecContext(ctx, updateQuery, values...); err != nil {
-		return errors.Wrap(err, "failed to update local table")
-	}
-
-	o.ValidatorAddress = related.Address
-	if o.R == nil {
-		o.R = &slashingEventR{
-			ValidatorAddressValidator: related,
-		}
-	} else {
-		o.R.ValidatorAddressValidator = related
-	}
-
-	if related.R == nil {
-		related.R = &validatorR{
-			ValidatorAddressSlashingEvents: SlashingEventSlice{o},
-		}
-	} else {
-		related.R.ValidatorAddressSlashingEvents = append(related.R.ValidatorAddressSlashingEvents, o)
-	}
-
-	return nil
 }
 
 // SlashingEvents retrieves all the records using an executor.

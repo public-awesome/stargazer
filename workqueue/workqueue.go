@@ -11,6 +11,7 @@ import (
 	"time"
 
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/davecgh/go-spew/spew"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/public-awesome/stargazer/client"
@@ -434,6 +435,7 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 	}
 	return nil
 }
+
 func handleLiveness(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
 	if attrs[slashingtypes.AttributeKeyAddress] == "" || attrs[slashingtypes.AttributeKeyMissedBlocks] == "" {
@@ -657,9 +659,43 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 	return tx.Commit()
 }
 
+func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+	// MsgBuyCreatorCoin{
+	// 	Username:  username,
+	// 	Creator:   creator.String(),
+	// 	Buyer:     buyer.String(),
+	// 	Validator: validator.String(),
+	// 	Amount:    amount,
+	// }
+
+	spew.Dump(attrs)
+	// if attrs[slashingtypes.AttributeKeyAddress] == "" || attrs[slashingtypes.AttributeKeyMissedBlocks] == "" {
+	// 	return nil
+	// }
+	// addr := attrs[slashingtypes.AttributeKeyAddress]
+
+	// blocksCounter, err := strconv.Atoi(attrs[slashingtypes.AttributeKeyMissedBlocks])
+	// if err != nil {
+	// 	log.Warn().Msg(fmt.Sprintf("can not parse block counter [%s] [%s]", addr, slashingtypes.AttributeKeyMissedBlocks))
+	// }
+	// se := &models.SlashingEvent{
+	// 	Height:           height,
+	// 	ValidatorAddress: addr,
+	// 	EventType:        slashingtypes.EventTypeLiveness,
+	// 	Counter:          int64(blocksCounter),
+	// }
+	// err = se.Insert(ctx, db, boil.Infer())
+	// if err != nil {
+	// 	return fmt.Errorf("slashing_event: error inserting liveness %s %w", addr, err)
+	// }
+	return nil
+}
+
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
 		for _, evt := range l.Events {
+			fmt.Println(evt.Type)
 			switch evt.Type {
 			case "post":
 				err := handlePost(ctx, db, evt.Attributes, height, ts)
@@ -678,6 +714,11 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 				}
 			case "unstake":
 				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			case "buy_creator_coin":
+				err := handleBuyCreatorCoin(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
