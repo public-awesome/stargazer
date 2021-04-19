@@ -666,6 +666,11 @@ func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attr
 		return err
 	}
 
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
 	buyer := attrs["buyer"]
 	creator := attrs["creator"]
 	username := attrs["username"]
@@ -693,20 +698,18 @@ func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attr
 
 		err = cc.Insert(ctx, db, boil.Infer())
 		if err != nil {
-			// _ = tx.Rollback()
+			_ = tx.Rollback()
 			return err
 		}
-		return nil
 	} else {
 		cc.Amount = cc.Amount + amount
 		_, err = cc.Update(ctx, db, boil.Infer())
 		if err != nil {
-			// _ = tx.Rollback()
+			_ = tx.Rollback()
 			return err
 		}
-		return nil
 	}
-	// return tx.Commit()
+	return tx.Commit()
 }
 
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {

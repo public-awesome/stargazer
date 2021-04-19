@@ -10,11 +10,11 @@ require (
 	github.com/lib/pq v1.2.1-0.20191011153232-f91d3411e481
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
-	github.com/public-awesome/stargaze v0.6.3-0.20210411223931-0ce3f5f60547
+	github.com/public-awesome/stargaze v0.7.0
 	github.com/rs/zerolog v1.20.0
 	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351
 	github.com/spf13/viper v1.7.1
-	github.com/tendermint/tendermint v0.34.9
+	github.com/tendermint/tendermint v0.34.10
 	github.com/volatiletech/null/v8 v8.1.2
 	github.com/volatiletech/randomize v0.0.1
 	github.com/volatiletech/sqlboiler/v4 v4.5.0
