@@ -21,24 +21,24 @@ var (
 	_ = queries.Equal
 )
 
-func testSlashingEvents(t *testing.T) {
+func testSocialGraphs(t *testing.T) {
 	t.Parallel()
 
-	query := SlashingEvents()
+	query := SocialGraphs()
 
 	if query.Query == nil {
 		t.Error("expected a query, got nothing")
 	}
 }
 
-func testSlashingEventsDelete(t *testing.T) {
+func testSocialGraphsDelete(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -54,7 +54,7 @@ func testSlashingEventsDelete(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -64,14 +64,14 @@ func testSlashingEventsDelete(t *testing.T) {
 	}
 }
 
-func testSlashingEventsQueryDeleteAll(t *testing.T) {
+func testSocialGraphsQueryDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -81,13 +81,13 @@ func testSlashingEventsQueryDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	if rowsAff, err := SlashingEvents().DeleteAll(ctx, tx); err != nil {
+	if rowsAff, err := SocialGraphs().DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -97,14 +97,14 @@ func testSlashingEventsQueryDeleteAll(t *testing.T) {
 	}
 }
 
-func testSlashingEventsSliceDeleteAll(t *testing.T) {
+func testSocialGraphsSliceDeleteAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -114,7 +114,7 @@ func testSlashingEventsSliceDeleteAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := SlashingEventSlice{o}
+	slice := SocialGraphSlice{o}
 
 	if rowsAff, err := slice.DeleteAll(ctx, tx); err != nil {
 		t.Error(err)
@@ -122,7 +122,7 @@ func testSlashingEventsSliceDeleteAll(t *testing.T) {
 		t.Error("should only have deleted one row, but affected:", rowsAff)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -132,14 +132,14 @@ func testSlashingEventsSliceDeleteAll(t *testing.T) {
 	}
 }
 
-func testSlashingEventsExists(t *testing.T) {
+func testSocialGraphsExists(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -149,23 +149,23 @@ func testSlashingEventsExists(t *testing.T) {
 		t.Error(err)
 	}
 
-	e, err := SlashingEventExists(ctx, tx, o.ID)
+	e, err := SocialGraphExists(ctx, tx, o.ID)
 	if err != nil {
-		t.Errorf("Unable to check if SlashingEvent exists: %s", err)
+		t.Errorf("Unable to check if SocialGraph exists: %s", err)
 	}
 	if !e {
-		t.Errorf("Expected SlashingEventExists to return true, but got false.")
+		t.Errorf("Expected SocialGraphExists to return true, but got false.")
 	}
 }
 
-func testSlashingEventsFind(t *testing.T) {
+func testSocialGraphsFind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -175,24 +175,24 @@ func testSlashingEventsFind(t *testing.T) {
 		t.Error(err)
 	}
 
-	slashingEventFound, err := FindSlashingEvent(ctx, tx, o.ID)
+	socialGraphFound, err := FindSocialGraph(ctx, tx, o.ID)
 	if err != nil {
 		t.Error(err)
 	}
 
-	if slashingEventFound == nil {
+	if socialGraphFound == nil {
 		t.Error("want a record, got nil")
 	}
 }
 
-func testSlashingEventsBind(t *testing.T) {
+func testSocialGraphsBind(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -202,19 +202,19 @@ func testSlashingEventsBind(t *testing.T) {
 		t.Error(err)
 	}
 
-	if err = SlashingEvents().Bind(ctx, tx, o); err != nil {
+	if err = SocialGraphs().Bind(ctx, tx, o); err != nil {
 		t.Error(err)
 	}
 }
 
-func testSlashingEventsOne(t *testing.T) {
+func testSocialGraphsOne(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -224,38 +224,38 @@ func testSlashingEventsOne(t *testing.T) {
 		t.Error(err)
 	}
 
-	if x, err := SlashingEvents().One(ctx, tx); err != nil {
+	if x, err := SocialGraphs().One(ctx, tx); err != nil {
 		t.Error(err)
 	} else if x == nil {
 		t.Error("expected to get a non nil record")
 	}
 }
 
-func testSlashingEventsAll(t *testing.T) {
+func testSocialGraphsAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	slashingEventOne := &SlashingEvent{}
-	slashingEventTwo := &SlashingEvent{}
-	if err = randomize.Struct(seed, slashingEventOne, slashingEventDBTypes, false, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	socialGraphOne := &SocialGraph{}
+	socialGraphTwo := &SocialGraph{}
+	if err = randomize.Struct(seed, socialGraphOne, socialGraphDBTypes, false, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
-	if err = randomize.Struct(seed, slashingEventTwo, slashingEventDBTypes, false, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	if err = randomize.Struct(seed, socialGraphTwo, socialGraphDBTypes, false, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = slashingEventOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = socialGraphOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = slashingEventTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = socialGraphTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	slice, err := SlashingEvents().All(ctx, tx)
+	slice, err := SocialGraphs().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -265,31 +265,31 @@ func testSlashingEventsAll(t *testing.T) {
 	}
 }
 
-func testSlashingEventsCount(t *testing.T) {
+func testSocialGraphsCount(t *testing.T) {
 	t.Parallel()
 
 	var err error
 	seed := randomize.NewSeed()
-	slashingEventOne := &SlashingEvent{}
-	slashingEventTwo := &SlashingEvent{}
-	if err = randomize.Struct(seed, slashingEventOne, slashingEventDBTypes, false, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	socialGraphOne := &SocialGraph{}
+	socialGraphTwo := &SocialGraph{}
+	if err = randomize.Struct(seed, socialGraphOne, socialGraphDBTypes, false, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
-	if err = randomize.Struct(seed, slashingEventTwo, slashingEventDBTypes, false, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	if err = randomize.Struct(seed, socialGraphTwo, socialGraphDBTypes, false, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = slashingEventOne.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = socialGraphOne.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
-	if err = slashingEventTwo.Insert(ctx, tx, boil.Infer()); err != nil {
+	if err = socialGraphTwo.Insert(ctx, tx, boil.Infer()); err != nil {
 		t.Error(err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -299,14 +299,14 @@ func testSlashingEventsCount(t *testing.T) {
 	}
 }
 
-func testSlashingEventsInsert(t *testing.T) {
+func testSocialGraphsInsert(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -316,7 +316,7 @@ func testSlashingEventsInsert(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -326,24 +326,24 @@ func testSlashingEventsInsert(t *testing.T) {
 	}
 }
 
-func testSlashingEventsInsertWhitelist(t *testing.T) {
+func testSocialGraphsInsertWhitelist(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
-	if err = o.Insert(ctx, tx, boil.Whitelist(slashingEventColumnsWithoutDefault...)); err != nil {
+	if err = o.Insert(ctx, tx, boil.Whitelist(socialGraphColumnsWithoutDefault...)); err != nil {
 		t.Error(err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -353,14 +353,14 @@ func testSlashingEventsInsertWhitelist(t *testing.T) {
 	}
 }
 
-func testSlashingEventsReload(t *testing.T) {
+func testSocialGraphsReload(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -375,14 +375,14 @@ func testSlashingEventsReload(t *testing.T) {
 	}
 }
 
-func testSlashingEventsReloadAll(t *testing.T) {
+func testSocialGraphsReloadAll(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -392,21 +392,21 @@ func testSlashingEventsReloadAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice := SlashingEventSlice{o}
+	slice := SocialGraphSlice{o}
 
 	if err = slice.ReloadAll(ctx, tx); err != nil {
 		t.Error(err)
 	}
 }
 
-func testSlashingEventsSelect(t *testing.T) {
+func testSocialGraphsSelect(t *testing.T) {
 	t.Parallel()
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -416,7 +416,7 @@ func testSlashingEventsSelect(t *testing.T) {
 		t.Error(err)
 	}
 
-	slice, err := SlashingEvents().All(ctx, tx)
+	slice, err := SocialGraphs().All(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -427,25 +427,25 @@ func testSlashingEventsSelect(t *testing.T) {
 }
 
 var (
-	slashingEventDBTypes = map[string]string{`ID`: `bigint`, `Height`: `bigint`, `ValidatorAddress`: `text`, `EventType`: `text`, `Counter`: `bigint`, `Reason`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
-	_                    = bytes.MinRead
+	socialGraphDBTypes = map[string]string{`ID`: `bigint`, `Amount`: `bigint`, `BuyerAddress`: `text`, `CreatorAddress`: `text`, `Height`: `bigint`, `Username`: `text`, `ValidatorAddress`: `text`, `CreatedAt`: `timestamp without time zone`, `UpdatedAt`: `timestamp without time zone`, `DeletedAt`: `timestamp without time zone`}
+	_                  = bytes.MinRead
 )
 
-func testSlashingEventsUpdate(t *testing.T) {
+func testSocialGraphsUpdate(t *testing.T) {
 	t.Parallel()
 
-	if 0 == len(slashingEventPrimaryKeyColumns) {
+	if 0 == len(socialGraphPrimaryKeyColumns) {
 		t.Skip("Skipping table with no primary key columns")
 	}
-	if len(slashingEventAllColumns) == len(slashingEventPrimaryKeyColumns) {
+	if len(socialGraphAllColumns) == len(socialGraphPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -455,7 +455,7 @@ func testSlashingEventsUpdate(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -464,8 +464,8 @@ func testSlashingEventsUpdate(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	if rowsAff, err := o.Update(ctx, tx, boil.Infer()); err != nil {
@@ -475,18 +475,18 @@ func testSlashingEventsUpdate(t *testing.T) {
 	}
 }
 
-func testSlashingEventsSliceUpdateAll(t *testing.T) {
+func testSocialGraphsSliceUpdateAll(t *testing.T) {
 	t.Parallel()
 
-	if len(slashingEventAllColumns) == len(slashingEventPrimaryKeyColumns) {
+	if len(socialGraphAllColumns) == len(socialGraphPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
-	o := &SlashingEvent{}
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventColumnsWithDefault...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := &SocialGraph{}
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphColumnsWithDefault...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
@@ -496,7 +496,7 @@ func testSlashingEventsSliceUpdateAll(t *testing.T) {
 		t.Error(err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -505,18 +505,18 @@ func testSlashingEventsSliceUpdateAll(t *testing.T) {
 		t.Error("want one record, got:", count)
 	}
 
-	if err = randomize.Struct(seed, o, slashingEventDBTypes, true, slashingEventPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	if err = randomize.Struct(seed, o, socialGraphDBTypes, true, socialGraphPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	// Remove Primary keys and unique columns from what we plan to update
 	var fields []string
-	if strmangle.StringSliceMatch(slashingEventAllColumns, slashingEventPrimaryKeyColumns) {
-		fields = slashingEventAllColumns
+	if strmangle.StringSliceMatch(socialGraphAllColumns, socialGraphPrimaryKeyColumns) {
+		fields = socialGraphAllColumns
 	} else {
 		fields = strmangle.SetComplement(
-			slashingEventAllColumns,
-			slashingEventPrimaryKeyColumns,
+			socialGraphAllColumns,
+			socialGraphPrimaryKeyColumns,
 		)
 	}
 
@@ -534,7 +534,7 @@ func testSlashingEventsSliceUpdateAll(t *testing.T) {
 		}
 	}
 
-	slice := SlashingEventSlice{o}
+	slice := SocialGraphSlice{o}
 	if rowsAff, err := slice.UpdateAll(ctx, tx, updateMap); err != nil {
 		t.Error(err)
 	} else if rowsAff != 1 {
@@ -542,29 +542,29 @@ func testSlashingEventsSliceUpdateAll(t *testing.T) {
 	}
 }
 
-func testSlashingEventsUpsert(t *testing.T) {
+func testSocialGraphsUpsert(t *testing.T) {
 	t.Parallel()
 
-	if len(slashingEventAllColumns) == len(slashingEventPrimaryKeyColumns) {
+	if len(socialGraphAllColumns) == len(socialGraphPrimaryKeyColumns) {
 		t.Skip("Skipping table with only primary key columns")
 	}
 
 	seed := randomize.NewSeed()
 	var err error
 	// Attempt the INSERT side of an UPSERT
-	o := SlashingEvent{}
-	if err = randomize.Struct(seed, &o, slashingEventDBTypes, true); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	o := SocialGraph{}
+	if err = randomize.Struct(seed, &o, socialGraphDBTypes, true); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	ctx := context.Background()
 	tx := MustTx(boil.BeginTx(ctx, nil))
 	defer func() { _ = tx.Rollback() }()
 	if err = o.Upsert(ctx, tx, false, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert SlashingEvent: %s", err)
+		t.Errorf("Unable to upsert SocialGraph: %s", err)
 	}
 
-	count, err := SlashingEvents().Count(ctx, tx)
+	count, err := SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}
@@ -573,15 +573,15 @@ func testSlashingEventsUpsert(t *testing.T) {
 	}
 
 	// Attempt the UPDATE side of an UPSERT
-	if err = randomize.Struct(seed, &o, slashingEventDBTypes, false, slashingEventPrimaryKeyColumns...); err != nil {
-		t.Errorf("Unable to randomize SlashingEvent struct: %s", err)
+	if err = randomize.Struct(seed, &o, socialGraphDBTypes, false, socialGraphPrimaryKeyColumns...); err != nil {
+		t.Errorf("Unable to randomize SocialGraph struct: %s", err)
 	}
 
 	if err = o.Upsert(ctx, tx, true, nil, boil.Infer(), boil.Infer()); err != nil {
-		t.Errorf("Unable to upsert SlashingEvent: %s", err)
+		t.Errorf("Unable to upsert SocialGraph: %s", err)
 	}
 
-	count, err = SlashingEvents().Count(ctx, tx)
+	count, err = SocialGraphs().Count(ctx, tx)
 	if err != nil {
 		t.Error(err)
 	}

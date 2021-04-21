@@ -14,6 +14,8 @@ func TestUpsert(t *testing.T) {
 
 	t.Run("SlashingEvents", testSlashingEventsUpsert)
 
+	t.Run("SocialGraphs", testSocialGraphsUpsert)
+
 	t.Run("Stakes", testStakesUpsert)
 
 	t.Run("SyncLogs", testSyncLogsUpsert)

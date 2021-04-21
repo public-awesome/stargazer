@@ -434,6 +434,7 @@ func handleProtocolReward(ctx context.Context, db *sql.DB, attributes []abcitype
 	}
 	return nil
 }
+
 func handleLiveness(ctx context.Context, db *sql.DB, attributes []abcitypes.EventAttribute, height int64) error {
 	attrs := parseEventAttributes(attributes)
 	if attrs[slashingtypes.AttributeKeyAddress] == "" || attrs[slashingtypes.AttributeKeyMissedBlocks] == "" {
@@ -657,6 +658,60 @@ func handleStake(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, he
 	return tx.Commit()
 }
 
+func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+
+	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	buyer := attrs["buyer"]
+	creator := attrs["creator"]
+	username := attrs["username"]
+	validator := attrs["validator"]
+
+	cc, err := models.SocialGraphs(
+		models.SocialGraphWhere.BuyerAddress.EQ(buyer),
+		models.SocialGraphWhere.CreatorAddress.EQ(creator),
+		models.SocialGraphWhere.Username.EQ(username),
+		models.SocialGraphWhere.ValidatorAddress.EQ(validator),
+	).One(ctx, db)
+
+	if err != nil && err != sql.ErrNoRows {
+		return err
+	}
+	if err == sql.ErrNoRows {
+		cc := &models.SocialGraph{
+			Amount:           amount,
+			BuyerAddress:     buyer,
+			CreatorAddress:   creator,
+			Height:           height,
+			Username:         username,
+			ValidatorAddress: validator,
+		}
+
+		err = cc.Insert(ctx, db, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	} else {
+		cc.Amount = cc.Amount + amount
+		_, err = cc.Update(ctx, db, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+	}
+	return tx.Commit()
+}
+
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
 	for _, l := range logs {
 		for _, evt := range l.Events {
@@ -678,6 +733,11 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs
 				}
 			case "unstake":
 				err := handleStake(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			case "buy_creator_coin":
+				err := handleBuyCreatorCoin(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
