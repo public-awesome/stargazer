@@ -12,5 +12,7 @@ CREATE TABLE social_graph (
   deleted_at timestamp
 );
 
+CREATE INDEX relationship ON social_graph (buyer_address, creator_address);
+
 -- +migrate Down
 DROP TABLE social_graph;
