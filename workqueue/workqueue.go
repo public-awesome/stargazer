@@ -300,7 +300,7 @@ func (w *Worker) ExportBlock(ctx context.Context, b *tmctypes.ResultBlock, txs [
 		if err != nil {
 			return fmt.Errorf("error inserting tx %w", err)
 		}
-		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, txResponse.Logs)
+		err = parseLogs(ctx, db, b.Block.Height, b.Block.Time, txResponse)
 		if err != nil {
 			return fmt.Errorf("error parsing logs %w", err)
 		}
@@ -324,7 +324,7 @@ func parseEventAttributes(attributes []abcitypes.EventAttribute) map[string]stri
 	return attrs
 }
 
-func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time, txResponse *sdk.TxResponse) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -362,6 +362,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		TotalVotesDenom:  attrs["vote_denom"],
 		CurationEndTime:  endTime,
 		Timestamp:        ts,
+		TX:               txResponse.TxHash,
 	}
 	return p.Insert(ctx, db, boil.Infer())
 }
@@ -712,12 +713,12 @@ func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attr
 	return tx.Commit()
 }
 
-func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, logs sdk.ABCIMessageLogs) error {
-	for _, l := range logs {
+func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, txResponse *sdk.TxResponse) error {
+	for _, l := range txResponse.Logs {
 		for _, evt := range l.Events {
 			switch evt.Type {
 			case "post":
-				err := handlePost(ctx, db, evt.Attributes, height, ts)
+				err := handlePost(ctx, db, evt.Attributes, height, ts, txResponse)
 				if err != nil {
 					return err
 				}
