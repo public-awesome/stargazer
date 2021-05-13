@@ -50,6 +50,7 @@ type Post struct {
 	Metadata                string    `boil:"metadata" json:"metadata" toml:"metadata" yaml:"metadata"`
 	Locked                  bool      `boil:"locked" json:"locked" toml:"locked" yaml:"locked"`
 	ParentID                string    `boil:"parent_id" json:"parentID" toml:"parentID" yaml:"parentID"`
+	TX                      string    `boil:"tx" json:"tx" toml:"tx" yaml:"tx"`
 
 	R *postR `boil:"-" json:"-" toml:"-" yaml:"-"`
 	L postL  `boil:"-" json:"-" toml:"-" yaml:"-"`
@@ -82,6 +83,7 @@ var PostColumns = struct {
 	Metadata                string
 	Locked                  string
 	ParentID                string
+	TX                      string
 }{
 	ID:                      "id",
 	Height:                  "height",
@@ -109,6 +111,7 @@ var PostColumns = struct {
 	Metadata:                "metadata",
 	Locked:                  "locked",
 	ParentID:                "parent_id",
+	TX:                      "tx",
 }
 
 // Generated where
@@ -149,6 +152,7 @@ var PostWhere = struct {
 	Metadata                whereHelperstring
 	Locked                  whereHelperbool
 	ParentID                whereHelperstring
+	TX                      whereHelperstring
 }{
 	ID:                      whereHelperstring{field: "\"posts\".\"id\""},
 	Height:                  whereHelperint64{field: "\"posts\".\"height\""},
@@ -176,6 +180,7 @@ var PostWhere = struct {
 	Metadata:                whereHelperstring{field: "\"posts\".\"metadata\""},
 	Locked:                  whereHelperbool{field: "\"posts\".\"locked\""},
 	ParentID:                whereHelperstring{field: "\"posts\".\"parent_id\""},
+	TX:                      whereHelperstring{field: "\"posts\".\"tx\""},
 }
 
 // PostRels is where relationship names are stored.
@@ -195,9 +200,9 @@ func (*postR) NewStruct() *postR {
 type postL struct{}
 
 var (
-	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id"}
+	postAllColumns            = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes", "total_votes_amount", "total_votes_denom", "created_at", "updated_at", "deleted_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id", "tx"}
 	postColumnsWithoutDefault = []string{"id", "height", "vendor_id", "post_id", "creator", "reward_address", "timestamp", "curation_end_time", "body", "total_votes_denom", "deleted_at"}
-	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id"}
+	postColumnsWithDefault    = []string{"total_votes", "total_votes_amount", "created_at", "updated_at", "total_voter_count", "total_upvote_reward_amount", "total_upvote_reward_denom", "total_staked_amount", "body_hash", "chain_id", "owner", "contract_address", "metadata", "locked", "parent_id", "tx"}
 	postPrimaryKeyColumns     = []string{"id"}
 )
 
