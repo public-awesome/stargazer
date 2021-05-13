@@ -324,7 +324,7 @@ func parseEventAttributes(attributes []abcitypes.EventAttribute) map[string]stri
 	return attrs
 }
 
-func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time, txResponse *sdk.TxResponse) error {
+func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time, txHash string) error {
 	attrs := parseAttributes(attributes)
 	vendorID, err := strconv.Atoi(attrs["vendor_id"])
 	if err != nil {
@@ -362,7 +362,7 @@ func handlePost(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, hei
 		TotalVotesDenom:  attrs["vote_denom"],
 		CurationEndTime:  endTime,
 		Timestamp:        ts,
-		TX:               txResponse.TxHash,
+		TX:               txHash,
 	}
 	return p.Insert(ctx, db, boil.Infer())
 }
@@ -718,7 +718,7 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, txRe
 		for _, evt := range l.Events {
 			switch evt.Type {
 			case "post":
-				err := handlePost(ctx, db, evt.Attributes, height, ts, txResponse)
+				err := handlePost(ctx, db, evt.Attributes, height, ts, txResponse.TxHash)
 				if err != nil {
 					return err
 				}
