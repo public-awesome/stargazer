@@ -713,6 +713,46 @@ func handleBuyCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attr
 	return tx.Commit()
 }
 
+func handleSellCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Attribute, height int64, ts time.Time) error {
+	attrs := parseAttributes(attributes)
+
+	amount, err := strconv.ParseInt(attrs["amount"], 10, 64)
+	if err != nil {
+		return err
+	}
+
+	tx, err := db.BeginTx(ctx, nil)
+	if err != nil {
+		return err
+	}
+
+	seller := attrs["seller"]
+	creator := attrs["creator"]
+	username := attrs["username"]
+	validator := attrs["validator"]
+
+	cc, err := models.SocialGraphs(
+		models.SocialGraphWhere.BuyerAddress.EQ(seller),
+		models.SocialGraphWhere.CreatorAddress.EQ(creator),
+		models.SocialGraphWhere.Username.EQ(username),
+		models.SocialGraphWhere.ValidatorAddress.EQ(validator),
+	).One(ctx, db)
+
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	cc.Amount = cc.Amount - amount
+	_, err = cc.Update(ctx, db, boil.Infer())
+	if err != nil {
+		_ = tx.Rollback()
+		return err
+	}
+
+	return tx.Commit()
+}
+
 func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, txResponse *sdk.TxResponse) error {
 	for _, l := range txResponse.Logs {
 		for _, evt := range l.Events {
@@ -739,6 +779,11 @@ func parseLogs(ctx context.Context, db *sql.DB, height int64, ts time.Time, txRe
 				}
 			case "buy_creator_coin":
 				err := handleBuyCreatorCoin(ctx, db, evt.Attributes, height, ts)
+				if err != nil {
+					return err
+				}
+			case "sell_creator_coin":
+				err := handleSellCreatorCoin(ctx, db, evt.Attributes, height, ts)
 				if err != nil {
 					return err
 				}
