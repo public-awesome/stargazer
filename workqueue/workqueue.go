@@ -744,10 +744,20 @@ func handleSellCreatorCoin(ctx context.Context, db *sql.DB, attributes []sdk.Att
 	}
 
 	cc.Amount = cc.Amount - amount
-	_, err = cc.Update(ctx, db, boil.Infer())
-	if err != nil {
-		_ = tx.Rollback()
-		return err
+	if cc.Amount == int64(0) {
+		_, err = cc.Delete(ctx, db)
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+
+	} else {
+		_, err = cc.Update(ctx, db, boil.Infer())
+		if err != nil {
+			_ = tx.Rollback()
+			return err
+		}
+
 	}
 
 	return tx.Commit()
