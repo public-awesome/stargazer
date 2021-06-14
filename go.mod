@@ -11,7 +11,7 @@ require (
 	github.com/markbates/pkger v0.17.1
 	github.com/mitchellh/mapstructure v1.3.1 // indirect
 	github.com/public-awesome/stargaze v0.7.1-0.20210524174113-b6c8e47f9516
-	github.com/rs/zerolog v1.21.0
+	github.com/rs/zerolog v1.23.0
 	github.com/rubenv/sql-migrate v0.0.0-20200616145509-8d140a17f351
 	github.com/spf13/viper v1.7.1
 	github.com/tendermint/tendermint v0.34.10
