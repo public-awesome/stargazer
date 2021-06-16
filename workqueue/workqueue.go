@@ -11,6 +11,7 @@ import (
 	"time"
 
 	txtypes "github.com/cosmos/cosmos-sdk/types/tx"
+	"github.com/dgraph-io/ristretto"
 
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/public-awesome/stargazer/client"
@@ -59,7 +60,7 @@ func (w *Worker) WithGenesisHeight(height int64) {
 }
 
 // Start runs the listener that process blocks.
-func (w *Worker) Start(ctx context.Context) {
+func (w *Worker) Start(ctx context.Context, cache *ristretto.Cache, id int) {
 	for {
 		select {
 		case <-ctx.Done():
@@ -67,11 +68,12 @@ func (w *Worker) Start(ctx context.Context) {
 			return
 		case blockHeight := <-w.q:
 			err := w.process(ctx, blockHeight)
+			cache.Del(blockHeight)
 			if err != nil {
-				log.Error().Err(err).Int64("height", blockHeight).Msg("error processing block")
+				log.Error().Err(err).Int("worker_id", id).Int64("height", blockHeight).Msg("error processing block")
 				continue
 			}
-			log.Info().Int64("height", blockHeight).Msg("block synced")
+			log.Info().Int("worker_id", id).Int64("height", blockHeight).Msg("block synced")
 		}
 	}
 }
