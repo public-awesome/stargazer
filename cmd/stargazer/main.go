@@ -12,6 +12,8 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/dgraph-io/ristretto"
+
 	_ "github.com/lib/pq"
 	"github.com/markbates/pkger"
 	"github.com/public-awesome/stargaze/app"
@@ -102,6 +104,14 @@ func main() {
 		log.Fatal().Err(err).Msg("error initializing client")
 	}
 	log.Info().Str("rpc-endpoint", rpcEndpoint).Str("grpc-address", grpcAddress).Msg("client settings")
+	cache, err := ristretto.NewCache(&ristretto.Config{
+		NumCounters: 1e7,     // number of keys to track frequency of (10M).
+		MaxCost:     1 << 30, // maximum cost of cache (1GB).
+		BufferItems: 64,      // number of keys per Get buffer.
+	})
+	if err != nil {
+		panic(err)
+	}
 
 	// context cancelation setup
 	ctx, cancel := context.WithCancel(context.Background())
@@ -128,12 +138,16 @@ func main() {
 	}()
 	go startHTTP(ctx)
 
-	exportQueue := make(chan int64, 100)
+	exportQueue := make(chan int64, 1000)
 	go enqueueMissingBlocks(ctx, cp, db, exportQueue)
 	wk := workqueue.NewWorker(config.Marshaler, config.Amino, exportQueue, db, cp)
 	wk.WithGenesisHeight(genesisHeight)
-	go wk.Start(ctx)
-	startNewBlockListener(ctx, cp, exportQueue, db)
+	for i := 0; i < 4; i++ {
+		go func(ctx context.Context, c *ristretto.Cache, id int) {
+			wk.Start(ctx, c, id)
+		}(ctx, cache, i)
+	}
+	startNewBlockListener(ctx, cp, exportQueue, db, cache)
 
 }
 
@@ -175,7 +189,7 @@ func enqueueMissingBlocks(ctx context.Context, cp *client.Proxy, db *sql.DB, exp
 // startNewBlockListener subscribes to new block events via the Tendermint RPC
 // and enqueues each new block height onto the provided queue. It blocks as new
 // blocks are incoming.
-func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64, db *sql.DB) {
+func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue chan<- int64, db *sql.DB, cache *ristretto.Cache) {
 	eventCh, cancel, err := cp.SubscribeNewBlocks("stargazer-client")
 	defer cancel()
 	if err != nil {
@@ -205,7 +219,7 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 			exportQueue <- height
 		case <-retryBlocksTicker.C:
 			log.Info().Msg("retry pending blocks")
-			go retryBlocks(ctx, exportQueue, db)
+			go retryBlocks(ctx, exportQueue, db, cache)
 		case <-statusTicker.C:
 			_, err := cp.Status(ctx)
 			if err != nil {
@@ -215,14 +229,25 @@ func startNewBlockListener(ctx context.Context, cp *client.Proxy, exportQueue ch
 	}
 }
 
-func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB) {
+func retryBlocks(ctx context.Context, exportQueue chan<- int64, db *sql.DB, cache *ristretto.Cache) {
 	q := fmt.Sprintf("%s is null and %s < ? and %s > 1 ", models.SyncLogColumns.SyncedAt, models.SyncLogColumns.CreatedAt, models.SyncLogColumns.BlockHeight)
-	blocks, err := models.SyncLogs(qm.Where(q, time.Now().UTC().Add(time.Second*-20))).All(ctx, db)
+	blocks, err := models.SyncLogs(qm.Where(q, time.Now().UTC().Add(time.Second*-20)), qm.OrderBy(models.SyncLogColumns.BlockHeight), qm.Limit(1000)).All(ctx, db)
 	if err != nil {
 		log.Error().Err(err).Msg("error getting pending blocks")
 		return
 	}
+	skip := 0
+	reQueued := 0
 	for _, b := range blocks {
+		_, ok := cache.Get(b.BlockHeight)
+		if ok {
+			skip++
+			cache.SetWithTTL(b.BlockHeight, true, 1, time.Second*60)
+			continue
+		}
+		reQueued++
 		exportQueue <- b.BlockHeight
+		cache.SetWithTTL(b.BlockHeight, true, 1, time.Second*60)
 	}
+	log.Info().Int("ski", skip).Int("re_queued", reQueued).Msg("retry pending blocks")
 }
