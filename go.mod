@@ -3,6 +3,7 @@ module github.com/public-awesome/stargazer
 go 1.16
 
 require (
+	github.com/avast/retry-go v3.0.0+incompatible // indirect
 	github.com/cosmos/cosmos-sdk v0.42.4
 	github.com/dgraph-io/ristretto v0.1.0
 	github.com/friendsofgo/errors v0.9.2

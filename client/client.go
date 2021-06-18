@@ -7,6 +7,7 @@ import (
 	"os"
 	"time"
 
+	"github.com/avast/retry-go"
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/flags"
 	sdk "github.com/cosmos/cosmos-sdk/types"
@@ -150,17 +151,28 @@ func (p *Proxy) SubscribeNewBlocks(subscriber string) (<-chan tmctypes.ResultEve
 // if the transaction exists. An error is returned if the tx doesn't exist or
 // decoding fails.
 func (p *Proxy) Tx(hash string) (*sdk.TxResponse, error) {
-	initClientCtx := client.Context{}.
-		WithJSONMarshaler(p.encodingConfig.Marshaler).
-		WithInterfaceRegistry(p.encodingConfig.InterfaceRegistry).
-		WithTxConfig(p.encodingConfig.TxConfig).
-		WithLegacyAmino(p.encodingConfig.Amino).
-		WithInput(os.Stdin).
-		WithAccountRetriever(types.AccountRetriever{}).
-		WithBroadcastMode(flags.BroadcastBlock).
-		WithNodeURI(p.rpcNode).
-		WithClient(p.rpcClient)
-	return authclient.QueryTx(initClientCtx, hash)
+	var resp *sdk.TxResponse
+	err := retry.Do(func() (err error) {
+		initClientCtx := client.Context{}.
+			WithJSONMarshaler(p.encodingConfig.Marshaler).
+			WithInterfaceRegistry(p.encodingConfig.InterfaceRegistry).
+			WithTxConfig(p.encodingConfig.TxConfig).
+			WithLegacyAmino(p.encodingConfig.Amino).
+			WithInput(os.Stdin).
+			WithAccountRetriever(types.AccountRetriever{}).
+			WithBroadcastMode(flags.BroadcastBlock).
+			WithNodeURI(p.rpcNode).
+			WithClient(p.rpcClient)
+		resp, err = authclient.QueryTx(initClientCtx, hash)
+		if err != nil {
+			return err
+		}
+		return nil
+	}, retry.Attempts(3), retry.Delay(time.Millisecond*500), retry.LastErrorOnly(true))
+	if err != nil {
+		return nil, err
+	}
+	return resp, err
 }
 
 // Txs queries for all the transactions in a block. Transactions are returned
